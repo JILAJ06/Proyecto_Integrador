@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLINK - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Agregar Google Fonts para Konkhmer Sleokchher -->
+    <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
+</head>
+<!-- ...resto del HTML permanece igual... -->
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>CLINK</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <!-- Sección principal de navegación -->
+                <div class="nav-section-main">
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Venta</span>
+                    </a>
+                                    <!-- Línea divisoria -->
+                <div class="nav-divider"></div>
+                
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-box"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Empleados</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Graficas</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>Historial</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Corte de caja</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                </div>
+
+
+
+                <!-- Sección inferior - Logout -->
+                <div class="nav-section-bottom">
+                    <button class="logout-btn" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </div>
+                <div class="header-right">
+                    <span class="session-info">Sesión ####<br>Administrador</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="card" data-module="venta">
+                    <div class="card-icon">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                    <h3>Venta</h3>
+                </div>
+
+                <div class="card" data-module="inventario">
+                    <div class="card-icon">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h3>Inventario</h3>
+                </div>
+
+                <div class="card" data-module="productos">
+                    <div class="card-icon">
+                        <i class="fas fa-archive"></i>
+                    </div>
+                    <h3>Productos</h3>
+                </div>
+
+                <div class="card" data-module="clientes">
+                    <div class="card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Clientes</h3>
+                </div>
+
+                <div class="card" data-module="empleados">
+                    <div class="card-icon">
+                        <i class="fas fa-id-badge"></i>
+                    </div>
+                    <h3>Empleados</h3>
+                </div>
+
+                <div class="card" data-module="graficas">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Graficas</h3>
+                </div>
+
+                <div class="card" data-module="historial">
+                    <div class="card-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Historial</h3>
+                </div>
+
+                <div class="card" data-module="corte">
+                    <div class="card-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <h3>Corte de caja</h3>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
