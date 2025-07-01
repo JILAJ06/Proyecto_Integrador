@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navigation handling
     const navItems = document.querySelectorAll('.nav-item');
     const cards = document.querySelectorAll('.card');
+    const path = window.location.pathname;
+
 
     // Handle sidebar navigation
     navItems.forEach(item => {

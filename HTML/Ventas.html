@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLINK - Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>CLINK - Ventas</title>
+    <link rel="stylesheet" href="ventas.css">
+    <link rel="stylesheet" href="base.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Agregar Google Fonts para Konkhmer Sleokchher -->
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
 </head>
-<!-- ...resto del HTML permanece igual... -->
 <body>
     <div class="container">
-        <!-- Sidebar -->
+        <!-- Sidebar - Reutilizada del código anterior -->
         <aside class="sidebar">
             <div class="logo">
                 <i class="fas fa-cube"></i>
@@ -22,46 +21,46 @@
             <nav class="nav-menu">
                 <!-- Sección principal de navegación -->
                 <div class="nav-section-main">
-                    <a href="#" class="nav-item active">
+                    <a href="index.html" class="nav-item">
                         <i class="fas fa-home"></i>
                         <span>Inicio</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="Ventas.html" class="nav-item active">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
                     </a>
                                     <!-- Línea divisoria -->
                 <div class="nav-divider"></div>
                 
-                    <a href="#" class="nav-item">
+                    <a href="inventario.html" class="nav-item">
                         <i class="fas fa-clipboard-list"></i>
                         <span>Inventario</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="productos.html" class="nav-item">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="clientes.html" class="nav-item">
                         <i class="fas fa-users"></i>
                         <span>Clientes</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="empleados.html" class="nav-item">
                         <i class="fas fa-user-tie"></i>
                         <span>Empleados</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="graficas.html" class="nav-item">
                         <i class="fas fa-chart-line"></i>
                         <span>Graficas</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="historial.html" class="nav-item">
                         <i class="fas fa-history"></i>
                         <span>Historial</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="corte-caja.html" class="nav-item">
                         <i class="fas fa-cash-register"></i>
                         <span>Corte de caja</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="ayuda.html" class="nav-item">
                         <i class="fas fa-question-circle"></i>
                         <span>Ayuda</span>
                     </a>
@@ -83,8 +82,8 @@
             <!-- Header -->
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-home"></i>
-                    <span>Inicio</span>
+                    <i class="fas fa-cash-register"></i>
+                    <span>Ventas</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Sesión ####<br>Administrador</span>
@@ -94,67 +93,57 @@
                 </div>
             </header>
 
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <div class="card" data-module="venta">
-                    <div class="card-icon">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <h3>Venta</h3>
+            <!-- Ventas Content -->
+            <div class="ventas-container">
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-action btn-add">
+                        <i class="fas fa-plus"></i>
+                        Agregar producto
+                    </button>
+                    <button class="btn-action btn-remove">
+                        <i class="fas fa-minus"></i>
+                        Eliminar producto
+                    </button>
                 </div>
 
-                <div class="card" data-module="inventario">
-                    <div class="card-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <h3>Inventario</h3>
+                <!-- Products Table -->
+                <div class="table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Precio unitario</th>
+                                <th>Cantidad</th>
+                                <th>Sub total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>19198398</td>
+                                <td>Leche no se qué</td>
+                                <td>12.5</td>
+                                <td>2</td>
+                                <td>25</td>
+                            </tr>
+                            <!-- Más filas se pueden agregar aquí -->
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="card" data-module="productos">
-                    <div class="card-icon">
-                        <i class="fas fa-archive"></i>
+                <!-- Total and Pay Section -->
+                <div class="payment-section">
+                    <div class="total-container">
+                        <span class="total-label">Total</span>
+                        <span class="total-amount">$ 156.5</span>
                     </div>
-                    <h3>Productos</h3>
-                </div>
-
-                <div class="card" data-module="clientes">
-                    <div class="card-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3>Clientes</h3>
-                </div>
-
-                <div class="card" data-module="empleados">
-                    <div class="card-icon">
-                        <i class="fas fa-id-badge"></i>
-                    </div>
-                    <h3>Empleados</h3>
-                </div>
-
-                <div class="card" data-module="graficas">
-                    <div class="card-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Graficas</h3>
-                </div>
-
-                <div class="card" data-module="historial">
-                    <div class="card-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3>Historial</h3>
-                </div>
-
-                <div class="card" data-module="corte">
-                    <div class="card-icon">
-                        <i class="fas fa-hand-holding-usd"></i>
-                    </div>
-                    <h3>Corte de caja</h3>
+                    <button class="btn-pay">Pagar</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script src="ventas.js"></script>
 </body>
 </html>
