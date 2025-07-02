@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="graficas.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <title>Clink - Graficas</title>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>CLINK</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section-main">
+                    <a href="index.html" class="nav-item active" data-tooltip="Inicio">
+                        <i class="fas fa-home"></i>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="ventas.html" class="nav-item" data-tooltip="Venta">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Venta</span>
+                    </a>
+
+                    <div class="nav-divider"></div>
+
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
+                    </a>
+                    <a href="productos.html" class="nav-item" data-tooltip="Productos">
+                        <i class="fas fa-box"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item" data-tooltip="Clientes">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="empleados.html" class="nav-item" data-tooltip="Empleados">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Empleados</span>
+                    </a>
+                    <a href="graficas.html" class="nav-item" data-tooltip="Graficas de ventas">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Graficas</span>
+                    </a>
+                    <a href="historial.html" class="nav-item" data-tooltip="Historial de ventas">
+                        <i class="fas fa-history"></i>
+                        <span>Historial</span>
+                    </a>
+                    <a href="corte-caja.html" class="nav-item" data-tooltip="Corte de caja">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Corte de caja</span>
+                    </a>
+                    <a href="ayuda.html" class="nav-item" data-tooltip="Ayuda">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                </div>
+
+
+                <div class="nav-section-bottom">
+                    <button class="logout-btn" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+         <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Graficas</span>
+                </div>
+                <div class="header-right">
+                    <span class="session-info">Sesión ####<br>Administrador</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="graficas-container">
+                <!-- Primera gráfica -->
+                <div class="chart-wrapper">
+                    <h3>Ventas por Semana</h3>
+                    <canvas id="ventasChart" width="400" height="200"></canvas>
+                </div>
+
+                <!-- Segunda gráfica -->
+                <div class="chart-wrapper">
+                    <h3>Productos Más Vendidos</h3>
+                    <canvas id="productosChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <script>
+                // Gráfica de Ventas por Mes
+                const ventasCtx = document.getElementById('ventasChart').getContext('2d');
+                const ventasChart = new Chart(ventasCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado','Domingo'],
+                        datasets: [{
+                            label: 'Ventas ($)',
+                            data: [12000, 19000, 8000, 15000, 20000, 18000],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(255, 205, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)',
+                                'rgba(255, 159, 64, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 205, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Gráfica de Productos Más Vendidos
+                const productosCtx = document.getElementById('productosChart').getContext('2d');
+                const productosChart = new Chart(productosCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Coca Cola', 'Sabritas', 'Bimbo', 'Nestlé', 'Pepsi'],
+                        datasets: [{
+                            label: 'Unidades Vendidas',
+                            data: [65, 59, 80, 81, 56],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+        </main>
+    </div>
+</body>
+</html>

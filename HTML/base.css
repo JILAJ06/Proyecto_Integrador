@@ -30,6 +30,14 @@ body {
     z-index: 1000;
 }
 
+.sidebar.expanded {
+  width: 223px;
+}
+
+body.sidebar-expanded .sidebar {
+  width: 223px;
+}
+
 .sidebar:hover {
     width: 223px; /* Ancho expandido al hacer hover */
 }
@@ -101,7 +109,7 @@ body {
 .nav-section-main {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
     margin-bottom: 2rem;
 }
 
@@ -406,3 +414,16 @@ body {
   /* ya tenías justify-content:flex-start */
   justify-content: flex-start;
 }
+
+.sidebar,
+.nav-item,
+.nav-item i,
+.nav-item span,
+.logo,
+.logo span {
+  transition: all 0.5s ease;
+}
+
+
+
+

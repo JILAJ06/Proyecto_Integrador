@@ -1,0 +1,225 @@
+.productos-container {
+    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    margin: 20px;
+    box-shadow: none;
+}
+
+.productos-table {
+    width: 100%;
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+.productos-table thead {
+    background-color: #D8D8C0;
+    color: black;
+}
+
+.cont-neto{
+    width: 139px;
+}
+
+.medi{
+    width: 107px;
+}
+
+.preci{
+    width: 166px;
+}
+
+.productos-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 11px;
+    position: sticky;
+    top: 0;
+    text-transform: none;
+    border: 1px solid black;
+}
+
+.productos-table tr {
+    height: 80px;
+    width: 196px;
+    border: 1px solid black;
+}
+
+.productos-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.productos-table tbody tr:hover {
+    background: #f8f9ff;
+    transform: none;
+    box-shadow: none;
+}
+
+.productos-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.productos-table tbody tr:nth-child(even):hover {
+    background: #f0f4ff;
+}
+
+.productos-table td {
+    padding: 10px 8px;
+    border: 1px solid black;
+    vertical-align: middle;
+    color: #333;
+    font-weight: 400;
+    text-align: center;
+}
+
+/* Estilos específicos para diferentes columnas */
+.productos-table td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+    font-family: inherit;
+}
+
+.productos-table td:nth-child(2),
+.productos-table td:nth-child(3),
+.productos-table td:nth-child(4) {
+    text-align: left;
+    font-weight: 500;
+}
+
+.productos-table td:nth-child(9) {
+    text-align: right;
+    font-weight: 600;
+    color: #27ae60;
+}
+
+/* Estilos para los botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 45px;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-add {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-add:hover {
+    background: #d4f4d4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(45, 106, 45, 0.2);
+}
+
+.btn-edit {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-edit:hover {
+    background: #fff3c4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 124, 0, 0.2);
+}
+
+.btn-category {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-category:hover {
+    background: #e1bee7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(123, 31, 162, 0.2);
+}
+
+.btn-action i {
+    font-size: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .productos-container {
+        margin: 10px;
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .productos-table {
+        min-width: 1000px;
+        font-size: 12px;
+    }
+    
+    .productos-table th,
+    .productos-table td {
+        padding: 8px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .productos-container {
+        margin: 5px;
+        padding: 10px;
+    }
+    
+    .productos-table {
+        font-size: 11px;
+    }
+    
+    .productos-table th,
+    .productos-table td {
+        padding: 6px 4px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-action {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-action {
+        font-size: 13px;
+        padding: 10px 15px;
+        min-width: auto;
+    }
+}
+
+/* Eliminar efectos innecesarios */
+.productos-table tbody tr:empty {
+    display: none;
+}
+
+.loading-row {
+    height: 50px;
+    background: #f8f9fa;
+}

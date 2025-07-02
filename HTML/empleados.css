@@ -1,8 +1,9 @@
 .inventario-container {
     padding: 20px;
-    background: #f5f5f0;
-    border-radius: 8px;
+    background: transparent;
+    border-radius: 0;
     margin: 20px;
+    box-shadow: none;
 }
 
 .products-table {
@@ -30,39 +31,41 @@
     border: 1px solid black;
 }
 
-.column-codigo{
-    width: 196px;
-}
-
-.column-producto{
-    width: 295px;
-}
-
-.column-cat{
-    width: 170px;
-}
-
-.column-id{
-    width: 170px;
-}
-
-.column-marca,
-.column-precio,
-.column-fechaent,
-.column-fechasal,
-.column-stockalm,
-.column-stockex,
-.column-fechacad{
-    width: 190px;
-}
-
-.products-table tr {
-    height: 80px;
+.products-table tr{
+    height: 72px;
+    border-color: black;
     border: 1px solid black;
+}
+
+/* Anchos específicos para las columnas de empleados */
+.ID {
+    width: 109px;
+}
+
+.Nombre {
+    width: 309px;
+}
+
+.phone {
+    width: 250px;
+}
+
+.direc {
+    width: 230px;
+}
+
+.rol {
+    width: 109px;
+}
+
+
+.products-table th:last-child {
+    border-right: none;
 }
 
 .products-table tbody tr {
     transition: background-color 0.2s ease;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .products-table tbody tr:hover {
@@ -88,7 +91,11 @@
     text-align: center;
 }
 
-/* Estilos específicos para diferentes columnas */
+.products-table td:last-child {
+    border-right: none;
+}
+
+/* Estilos específicos para diferentes columnas de empleados */
 .products-table td:first-child {
     font-weight: 600;
     color: #2c3e50;
@@ -96,83 +103,32 @@
 }
 
 .products-table td:nth-child(2) {
+    text-align: left;
     font-weight: 500;
     color: #2c3e50;
-    text-align: left;
 }
 
-.products-table td:nth-child(3),
+.products-table td:nth-child(3) {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
 .products-table td:nth-child(4) {
     text-align: left;
+    font-weight: 400;
 }
 
-.products-table td:nth-child(9),
-.products-table td:nth-child(10) {
+.products-table td:nth-child(5) {
     text-align: center;
-    font-weight: 500;
-    color: #666;
-}
-
-.products-table td:nth-child(11) {
-    text-align: right;
     font-weight: 600;
-    color: #27ae60;
-}
-
-/* Responsive design */
-@media (max-width: 1200px) {
-    .inventario-container {
-        margin: 10px;
-        padding: 15px;
-        overflow-x: auto;
-    }
-    
-    .products-table {
-        min-width: 1000px;
-        font-size: 12px;
-    }
-    
-    .products-table th,
-    .products-table td {
-        padding: 8px 6px;
-    }
-}
-
-@media (max-width: 768px) {
-    .inventario-container {
-        margin: 5px;
-        padding: 10px;
-    }
-    
-    .products-table {
-        font-size: 11px;
-    }
-    
-    .products-table th,
-    .products-table td {
-        padding: 6px 4px;
-    }
-}
-
-/* Eliminar efectos innecesarios */
-.products-table tbody tr:empty {
-    display: none;
-}
-
-.products-table::before {
-    display: none;
-}
-
-.loading-row {
-    height: 50px;
-    background: #f8f9fa;
+    color: #495057;
 }
 
 /* Estilos para los botones de acción */
 .action-buttons {
     display: flex;
     gap: 45px;
-    justify-content: center;
+    justify-content: flex-end;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -224,20 +180,53 @@
 }
 
 .btn-category:hover {
-    background: #e1bee7;
+    background: #ffcdd2;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(123, 31, 162, 0.2);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
 }
 
 .btn-action i {
     font-size: 16px;
 }
 
-/* Responsive para botones */
+/* Responsive design */
+@media (max-width: 1200px) {
+    .inventario-container {
+        margin: 10px;
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .products-table {
+        min-width: 900px;
+        font-size: 12px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 8px 6px;
+    }
+}
+
 @media (max-width: 768px) {
+    .inventario-container {
+        margin: 5px;
+        padding: 10px;
+    }
+    
+    .products-table {
+        font-size: 11px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 6px 4px;
+    }
+    
     .action-buttons {
         flex-direction: column;
         gap: 10px;
+        justify-content: center;
     }
     
     .btn-action {
@@ -252,4 +241,14 @@
         padding: 10px 15px;
         min-width: auto;
     }
+}
+
+/* Eliminar efectos innecesarios */
+.products-table tbody tr:empty {
+    display: none;
+}
+
+.loading-row {
+    height: 50px;
+    background: #f8f9fa;
 }

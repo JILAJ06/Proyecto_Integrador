@@ -1,0 +1,45 @@
+.graficas-container {
+    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    margin: 20px;
+    display: grid;
+    grid-template-columns: 1fr;  /* Cambiar de "1fr 1fr" a "1fr" */
+    gap: 30px;
+    justify-items: center;
+
+}
+
+.chart-wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ddd;
+    width: 100%;
+    max-width: 1000px; /* Limitar el ancho máximo */
+    box-sizing: border-box;
+}
+
+.chart-wrapper h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .graficas-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 10px;
+        padding: 15px;
+    }
+}
