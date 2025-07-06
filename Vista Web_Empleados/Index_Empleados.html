@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLINK - Dashboard</title>
+    <link rel="stylesheet" href="base_Empleado.css">
+    <link rel="stylesheet" href="dashboard_Empleados.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>CLINK</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section-main">
+                    <a href="Index_Empleados.html" class="nav-item" data-tooltip="Inicio">
+                        <i class="fas fa-home"></i>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="Ventas_Empleados.html" class="nav-item" data-tooltip="Venta">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Venta</span>
+                    </a>
+
+                    <div class="nav-divider"></div>
+
+                    <a href="inventario_Empleados.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
+                    </a>
+                    
+                    <a href="clientes_Empleados.html" class="nav-item" data-tooltip="Clientes">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    
+                    <a href="historial_Empleados.html" class="nav-item" data-tooltip="Historial de ventas">
+                        <i class="fas fa-history"></i>
+                        <span>Historial</span>
+                    </a>
+                    
+                    <a href="ayuda.html" class="nav-item" data-tooltip="Ayuda">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                </div>
+
+
+                <div class="nav-section-bottom">
+                    <button class="logout-btn" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </div>
+                <div class="header-right">
+                    <span class="session-info">Sesión ####<br>Administrador</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="card" data-module="venta" onclick="window.location.href='ventas_Empleados.html'">
+                    <div class="card-icon">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                    <h3>Venta</h3>
+                </div>
+
+                <div class="card" data-module="inventario" onclick="window.location.href='inventario_Empleados.html'">
+                    <div class="card-icon">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h3>Inventario</h3>
+                </div>
+
+                <div class="card" data-module="clientes" onclick="window.location.href='clientes_Empleados.html'">
+                    <div class="card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Clientes</h3>
+                </div>
+
+                <div class="card" data-module="historial" onclick="window.location.href='historial_Empleados.html'">
+                    <div class="card-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Historial</h3>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    
+
+</body>
+</html>

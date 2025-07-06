@@ -1,0 +1,156 @@
+.clientes-container {
+    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    margin: 20px;
+    box-shadow: none;
+}
+.clientes-table {
+    margin-top: 8px;
+}
+.action-buttons {
+    display: contents;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    gap: 16px;
+}
+.action-buttons {
+    flex-direction: row-reverse;
+}
+.btn-action {
+    display: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    justify-content: center;
+    background: white;
+}
+
+.btn-add {
+    background: white;
+    color: black;
+}
+
+.btn-add:hover {
+    background: #d4f4d4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(45, 106, 45, 0.2);
+}
+
+.btn-action i {
+    font-size: 16px;
+}
+
+.clientes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    border: 2px solid #333;
+}
+
+.clientes-table thead {
+    background-color: #D8D8C0;
+    color: #333;
+}
+
+.clientes-table th {
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #D8D8C0;
+}
+
+.clientes-table tbody tr {
+    height: 50px;
+    transition: background-color 0.2s ease;
+    border: 1px solid #333;
+}
+
+.clientes-table tbody tr:hover {
+    background: #f8f9ff;
+}
+
+.clientes-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.clientes-table tbody tr:nth-child(even):hover {
+    background: #f0f4ff;
+}
+
+.clientes-table td {
+    padding: 15px 20px;
+    border: 1px solid #333;
+    vertical-align: middle;
+    color: #333;
+    font-weight: 400;
+    text-align: center;
+    height: 50px;
+}
+
+.clientes-table td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.clientes-table td:nth-child(2) {
+    text-align: left;
+    font-weight: 500;
+}
+
+.clientes-table td:nth-child(3) {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .clientes-container {
+        margin: 10px;
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .clientes-table {
+        min-width: 600px;
+        font-size: 12px;
+    }
+    
+    .clientes-table th,
+    .clientes-table td {
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .clientes-container {
+        margin: 5px;
+        padding: 10px;
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .btn-action {
+        width: 100%;
+        max-width: 200px;
+    }
+}
