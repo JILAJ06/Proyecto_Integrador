@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="empleados.css">
+    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
+    <link rel="stylesheet" href="/Vista Web Admin/css/productos.css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <script src="script.js"></script>
-    <title>Clink - Inventario</title>
+    <title>Clink - Productos</title>
 </head>
 <body>
     <div class="container">
@@ -78,7 +78,7 @@
             <header class="header">
                 <div class="header-left">
                     <i class="fas fa-box"></i>
-                    <span>Empleados</span>
+                    <span>Productos</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Sesión ####<br>Administrador</span>
@@ -87,44 +87,48 @@
                     </div>
                 </div>
             </header>
-                    <div class="inventario-container">
-                                <div class="action-buttons">
+        
+        <div class="productos-container">
+            <div class="action-buttons">
                     <button class="btn-action btn-add">
                         <i class="fas fa-plus"></i>
-                        Agregar
+                        Agregar producto
                     </button>
                     <button class="btn-action btn-edit">
                         <i class="fas fa-edit"></i>
-                        Editar
+                        Editar producto
                     </button>
                     <button class="btn-action btn-category">
-                        <i class="fas fa-filter"></i>
+                        <i class="fas fa-times-circle"></i>
                         Eliminar
                     </button>
                 </div>
-                <table class="products-table">
-                    <thead>
-                        <tr>
-                            <th class="ID">ID</th>
-                            <th class="Nombre">Nombre</th>
-                            <th class="phone">Teléfono</th>
-                            <th class="direc">Dirección</th>
-                            <th class="rol">Puesto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                    </tbody>
-                </table>
-        </div>
 
+            <table class="productos-table">
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Categoria</th>
+                        <th>Marca</th>
+                        <th>Producto</th>
+                        <th>Envase</th>
+                        <th>Variedad</th>
+                        <th class="cont-neto">Contenido neto</th>
+                        <th class="medi">Medida</th>
+                        <th class="Preci">Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table> 
+        </div>
 </body>
 </html>

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLINK - Dashboard</title>
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="dashboard.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
+    <link rel="stylesheet" href="/Vista Web Admin/css/empleados.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <script src="script.js"></script>
+    <title>Clink - Inventario</title>
 </head>
 <body>
     <div class="container">
@@ -21,7 +21,7 @@
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item" data-tooltip="Inicio">
+                    <a href="index.html" class="nav-item active" data-tooltip="Inicio">
                         <i class="fas fa-home"></i>
                         <span>Inicio</span>
                     </a>
@@ -74,13 +74,11 @@
                 </div>
             </nav>
         </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
+         <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-home"></i>
-                    <span>Inicio</span>
+                    <i class="fas fa-box"></i>
+                    <span>Empleados</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Sesión ####<br>Administrador</span>
@@ -89,69 +87,44 @@
                     </div>
                 </div>
             </header>
-
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <div class="card" data-module="venta" onclick="window.location.href='ventas.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <h3>Venta</h3>
+                    <div class="inventario-container">
+                                <div class="action-buttons">
+                    <button class="btn-action btn-add">
+                        <i class="fas fa-plus"></i>
+                        Agregar
+                    </button>
+                    <button class="btn-action btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Editar
+                    </button>
+                    <button class="btn-action btn-category">
+                        <i class="fas fa-filter"></i>
+                        Eliminar
+                    </button>
                 </div>
-
-                <div class="card" data-module="inventario" onclick="window.location.href='inventario.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <h3>Inventario</h3>
-                </div>
-
-                <div class="card" data-module="productos" onclick="window.location.href='productos.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-archive"></i>
-                    </div>
-                    <h3>Productos</h3>
-                </div>
-
-                <div class="card" data-module="clientes" onclick="window.location.href='clientes.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3>Clientes</h3>
-                </div>
-
-                <div class="card" data-module="empleados" onclick="window.location.href='empleados.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-id-badge"></i>
-                    </div>
-                    <h3>Empleados</h3>
-                </div>
-
-                <div class="card" data-module="graficas" onclick="window.location.href='graficas.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Graficas</h3>
-                </div>
-
-                <div class="card" data-module="historial" onclick="window.location.href='historial.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3>Historial</h3>
-                </div>
-
-                <div class="card" data-module="corte" onclick="window.location.href='corte-caja.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-hand-holding-usd"></i>
-                    </div>
-                    <h3>Corte de caja</h3>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th class="ID">ID</th>
+                            <th class="Nombre">Nombre</th>
+                            <th class="phone">Teléfono</th>
+                            <th class="direc">Dirección</th>
+                            <th class="rol">Puesto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+        </div>
 
 </body>
 </html>
