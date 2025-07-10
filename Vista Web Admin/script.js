@@ -34,5 +34,3 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-import { getClientes } from '/Vista Web Admin/src/Servicios/clientesServices.js';
-
