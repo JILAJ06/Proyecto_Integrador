@@ -28,6 +28,13 @@ export async function postClientes(datos) {
     const url_endpoint = 'https://jsonplaceholder.typicode.com/users'; // Replace with your actual API endpoint\
 
     try{
+        //quitar este comentario despues de acabar los formularios
+        /*const datos = {
+        nombre: document.querySelector('#nombre').value,
+        telefono: document.querySelector('#telefono').value,
+        direccion: document.querySelector('#direccion').value
+        };*/
+
         const response = await fetch(url_endpoint, {
             method: 'post',
             headers: {

@@ -1,0 +1,297 @@
+.historial-container {
+    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    margin: 20px;
+    box-shadow: none;
+}
+
+.products-table {
+    width: 100%;
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+.products-table thead {
+    background-color: #D8D8C0;
+    color: black;
+}
+
+.products-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 11px;
+    position: sticky;
+    top: 0;
+    text-transform: none;
+    border: 1px solid black;
+}
+
+.products-table tr {
+    height: 80px;
+    border: 1px solid black;
+}
+
+.products-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.products-table tbody tr:hover {
+    background: #f8f9ff;
+    transform: none;
+    box-shadow: none;
+}
+
+.products-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.products-table tbody tr:nth-child(even):hover {
+    background: #f0f4ff;
+}
+
+.products-table td {
+    padding: 10px 8px;
+    border: 1px solid black;
+    vertical-align: middle;
+    color: #333;
+    font-weight: 400;
+    text-align: center;
+}
+
+/* Estilos específicos para diferentes columnas */
+.products-table td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+    font-family: inherit;
+}
+
+.products-table td:nth-child(2) {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.products-table td:nth-child(3),
+.products-table td:nth-child(4) {
+    text-align: left;
+    font-weight: 500;
+}
+
+.products-table td:nth-child(5) {
+    font-weight: 500;
+    color: #666;
+}
+
+.products-table td:nth-child(6) {
+    text-align: right;
+    font-weight: 600;
+    color: #27ae60;
+}
+
+/* Estilos para los botones de acción y dropdowns */
+.action-buttons {
+    display: flex;
+    gap: 45px;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-delete {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-delete:hover {
+    background: #ffcdd2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+}
+
+.btn-export {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-export:hover {
+    background: #e1bee7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(123, 31, 162, 0.2);
+}
+
+.btn-action i {
+    font-size: 16px;
+}
+
+/* Dropdown personalizado */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid black;
+    border-radius: 25px;
+    background: white;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-dropdown:hover {
+    background: #f0f4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+}
+
+.dropdown-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-content a:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-content a:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .historial-container {
+        margin: 10px;
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .products-table {
+        min-width: 800px;
+        font-size: 12px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 8px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .historial-container {
+        margin: 5px;
+        padding: 10px;
+    }
+    
+    .products-table {
+        font-size: 11px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 6px 4px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .btn-action,
+    .btn-dropdown {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-action,
+    .btn-dropdown {
+        font-size: 13px;
+        padding: 10px 15px;
+        min-width: auto;
+    }
+}
+
+/* Eliminar efectos innecesarios */
+.products-table tbody tr:empty {
+    display: none;
+}
+
+.loading-row {
+    height: 50px;
+    background: #f8f9fa;
+}

@@ -27,12 +27,18 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     min-width: 120px;
     justify-content: center;
-    background: white;
 }
 
 .btn-add {
-    background: white;
+    background: #d8d8C0;
     color: black;
+    border: 1px solid #a8d8a8;
+}
+
+.btn-edit{
+    background: #d8d8C0;
+    color: black;
+    border: 1px solid #a8d8a8;
 }
 
 .btn-add:hover {

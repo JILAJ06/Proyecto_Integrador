@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
-    <link rel="stylesheet" href="/Vista Web Admin/css/historial.css">
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="historial.css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <script src="script.js"></script>
@@ -77,7 +77,7 @@
          <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-history"></i>
                     <span>Historial</span>
                 </div>
                 <div class="header-right">
@@ -87,5 +87,110 @@
                     </div>
                 </div>
             </header>
+
+            <div class="historial-container">
+                <div class="action-buttons">
+                    <!-- Dropdown Venta -->
+                    <div class="dropdown">
+                        <button class="btn-action btn-dropdown" onclick="toggleDropdown('ventaDropdown')">
+                            <i class="fas fa-cash-register"></i>
+                            Venta
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        <div class="dropdown-content" id="ventaDropdown">
+                            <a href="#" onclick="filterByVenta('todas')">
+                                <i class="fas fa-list"></i> Todas las ventas
+                            </a>
+                            <a href="#" onclick="filterByVenta('matutina')">
+                                <i class="fas fa-sun"></i> Venta matutina
+                            </a>
+                            <a href="#" onclick="filterByVenta('vespertina')">
+                                <i class="fas fa-moon"></i> Venta vespertina
+                            </a>
+                            <a href="#" onclick="filterByVenta('nocturna')">
+                                <i class="fas fa-star"></i> Venta nocturna
+                            </a>
+                            <a href="#" onclick="filterByVenta('hoy')">
+                                <i class="fas fa-calendar-day"></i> Ventas de hoy
+                            </a>
+                            <a href="#" onclick="filterByVenta('ayer')">
+                                <i class="fas fa-calendar-minus"></i> Ventas de ayer
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Meses -->
+                    <div class="dropdown">
+                        <button class="btn-action btn-dropdown" onclick="toggleDropdown('mesesDropdown')">
+                            <i class="fas fa-calendar"></i>
+                            Meses
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        <div class="dropdown-content" id="mesesDropdown">
+                            <a href="#" onclick="filterByMonth('enero')">
+                                <i class="fas fa-calendar-alt"></i> Enero
+                            </a>
+                            <a href="#" onclick="filterByMonth('febrero')">
+                                <i class="fas fa-calendar-alt"></i> Febrero
+                            </a>
+                            <a href="#" onclick="filterByMonth('marzo')">
+                                <i class="fas fa-calendar-alt"></i> Marzo
+                            </a>
+                            <a href="#" onclick="filterByMonth('abril')">
+                                <i class="fas fa-calendar-alt"></i> Abril
+                            </a>
+                            <a href="#" onclick="filterByMonth('mayo')">
+                                <i class="fas fa-calendar-alt"></i> Mayo
+                            </a>
+                            <a href="#" onclick="filterByMonth('junio')">
+                                <i class="fas fa-calendar-alt"></i> Junio
+                            </a>
+                            <a href="#" onclick="filterByMonth('todos')">
+                                <i class="fas fa-list"></i> Todos los meses
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Botón Exportar -->
+                    <button class="btn-action btn-export">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+
+                    <!-- Botón Eliminar -->
+                    <button class="btn-action btn-delete">
+                        <i class="fas fa-trash"></i>
+                        Eliminar
+                    </button>
+                </div>
+
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>ID de venta</th>
+                            <th>Producto</th>
+                            <th>Categoria</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <script src="dropdown.js"></script>
+    </div>
 </body>
 </html>
