@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLINK - Dashboard</title>
-    <link rel="stylesheet" href="base_Empleado.css">
-    <link rel="stylesheet" href="dashboard_Empleados.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Vista Web_Empleados/CSS/base_Empleado.css">
+    <link rel="stylesheet" href="/Vista Web_Empleados/CSS/clientes_Empleados.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
-    <script src="script.js"></script>
+    <script src="/Vista Web_Empleados/src/sidebar_Empleados.js"></script>
+    <title>Clink - Clientes</title>
 </head>
 <body>
     <div class="container">
@@ -21,7 +21,7 @@
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="Index_Empleados.html" class="nav-item" data-tooltip="Inicio">
+                    <a href="Index_Empleados.html" class="nav-item active" data-tooltip="Inicio">
                         <i class="fas fa-home"></i>
                         <span>Inicio</span>
                     </a>
@@ -46,7 +46,7 @@
                         <i class="fas fa-history"></i>
                         <span>Historial</span>
                     </a>
-                    
+                   
                     <a href="ayuda.html" class="nav-item" data-tooltip="Ayuda">
                         <i class="fas fa-question-circle"></i>
                         <span>Ayuda</span>
@@ -61,13 +61,11 @@
                 </div>
             </nav>
         </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
+         <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-home"></i>
-                    <span>Inicio</span>
+                    <i class="fas fa-box"></i>
+                    <span>Clientes</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Sesión ####<br>Administrador</span>
@@ -76,42 +74,36 @@
                     </div>
                 </div>
             </header>
+        <div class="clientes-container">
+             <!-- Botón de agregar -->
+                <div class="action-buttons">
+                    <button class="btn-action btn-add">
+                        <i class="fas fa-plus"></i>
+                        Agregar
+                    </button>
 
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <div class="card" data-module="venta" onclick="window.location.href='ventas_Empleados.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <h3>Venta</h3>
-                </div>
-
-                <div class="card" data-module="inventario" onclick="window.location.href='inventario_Empleados.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <h3>Inventario</h3>
-                </div>
-
-                <div class="card" data-module="clientes" onclick="window.location.href='clientes_Empleados.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3>Clientes</h3>
-                </div>
-
-                <div class="card" data-module="historial" onclick="window.location.href='historial_Empleados.html'">
-                    <div class="card-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3>Historial</h3>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    
-
+                <!-- Tabla de clientes -->
+                <table class="clientes-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Numero de Telefono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+        </div>
 </body>
 </html>

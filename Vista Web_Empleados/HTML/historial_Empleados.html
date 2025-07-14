@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="base_Empleado.css">
-    <link rel="stylesheet" href="inventario_Empleados.css">
+    <link rel="stylesheet" href="/Vista Web_Empleados/CSS/base_Empleado.css">
+    <link rel="stylesheet" href="/Vista Web_Empleados/CSS/historial_Empleados.css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
-    <script src="script.js"></script>
-    <title>Clink - Inventario</title>
+    <script src="/Vista Web_Empleados/src/script.js"></script>
+    <title>Clink - Historial</title>
 </head>
 <body>
     <div class="container">
@@ -21,7 +21,7 @@
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="Index_Empleados.html" class="nav-item" data-tooltip="Inicio">
+                    <a href="Index_Empleados.html" class="nav-item active" data-tooltip="Inicio">
                         <i class="fas fa-home"></i>
                         <span>Inicio</span>
                     </a>
@@ -46,7 +46,7 @@
                         <i class="fas fa-history"></i>
                         <span>Historial</span>
                     </a>
-                   
+                    
                     <a href="ayuda.html" class="nav-item" data-tooltip="Ayuda">
                         <i class="fas fa-question-circle"></i>
                         <span>Ayuda</span>
@@ -64,8 +64,8 @@
          <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Inventario</span>
+                    <i class="fas fa-box"></i>
+                    <span>Historial</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Sesión ####<br>Administrador</span>
@@ -75,49 +75,40 @@
                 </div>
             </header>
 
-            <div class="inventario-container">
+             <div class="historial_container">
                                 <div class="action-buttons">
-                    <button class="btn-action btn-add">
-                        <i class="fas fa-plus"></i>
-                        Agregar lote
-                    </button>
-                    <button class="btn-action btn-edit">
-                        <i class="fas fa-edit"></i>
-                        Modificar lote
-                    </button>
-                    <button class="btn-action btn-category">
+                    <button class="btn-action btn-sale">
                         <i class="fas fa-filter"></i>
-                        Categoria
+                        Venta
+                    </button>
+                    <button class="btn-action btn-month">
+                        <i class="fas fa-calendar-alt"></i>
+                        Mes
                     </button>
                 </div>
                 <table class="products-table">
                     <thead>
                         <tr>
-                            <th class="column-codigo">Código</th>
+                            <th class="column-fecha">Fecha</th>
+                            <th class="column-IDventa">ID de Venta</th>
                             <th class="column-producto">Producto</th>
-                            <th class="column-cat">Categoria</th>
-                            <th class="column-marca">Marca</th>
-                            <th class="column-fechacad">Fecha de Caducidad</th>
-                            <th class="column-id">ID de registro</th>
-                            <th class="column-fechaent">Fecha de Entrada</th>
-                            <th class="column-fechasal">Fecha de Salida</th>
-                            <th class="column-stockalm">Stock en Almacen</th>
-                            <th class="column-stockex">Stock en Exhibicion</th>
-                            <th class="column-precio">Precio unitario</th>
+                            <th class="column-categoria">Categoria</th>
+                            <th class="column-cantidad">Cantidad</th>
+                            <th class="column-total">Total</th>
+
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
                     </tbody>
                 </table>
-        </div>
 </body>
 </html>
