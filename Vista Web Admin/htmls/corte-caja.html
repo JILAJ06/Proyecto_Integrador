@@ -87,5 +87,53 @@
                     </div>
                 </div>
             </header>
+        <section class="corte-caja-section">
+            <div class="corte-caja-card">
+                <table class="corte-caja-table" id="corteCajaTable">
+                    <tr>
+                        <td class="label">Fecha:</td>
+                        <td class="value" id="fecha">DD/MM/AAAA</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Empleado:</td>
+                        <td class="value" id="empleado">------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Cantidad Inicial:</td>
+                        <td class="value" id="cantidadInicial">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Ingresos:</td>
+                        <td class="value" id="ingresos">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Ganancias:</td>
+                        <td class="value" id="ganancias">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total a entregar:</td>
+                        <td class="value" id="totalEntregar">$------</td>
+                    </tr>
+                </table>
+                <div class="corte-caja-actions">
+                    <button class="corte-caja-btn" id="cargarCajaBtn">Cargar caja</button>
+                    <button class="corte-caja-btn">Cerrar caja</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        document.getElementById('cargarCajaBtn').addEventListener('click', function() {
+            // Simulación de datos
+            const fecha = new Date();
+            const fechaStr = fecha.toLocaleDateString('es-MX');
+            document.getElementById('fecha').textContent = fechaStr;
+            document.getElementById('empleado').textContent = 'Juan Chin Chin';
+            document.getElementById('cantidadInicial').textContent = '$1,000.00';
+            document.getElementById('ingresos').textContent = '$2,500.00';
+            document.getElementById('ganancias').textContent = '$1,500.00';
+            document.getElementById('totalEntregar').textContent = '$2,500.00';
+        });
+    </script>
 </body>
 </html>
