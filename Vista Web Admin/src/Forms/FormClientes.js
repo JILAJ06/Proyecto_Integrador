@@ -71,21 +71,36 @@ function setupEventListeners() {
     setupRowSelection();
 }
 
-// Configurar selección de filas
-function setupRowSelection() {
-    const tabla = document.querySelector('.clientes-table tbody');
-    if (tabla) {
-        tabla.addEventListener('click', function(e) {
-            const fila = e.target.closest('tr');
-            if (fila && fila.querySelector('td') && fila.querySelector('td').textContent.trim() !== '' && fila.querySelector('td').textContent.trim() !== '\u00A0') {
-                seleccionarFila(fila);
-            }
-        });
-    }
-}
-
-// Seleccionar fila
+// Seleccionar fila - CORREGIR ESTA FUNCIÓN
 function seleccionarFila(fila) {
+    // Asegurar que los estilos CSS para selección existan
+    if (!document.getElementById('row-selection-styles')) {
+        const style = document.createElement('style');
+        style.id = 'row-selection-styles';
+        style.textContent = `
+            .clientes-table tbody tr.selected {
+                background-color: rgba(212, 197, 161, 0.5) !important;
+                border-left: 4px solid #8B7355 !important;
+                box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2) !important;
+            }
+            
+            .clientes-table tbody tr {
+                cursor: pointer !important;
+                transition: all 0.2s ease !important;
+            }
+            
+            .clientes-table tbody tr:hover {
+                background-color: rgba(212, 197, 161, 0.2) !important;
+                transform: translateY(-1px) !important;
+            }
+            
+            .clientes-table tbody tr.selected:hover {
+                background-color: rgba(212, 197, 161, 0.6) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
     // Remover selección anterior
     document.querySelectorAll('.clientes-table tbody tr').forEach(tr => {
         tr.classList.remove('selected');
@@ -94,262 +109,105 @@ function seleccionarFila(fila) {
     // Seleccionar nueva fila
     fila.classList.add('selected');
     filaSeleccionada = fila;
+    
+    console.log('Fila seleccionada:', filaSeleccionada); // Para debug
+    
+    // Obtener datos del cliente seleccionado
+    const celdas = fila.querySelectorAll('td');
+    if (celdas.length >= 3) {
+        const clienteData = {
+            id: celdas[0].textContent,
+            nombre: celdas[1].textContent,
+            telefono: celdas[2].textContent
+        };
+        console.log('Cliente seleccionado:', clienteData); // Para debug
+    }
 }
 
-// Función para crear el modal de agregar cliente
+// Configurar selección de filas - MEJORAR ESTA FUNCIÓN
+function setupRowSelection() {
+    const tabla = document.querySelector('.clientes-table tbody');
+    if (tabla) {
+        tabla.addEventListener('click', function(e) {
+            const fila = e.target.closest('tr');
+            if (fila && fila.children.length > 0) {
+                const primeraCelda = fila.children[0];
+                const contenidoCelda = primeraCelda.textContent.trim();
+                
+                // Solo seleccionar si la fila tiene contenido real (no está vacía)
+                if (contenidoCelda && 
+                    contenidoCelda !== '' && 
+                    contenidoCelda !== '\u00A0' && 
+                    contenidoCelda !== '&nbsp;' &&
+                    !isNaN(parseInt(contenidoCelda))) { // Verificar que sea un ID válido
+                    
+                    seleccionarFila(fila);
+                }
+            }
+        });
+    } else {
+        console.error('No se encontró la tabla de clientes para configurar selección');
+    }
+}
+
+// Función para crear el modal de agregar cliente (ACTUALIZADA con diseño de formsInventario.js)
 function crearModalCliente() {
     console.log('Creando modal de cliente...');
     
     // Verificar si ya existe un modal
-    const modalExistente = document.querySelector('.modal-overlay');
+    const modalExistente = document.getElementById('modal-add-cliente');
     if (modalExistente) {
         modalExistente.remove();
     }
 
-    // Crear el overlay del modal
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    
-    // Crear el contenedor del modal
-    const modalContainer = document.createElement('div');
-    modalContainer.className = 'modal-container cliente-modal';
-    
-    // HTML del modal
-    modalContainer.innerHTML = `
-        <div class="modal-content">
-            <div class="form-group">
-                <label for="nombreCliente">Escriba el nombre</label>
-                <input type="text" id="nombreCliente" class="form-input" placeholder="">
+    // Crear el modal con el diseño de formsInventario.js
+    const modal = document.createElement('div');
+    modal.id = 'modal-add-cliente';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Agregar Nuevo Cliente</h3>
+                <button class="modal-close">&times;</button>
             </div>
-            
-            <div class="form-group">
-                <label for="telefonoCliente">Escriba el teléfono</label>
-                <input type="tel" id="telefonoCliente" class="form-input" placeholder="Ejem. 961-XXX-XXXX">
-            </div>
-            
-            <div class="modal-buttons">
-                <button type="button" class="btn-accept-cliente">Aceptar</button>
-                <button type="button" class="btn-cancel-cliente">Cancelar</button>
-            </div>
+            <form id="form-add-cliente" class="modal-form">
+                <div class="form-group">
+                    <label>Nombre del cliente</label>
+                    <input type="text" name="nombre" required placeholder="Juan Pérez">
+                </div>
+                
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" name="telefono" required placeholder="961-123-4567">
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-accept">Aceptar</button>
+                </div>
+            </form>
         </div>
     `;
-
-    // Agregar el modal al overlay
-    modalOverlay.appendChild(modalContainer);
     
-    // Agregar el overlay al documento
-    document.body.appendChild(modalOverlay);
+    document.body.appendChild(modal);
     
-    // Aplicar estilos
-    aplicarEstilosModal();
+    // Aplicar estilos del formulario de inventario
+    aplicarEstilosModalFormularioClientes();
     
     // Configurar eventos del modal
-    setupModalClienteEvents(modalOverlay);
+    setupModalFormularioEventsClientes(modal);
     
     // Mostrar modal
+    modal.classList.add('active');
+    
+    // Auto-enfocar primer input
     setTimeout(() => {
-        modalOverlay.classList.add('active');
-        const nombreInput = document.getElementById('nombreCliente');
-        if (nombreInput) {
-            nombreInput.focus();
-        }
-    }, 10);
+        const primerInput = modal.querySelector('input[name="nombre"]');
+        if (primerInput) primerInput.focus();
+    }, 300);
 }
 
-// Función para configurar los eventos del modal de cliente (agregar)
-function setupModalClienteEvents(modalOverlay) {
-    const btnAceptar = modalOverlay.querySelector('.btn-accept-cliente');
-    const btnCancelar = modalOverlay.querySelector('.btn-cancel-cliente');
-    const nombreInput = modalOverlay.querySelector('#nombreCliente');
-    const telefonoInput = modalOverlay.querySelector('#telefonoCliente');
-
-    // Evento para cerrar modal con Escape
-    function handleEscape(e) {
-        if (e.key === 'Escape') {
-            cerrarModal();
-        }
-    }
-
-    document.addEventListener('keydown', handleEscape);
-
-    // Evento para cerrar modal al hacer clic fuera
-    modalOverlay.addEventListener('click', function(e) {
-        if (e.target === modalOverlay) {
-            cerrarModal();
-        }
-    });
-
-    // Evento del botón cancelar
-    btnCancelar.addEventListener('click', cerrarModal);
-
-    // Evento del botón aceptar
-    btnAceptar.addEventListener('click', function() {
-        const nombre = nombreInput.value.trim();
-        const telefono = telefonoInput.value.trim();
-
-        // Validar campos
-        if (!nombre) {
-            mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
-            nombreInput.focus();
-            return;
-        }
-
-        if (!telefono) {
-            mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
-            telefonoInput.focus();
-            return;
-        }
-
-        // Validar formato de teléfono (opcional)
-        const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
-        if (!telefonoRegex.test(telefono)) {
-            mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
-            telefonoInput.focus();
-            return;
-        }
-
-        // Crear objeto cliente
-        const nuevoCliente = {
-            id: Date.now(), // ID único basado en timestamp
-            nombre: nombre,
-            telefono: telefono,
-            fechaRegistro: new Date().toLocaleDateString()
-        };
-
-        // Agregar cliente al array
-        clientes.push(nuevoCliente);
-        
-        // Guardar en localStorage
-        localStorage.setItem('clientes', JSON.stringify(clientes));
-
-        console.log('Cliente agregado:', nuevoCliente);
-
-        // Actualizar la tabla
-        cargarTablaClientes();
-
-        // Mostrar mensaje de éxito
-        mostrarToast('Cliente agregado exitosamente', 'success');
-
-        // Cerrar modal
-        cerrarModal();
-    });
-
-    // Función para cerrar el modal
-    function cerrarModal() {
-        document.removeEventListener('keydown', handleEscape);
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            modalOverlay.remove();
-        }, 300);
-    }
-
-    // Permitir envío con Enter
-    [nombreInput, telefonoInput].forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                btnAceptar.click();
-            }
-        });
-    });
-}
-
-// Función para configurar los eventos del modal de editar
-function setupModalEditarEvents(modalOverlay) {
-    const btnAceptar = modalOverlay.querySelector('.btn-accept-cliente');
-    const btnCancelar = modalOverlay.querySelector('.btn-cancel-cliente');
-    const nombreInput = modalOverlay.querySelector('#editNombreCliente');
-    const telefonoInput = modalOverlay.querySelector('#editTelefonoCliente');
-    const clienteId = parseInt(btnAceptar.getAttribute('data-id'));
-
-    // Evento para cerrar modal con Escape
-    function handleEscape(e) {
-        if (e.key === 'Escape') {
-            cerrarModal();
-        }
-    }
-
-    document.addEventListener('keydown', handleEscape);
-
-    // Evento para cerrar modal al hacer clic fuera
-    modalOverlay.addEventListener('click', function(e) {
-        if (e.target === modalOverlay) {
-            cerrarModal();
-        }
-    });
-
-    // Evento del botón cancelar
-    btnCancelar.addEventListener('click', cerrarModal);
-
-    // Evento del botón aceptar (guardar cambios)
-    btnAceptar.addEventListener('click', function() {
-        const nombre = nombreInput.value.trim();
-        const telefono = telefonoInput.value.trim();
-
-        // Validar campos
-        if (!nombre) {
-            mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
-            nombreInput.focus();
-            return;
-        }
-
-        if (!telefono) {
-            mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
-            telefonoInput.focus();
-            return;
-        }
-
-        // Validar formato de teléfono
-        const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
-        if (!telefonoRegex.test(telefono)) {
-            mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
-            telefonoInput.focus();
-            return;
-        }
-
-        // Actualizar cliente
-        const datosActualizados = {
-            nombre: nombre,
-            telefono: telefono
-        };
-
-        const clienteActualizado = editarCliente(clienteId, datosActualizados);
-        
-        if (clienteActualizado) {
-            console.log('Cliente actualizado:', clienteActualizado);
-            
-            // Actualizar la tabla
-            cargarTablaClientes();
-            
-            // Mostrar mensaje de éxito
-            mostrarToast('Cliente actualizado exitosamente', 'success');
-            
-            // Cerrar modal
-            cerrarModal();
-        } else {
-            mostrarToast('Error al actualizar el cliente', 'error');
-        }
-    });
-
-    // Función para cerrar el modal
-    function cerrarModal() {
-        document.removeEventListener('keydown', handleEscape);
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            modalOverlay.remove();
-        }, 300);
-    }
-
-    // Permitir envío con Enter
-    [nombreInput, telefonoInput].forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                btnAceptar.click();
-            }
-        });
-    });
-}
-
-// Función para crear el modal de editar cliente
+// Función para crear el modal de editar cliente (ACTUALIZADA con diseño de formsInventario.js)
 function crearModalEditarCliente() {
     if (!filaSeleccionada) {
         mostrarToast('Por favor, selecciona un cliente para editar', 'warning');
@@ -366,59 +224,421 @@ function crearModalEditarCliente() {
     }
 
     // Verificar si ya existe un modal
-    const modalExistente = document.querySelector('.modal-overlay');
+    const modalExistente = document.getElementById('modal-edit-cliente');
     if (modalExistente) {
         modalExistente.remove();
     }
 
-    // Crear el overlay del modal
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    
-    // Crear el contenedor del modal
-    const modalContainer = document.createElement('div');
-    modalContainer.className = 'modal-container cliente-modal';
-    
-    // HTML del modal de editar
-    modalContainer.innerHTML = `
-        <div class="modal-content">
-            <div class="form-group">
-                <label for="editNombreCliente">Escriba el nombre</label>
-                <input type="text" id="editNombreCliente" class="form-input" value="${cliente.nombre}">
+    // Crear el modal con el diseño de formsInventario.js
+    const modal = document.createElement('div');
+    modal.id = 'modal-edit-cliente';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Modificar Cliente</h3>
+                <button class="modal-close">&times;</button>
             </div>
-            
-            <div class="form-group">
-                <label for="editTelefonoCliente">Escriba el teléfono</label>
-                <input type="tel" id="editTelefonoCliente" class="form-input" value="${cliente.telefono}" placeholder="Ejem. 961-XXX-XXXX">
-            </div>
-            
-            <div class="modal-buttons">
-                <button type="button" class="btn-accept-cliente" data-id="${cliente.id}">Aceptar</button>
-                <button type="button" class="btn-cancel-cliente">Cancelar</button>
-            </div>
+            <form id="form-edit-cliente" class="modal-form">
+                <div class="form-group">
+                    <label>ID del cliente</label>
+                    <input type="text" name="id" value="${cliente.id}" required readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nombre del cliente</label>
+                    <input type="text" name="nombre" value="${cliente.nombre}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" name="telefono" value="${cliente.telefono}" required>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-accept" data-id="${cliente.id}">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
     `;
-
-    // Agregar el modal al overlay
-    modalOverlay.appendChild(modalContainer);
     
-    // Agregar el overlay al documento
-    document.body.appendChild(modalOverlay);
+    document.body.appendChild(modal);
     
-    // Aplicar estilos
-    aplicarEstilosModal();
+    // Aplicar estilos del formulario de inventario
+    aplicarEstilosModalFormularioClientes();
     
-    // Configurar eventos del modal de editar
-    setupModalEditarEvents(modalOverlay);
+    // Configurar eventos del modal
+    setupModalFormularioEventsClientes(modal);
     
     // Mostrar modal
+    modal.classList.add('active');
+    
+    // Auto-enfocar primer input editable
     setTimeout(() => {
-        modalOverlay.classList.add('active');
-        const nombreInput = document.getElementById('editNombreCliente');
-        if (nombreInput) {
-            nombreInput.focus();
+        const primerInput = modal.querySelector('input[name="nombre"]');
+        if (primerInput) primerInput.focus();
+    }, 300);
+}
+
+// Función para aplicar estilos del formulario (copiado de formsInventario.js)
+function aplicarEstilosModalFormularioClientes() {
+    // Verificar si ya existen los estilos
+    if (document.getElementById('modal-formulario-clientes-styles')) {
+        return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'modal-formulario-clientes-styles';
+    style.textContent = `
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-    }, 10);
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Modal Container */
+        .modal-container {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e5e5;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        /* Modal Form */
+        .modal-form {
+            padding: 24px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+
+        /* Modal Buttons */
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .btn-cancel,
+        .btn-accept {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .btn-accept {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-accept:hover {
+            background: #0056b3;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .modal-container {
+                width: 95%;
+                margin: 20px;
+            }
+
+            .modal-header {
+                padding: 16px 20px;
+            }
+
+            .modal-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .modal-form {
+                padding: 20px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+
+            .btn-cancel,
+            .btn-accept {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .modal-header {
+                border-radius: 0;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+// Función para configurar eventos del modal (copiado de formsInventario.js)
+function setupModalFormularioEventsClientes(modal) {
+    const closeBtn = modal.querySelector(".modal-close");
+    const cancelBtns = modal.querySelectorAll(".btn-cancel");
+    const form = modal.querySelector("form");
+    
+    // Cerrar con X
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => cerrarModalCliente(modal));
+    }
+    
+    // Cerrar con botón cancelar
+    cancelBtns.forEach(btn => {
+        btn.addEventListener("click", () => cerrarModalCliente(modal));
+    });
+    
+    // Cerrar haciendo click fuera
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            cerrarModalCliente(modal);
+        }
+    });
+    
+    // Cerrar con Escape
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("active")) {
+            cerrarModalCliente(modal);
+        }
+    });
+
+    // Manejar envío del formulario
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const isEdit = form.id === 'form-edit-cliente';
+            
+            if (isEdit) {
+                // Lógica para editar cliente
+                const clienteId = parseInt(formData.get("id"));
+                const nombre = formData.get("nombre").trim();
+                const telefono = formData.get("telefono").trim();
+
+                // Validar campos
+                if (!nombre) {
+                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
+                    return;
+                }
+
+                if (!telefono) {
+                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
+                    return;
+                }
+
+                // Validar formato de teléfono
+                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
+                if (!telefonoRegex.test(telefono)) {
+                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
+                    return;
+                }
+
+                // Actualizar cliente
+                const datosActualizados = {
+                    nombre: nombre,
+                    telefono: telefono
+                };
+
+                const clienteActualizado = editarCliente(clienteId, datosActualizados);
+                
+                if (clienteActualizado) {
+                    console.log('Cliente actualizado:', clienteActualizado);
+                    
+                    // Actualizar la tabla
+                    cargarTablaClientes();
+                    
+                    // Mostrar mensaje de éxito
+                    mostrarToast('Cliente actualizado exitosamente', 'success');
+                    
+                    // Limpiar selección
+                    filaSeleccionada = null;
+                    
+                    // Cerrar modal
+                    cerrarModalCliente(modal);
+                } else {
+                    mostrarToast('Error al actualizar el cliente', 'error');
+                }
+            } else {
+                // Lógica para agregar cliente
+                const nombre = formData.get("nombre").trim();
+                const telefono = formData.get("telefono").trim();
+
+                // Validar campos
+                if (!nombre) {
+                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
+                    return;
+                }
+
+                if (!telefono) {
+                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
+                    return;
+                }
+
+                // Validar formato de teléfono
+                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
+                if (!telefonoRegex.test(telefono)) {
+                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
+                    return;
+                }
+
+                // Crear objeto cliente
+                const nuevoCliente = {
+                    id: Date.now(), // ID único basado en timestamp
+                    nombre: nombre,
+                    telefono: telefono,
+                    fechaRegistro: new Date().toLocaleDateString()
+                };
+
+                // Agregar cliente al array
+                clientes.push(nuevoCliente);
+                
+                // Guardar en localStorage
+                localStorage.setItem('clientes', JSON.stringify(clientes));
+
+                console.log('Cliente agregado:', nuevoCliente);
+
+                // Actualizar la tabla
+                cargarTablaClientes();
+
+                // Mostrar mensaje de éxito
+                mostrarToast('Cliente agregado exitosamente', 'success');
+
+                // Cerrar modal
+                cerrarModalCliente(modal);
+            }
+        });
+    }
+}
+
+// Función para cerrar modal
+function cerrarModalCliente(modal) {
+    modal.classList.remove("active");
 }
 
 // Función para crear el modal de eliminar cliente
@@ -438,57 +658,194 @@ function crearModalEliminarCliente() {
     }
 
     // Verificar si ya existe un modal
-    const modalExistente = document.querySelector('.modal-overlay');
+    const modalExistente = document.getElementById('modal-advertencia');
     if (modalExistente) {
         modalExistente.remove();
     }
 
-    // Crear el overlay del modal
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    
-    // Crear el contenedor del modal de eliminar
-    const modalContainer = document.createElement('div');
-    modalContainer.className = 'modal-container advertencia-modal';
-    
-    // HTML del modal de eliminar
-    modalContainer.innerHTML = `
-        <div class="modal-content">
-            <div class="delete-warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Advertencia</h3>
-                <p>Está a punto de eliminar al cliente "${cliente.nombre}" de esta sección, ¿está seguro de querer realizar esta acción?</p>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-accept-advertencia" data-id="${cliente.id}">Aceptar</button>
-                <button type="button" class="btn-cancel-advertencia">Cancelar</button>
+    // Crear el modal usando el mismo diseño que modalAdvertencia.js
+    const modal = document.createElement('div');
+    modal.id = 'modal-advertencia';
+    modal.innerHTML = `
+        <div class="modal-advertencia-overlay"></div>
+        <div class="modal-advertencia-content">
+            <div class="modal-advertencia-icon">&#9888;</div>
+            <div class="modal-advertencia-title">Advertencia</div>
+            <div class="modal-advertencia-text">Está a punto de eliminar al cliente<br>"${cliente.nombre}" de esta sección,<br>¿está seguro de querer realizar esta acción?</div>
+            <div class="modal-advertencia-actions">
+                <button class="modal-advertencia-btn-aceptar" data-id="${cliente.id}">Aceptar</button>
+                <button class="modal-advertencia-btn-cancelar">Cancelar</button>
             </div>
         </div>
     `;
-
-    // Agregar el modal al overlay
-    modalOverlay.appendChild(modalContainer);
     
-    // Agregar el overlay al documento
-    document.body.appendChild(modalOverlay);
+    document.body.appendChild(modal);
     
-    // Aplicar estilos de modal de eliminar
-    aplicarEstilosModalEliminar();
+    // Aplicar estilos del modal de advertencia
+    aplicarEstilosModalAdvertencia();
     
     // Configurar eventos del modal de eliminar
-    setupModalEliminarEvents(modalOverlay);
+    setupModalAdvertenciaEvents(modal);
     
-    // Mostrar modal
-    setTimeout(() => {
-        modalOverlay.classList.add('active');
-    }, 10);
+    // Mostrar modal con animación
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('mostrar'), 10);
 }
 
-// Función para configurar eventos del modal de eliminar
-function setupModalEliminarEvents(modalOverlay) {
-    const btnAceptar = modalOverlay.querySelector('.btn-accept-advertencia');
-    const btnCancelar = modalOverlay.querySelector('.btn-cancel-advertencia');
+// Función para aplicar estilos específicos del modal de advertencia
+function aplicarEstilosModalAdvertencia() {
+    // Verificar si ya existen los estilos
+    if (document.getElementById('modal-advertencia-styles')) {
+        return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'modal-advertencia-styles';
+    style.textContent = `
+        #modal-advertencia {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0; 
+            top: 0; 
+            width: 100vw; 
+            height: 100vh;
+            align-items: center; 
+            justify-content: center;
+        }
+
+        #modal-advertencia .modal-advertencia-overlay {
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(0,0,0,0.4);
+        }
+
+        #modal-advertencia .modal-advertencia-content {
+            position: relative;
+            background: #e6e7c7;
+            border-radius: 32px;
+            padding: 38px 38px 32px 38px;
+            min-width: 420px;
+            min-height: 220px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0.85);
+            transition: opacity 0.28s cubic-bezier(.4,1.3,.6,1), transform 0.28s cubic-bezier(.4,1.3,.6,1);
+        }
+
+        #modal-advertencia.mostrar .modal-advertencia-content {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #modal-advertencia .modal-advertencia-icon {
+            font-size: 3.5rem;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        #modal-advertencia .modal-advertencia-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        #modal-advertencia .modal-advertencia-text {
+            font-size: 1.2rem;
+            color: #222;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        #modal-advertencia .modal-advertencia-actions {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            width: 100%;
+        }
+
+        #modal-advertencia .modal-advertencia-btn-aceptar, 
+        #modal-advertencia .modal-advertencia-btn-cancelar {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            border-radius: 20px;
+            background: #fff;
+            font-weight: bold;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 0 8px;
+        }
+
+        #modal-advertencia .modal-advertencia-btn-aceptar:hover {
+            background: #b8e6b8;
+        }
+
+        #modal-advertencia .modal-advertencia-btn-cancelar:hover {
+            background: #f2bcbc;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 480px) {
+            #modal-advertencia .modal-advertencia-content {
+                min-width: 320px;
+                padding: 30px 25px 25px 25px;
+                margin: 20px;
+            }
+            
+            #modal-advertencia .modal-advertencia-icon {
+                font-size: 2.8rem;
+            }
+            
+            #modal-advertencia .modal-advertencia-title {
+                font-size: 1.6rem;
+            }
+            
+            #modal-advertencia .modal-advertencia-text {
+                font-size: 1rem;
+            }
+            
+            #modal-advertencia .modal-advertencia-actions {
+                gap: 20px;
+            }
+            
+            #modal-advertencia .modal-advertencia-btn-aceptar, 
+            #modal-advertencia .modal-advertencia-btn-cancelar {
+                font-size: 1.1rem;
+                padding: 12px 0;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+// Función para configurar eventos del modal de advertencia
+function setupModalAdvertenciaEvents(modal) {
+    const btnAceptar = modal.querySelector('.modal-advertencia-btn-aceptar');
+    const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
+    const overlay = modal.querySelector('.modal-advertencia-overlay');
     const clienteId = parseInt(btnAceptar.getAttribute('data-id'));
+
+    // Función para cerrar modal con animación
+    function cerrarModal() {
+        modal.classList.remove('mostrar');
+        setTimeout(() => { 
+            if (modal.parentNode) {
+                modal.remove(); 
+            }
+        }, 280);
+    }
 
     // Evento para cerrar modal con Escape
     function handleEscape(e) {
@@ -499,18 +856,13 @@ function setupModalEliminarEvents(modalOverlay) {
 
     document.addEventListener('keydown', handleEscape);
 
-    // Evento para cerrar modal al hacer clic fuera
-    modalOverlay.addEventListener('click', function(e) {
-        if (e.target === modalOverlay) {
-            cerrarModal();
-        }
-    });
-
-    // Evento del botón cancelar
-    btnCancelar.addEventListener('click', cerrarModal);
+    // Limpiar listeners previos
+    btnAceptar.onclick = null;
+    btnCancelar.onclick = null;
+    overlay.onclick = null;
 
     // Evento del botón aceptar (confirmar eliminación)
-    btnAceptar.addEventListener('click', function() {
+    btnAceptar.onclick = function() {
         const cliente = clientes.find(c => c.id === clienteId);
         const nombreCliente = cliente ? cliente.nombre : 'Cliente';
         
@@ -521,19 +873,25 @@ function setupModalEliminarEvents(modalOverlay) {
         } else {
             mostrarToast('Error al eliminar el cliente', 'error');
         }
-    });
-
-    // Función para cerrar el modal
-    function cerrarModal() {
+        
+        // Limpiar event listener
         document.removeEventListener('keydown', handleEscape);
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            modalOverlay.remove();
-        }, 300);
-    }
+    };
+
+    // Evento del botón cancelar
+    btnCancelar.onclick = function() {
+        cerrarModal();
+        document.removeEventListener('keydown', handleEscape);
+    };
+
+    // Evento para cerrar modal al hacer clic en overlay
+    overlay.onclick = function() {
+        cerrarModal();
+        document.removeEventListener('keydown', handleEscape);
+    };
 }
 
-// Función para aplicar estilos al modal
+// Función para aplicar estilos al modal - ACTUALIZAR PARA QUITAR ESTILOS DUPLICADOS
 function aplicarEstilosModal() {
     // Verificar si ya existen los estilos
     if (document.getElementById('cliente-modal-styles')) {
@@ -708,148 +1066,6 @@ function aplicarEstilosModal() {
           padding: 10px 20px;
           font-size: 14px;
           min-width: 80px;
-        }
-      }
-    `;
-
-    document.head.appendChild(style);
-}
-
-// Función para aplicar estilos específicos al modal de eliminar
-function aplicarEstilosModalEliminar() {
-    // Verificar si ya existen los estilos del modal de eliminar
-    if (document.getElementById('eliminar-modal-styles')) {
-        return;
-    }
-
-    const style = document.createElement('style');
-    style.id = 'eliminar-modal-styles';
-    style.textContent = `
-      /* Estilos especiales para el modal de advertencia de eliminación */
-      .advertencia-modal {
-        background: #D4C5A1 !important;
-        border: 4px solid #8B7355 !important;
-        border-radius: 20px !important;
-        width: 600px !important;
-        height: 451px !important;
-        text-align: center !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        padding: 40px !important;
-        box-sizing: border-box !important;
-        transform: scale(0.7);
-        transition: all 0.3s ease;
-      }
-
-      .modal-overlay.active .advertencia-modal {
-        transform: scale(1);
-      }
-
-      .advertencia-modal .modal-content {
-        padding: 0 !important;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .advertencia-modal .delete-warning {
-        text-align: center;
-        padding: 0;
-        margin-bottom: 40px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .advertencia-modal .delete-warning i {
-        font-size: 80px;
-        color: #333;
-        margin-bottom: 20px;
-        display: block;
-      }
-
-      .advertencia-modal .delete-warning h3 {
-        font-size: 32px;
-        font-weight: bold;
-        color: #333;
-        margin: 0 0 30px 0;
-        font-family: Arial, sans-serif;
-      }
-
-      .advertencia-modal .delete-warning p {
-        font-size: 18px;
-        color: #333;
-        line-height: 1.5;
-        margin: 0;
-        max-width: 500px;
-        margin: 0 auto;
-        font-family: Arial, sans-serif;
-        font-weight: 400;
-      }
-
-      .advertencia-modal .modal-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 0;
-        margin-bottom: 20px;
-      }
-
-      .btn-accept-advertencia,
-      .btn-cancel-advertencia {
-        background: white;
-        color: #333;
-        border: none;
-        border-radius: 25px;
-        padding: 15px 35px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        min-width: 120px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        font-family: Arial, sans-serif;
-      }
-
-      .btn-accept-advertencia:hover,
-      .btn-cancel-advertencia:hover {
-        background: #f0f0f0;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Responsive para pantallas pequeñas */
-      @media (max-width: 650px) {
-        .advertencia-modal {
-          width: 90vw !important;
-          height: auto !important;
-          min-height: 400px !important;
-          max-height: 90vh !important;
-        }
-        
-        .advertencia-modal .delete-warning i {
-          font-size: 60px;
-        }
-        
-        .advertencia-modal .delete-warning h3 {
-          font-size: 24px;
-        }
-        
-        .advertencia-modal .delete-warning p {
-          font-size: 16px;
-        }
-        
-        .btn-accept-advertencia,
-        .btn-cancel-advertencia {
-          padding: 12px 25px;
-          font-size: 14px;
         }
       }
     `;

@@ -315,67 +315,246 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Crear modal para eliminar producto
   function crearModalEliminar() {
-    const modal = document.createElement("div");
-    modal.id = "modal-eliminar-producto";
-    modal.className = "modal-overlay";
-    
+    // Verificar si ya existe un modal
+    const modalExistente = document.getElementById('modal-advertencia');
+    if (modalExistente) {
+      modalExistente.remove();
+    }
+
+    // Crear el modal usando el mismo diseño que modalAdvertencia.js
+    const modal = document.createElement('div');
+    modal.id = 'modal-advertencia';
     modal.innerHTML = `
-      <div class="modal-container modal-small advertencia-modal">
-        <div class="modal-content">
-          <div class="delete-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Advertencia</h3>
-            <p>Esta a punto de eliminar un producto de esta sección, ¿esta seguro de querer realizar esta acción?</p>
-          </div>
-          <div class="modal-buttons">
-            <button type="button" class="btn-accept-advertencia">Aceptar</button>
-            <button type="button" class="btn-cancel-advertencia">Cancelar</button>
-          </div>
+      <div class="modal-advertencia-overlay"></div>
+      <div class="modal-advertencia-content">
+        <div class="modal-advertencia-icon">&#9888;</div>
+        <div class="modal-advertencia-title">Advertencia</div>
+        <div class="modal-advertencia-text">Esta a punto de eliminar un producto<br>de esta sección,<br>¿está seguro de querer realizar esta acción?</div>
+        <div class="modal-advertencia-actions">
+          <button class="modal-advertencia-btn-aceptar">Aceptar</button>
+          <button class="modal-advertencia-btn-cancelar">Cancelar</button>
         </div>
       </div>
     `;
-
+    
     document.body.appendChild(modal);
     
-    // Aplicar estilos inline consistentes
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    `;
-
-    const modalContainer = modal.querySelector('.modal-container');
-    if (modalContainer) {
-      modalContainer.style.cssText = `
-        background: #D4C5A1;
-        border-radius: 20px;
-        width: 600px;
-        height: 451px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-        padding: 0;
-        text-align: center;
-        border: 4px solid #8B7355;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-      `;
-    }
+    // Aplicar estilos del modal de advertencia
+    aplicarEstilosModalAdvertencia();
+    
+    // Configurar eventos del modal de eliminar
+    setupModalAdvertenciaEvents(modal);
+    
+    // Mostrar modal con animación
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('mostrar'), 10);
     
     return modal;
+  }
+
+  // Función para aplicar estilos específicos del modal de advertencia
+  function aplicarEstilosModalAdvertencia() {
+    // Verificar si ya existen los estilos
+    if (document.getElementById('modal-advertencia-styles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'modal-advertencia-styles';
+    style.textContent = `
+      #modal-advertencia {
+        display: none;
+        position: fixed;
+        z-index: 3000;
+        left: 0; 
+        top: 0; 
+        width: 100vw; 
+        height: 100vh;
+        align-items: center; 
+        justify-content: center;
+      }
+
+      #modal-advertencia .modal-advertencia-overlay {
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100vw; 
+        height: 100vh;
+        background: rgba(0,0,0,0.4);
+      }
+
+      #modal-advertencia .modal-advertencia-content {
+        position: relative;
+        background: #e6e7c7;
+        border-radius: 32px;
+        padding: 38px 38px 32px 38px;
+        min-width: 420px;
+        min-height: 220px;
+        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        opacity: 0;
+        transform: scale(0.85);
+        transition: opacity 0.28s cubic-bezier(.4,1.3,.6,1), transform 0.28s cubic-bezier(.4,1.3,.6,1);
+      }
+
+      #modal-advertencia.mostrar .modal-advertencia-content {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      #modal-advertencia .modal-advertencia-icon {
+        font-size: 3.5rem;
+        color: #222;
+        margin-bottom: 8px;
+      }
+
+      #modal-advertencia .modal-advertencia-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #222;
+      }
+
+      #modal-advertencia .modal-advertencia-text {
+        font-size: 1.2rem;
+        color: #222;
+        text-align: center;
+        margin-bottom: 24px;
+        line-height: 1.4;
+      }
+
+      #modal-advertencia .modal-advertencia-actions {
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        width: 100%;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-aceptar, 
+      #modal-advertencia .modal-advertencia-btn-cancelar {
+        flex: 1;
+        padding: 14px 0;
+        border: none;
+        border-radius: 20px;
+        background: #fff;
+        font-weight: bold;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin: 0 8px;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-aceptar:hover {
+        background: #b8e6b8;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-cancelar:hover {
+        background: #f2bcbc;
+      }
+
+      /* Responsive para pantallas pequeñas */
+      @media (max-width: 480px) {
+        #modal-advertencia .modal-advertencia-content {
+          min-width: 320px;
+          padding: 30px 25px 25px 25px;
+          margin: 20px;
+        }
+        
+        #modal-advertencia .modal-advertencia-icon {
+          font-size: 2.8rem;
+        }
+        
+        #modal-advertencia .modal-advertencia-title {
+          font-size: 1.6rem;
+        }
+        
+        #modal-advertencia .modal-advertencia-text {
+          font-size: 1rem;
+        }
+        
+        #modal-advertencia .modal-advertencia-actions {
+          gap: 20px;
+        }
+        
+        #modal-advertencia .modal-advertencia-btn-aceptar, 
+        #modal-advertencia .modal-advertencia-btn-cancelar {
+          font-size: 1.1rem;
+          padding: 12px 0;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  // Función para configurar eventos del modal de advertencia
+  function setupModalAdvertenciaEvents(modal) {
+    const btnAceptar = modal.querySelector('.modal-advertencia-btn-aceptar');
+    const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
+    const overlay = modal.querySelector('.modal-advertencia-overlay');
+
+    // Función para cerrar modal con animación
+    function cerrarModal() {
+      modal.classList.remove('mostrar');
+      setTimeout(() => { 
+        if (modal.parentNode) {
+          modal.remove(); 
+        }
+      }, 280);
+    }
+
+    // Evento para cerrar modal con Escape
+    function handleEscape(e) {
+      if (e.key === 'Escape') {
+        cerrarModal();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape);
+
+    // Limpiar listeners previos
+    btnAceptar.onclick = null;
+    btnCancelar.onclick = null;
+    overlay.onclick = null;
+
+    // Evento del botón aceptar (confirmar eliminación)
+    btnAceptar.onclick = function() {
+      confirmarEliminar();
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+
+    // Evento del botón cancelar
+    btnCancelar.onclick = function() {
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+
+    // Evento para cerrar modal al hacer clic en overlay
+    overlay.onclick = function() {
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }
+
+  // Confirmar eliminación
+  function confirmarEliminar() {
+    if (!filaSeleccionada) return;
+
+    const celdas = filaSeleccionada.querySelectorAll("td");
+    const codigo = celdas[0].textContent.trim();
+    const index = productos.findIndex(p => p.codigo === codigo);
+
+    if (index !== -1) {
+      productos.splice(index, 1);
+      cargarProductos();
+      cerrarModal();
+      filaSeleccionada = null;
+      mostrarAlertaVisual("Producto eliminado exitosamente.");
+    }
   }
 
   // Cargar productos en la tabla
@@ -488,16 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let modal = document.getElementById("modal-eliminar-producto");
-    if (!modal) {
-      modal = crearModalEliminar();
-      setupModalEliminarEvents(modal);
-    }
-
-    modal.style.display = "flex";
-    modal.style.visibility = "visible";
-    modal.style.opacity = "1";
-    modal.classList.add("active");
+    crearModalEliminar();
   }
 
   // Configurar eventos específicos del modal de eliminar
@@ -519,23 +689,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelBtn = modal.querySelector(".btn-cancel-advertencia");
     if (cancelBtn) {
       cancelBtn.addEventListener("click", cerrarModal);
-    }
-  }
-
-  // Confirmar eliminación
-  function confirmarEliminar() {
-    if (!filaSeleccionada) return;
-
-    const celdas = filaSeleccionada.querySelectorAll("td");
-    const codigo = celdas[0].textContent.trim();
-    const index = productos.findIndex(p => p.codigo === codigo);
-
-    if (index !== -1) {
-      productos.splice(index, 1);
-      cargarProductos();
-      cerrarModal();
-      filaSeleccionada = null;
-      mostrarAlertaVisual("Producto eliminado exitosamente.");
     }
   }
 
@@ -976,7 +1129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        padding: 40px !important;
+        padding: 0;
         box-sizing: border-box !important;
       }
 
