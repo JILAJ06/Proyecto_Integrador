@@ -223,3 +223,50 @@
     height: 50px;
     background: #f8f9fa;
 }
+
+/* Selección */
+.productos-table tbody tr.selected {
+  background: #d0ebff;
+}
+
+/* Overlay y modal */
+.modal-overlay {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.4);
+  display: none; justify-content: flex-end;
+  z-index: 1000;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #fff;
+  width: 320px;
+  max-width: 90%;
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform .3s ease;
+}
+.modal-overlay.show .modal {
+  transform: translateX(0);
+}
+
+/* Toast */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1100;
+}
+.toast {
+  background: #323232;
+  color: #fff;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 4px;
+  opacity: 0;
+  animation: fadeInOut 4s forwards;
+}
+@keyframes fadeInOut {
+  0%   { opacity:0; transform: translateY(10px); }
+  10%,90% { opacity:1; transform: translateY(0); }
+  100% { opacity:0; transform: translateY(10px); }
+}
