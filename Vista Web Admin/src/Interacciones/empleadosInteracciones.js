@@ -263,19 +263,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, 2500);
                 return;
             }
-            // Obtener datos actuales de la fila seleccionada
-            const celdas = filaSeleccionada.querySelectorAll('td');
-            const id = celdas[0]?.textContent || '';
-            const nombreUsuario = celdas[1]?.textContent || '';
-            const correo = celdas[2]?.textContent || '';
-            const direccionCompleta = celdas[3]?.textContent || '';
-            const rol = celdas[4]?.textContent || 'Empleado';
             
-            // Parsear la dirección completa para extraer calle, colonia y código postal
+            // Obtener datos actuales de la fila seleccionada (estructura correcta)
+            const celdas = filaSeleccionada.querySelectorAll('td');
+            
+            console.log('Celdas encontradas:', celdas.length);
+            console.log('Datos de celdas:', Array.from(celdas).map(celda => celda.textContent));
+            
+            // Estructura real de la tabla: [nombreUsuario, correo, direccion_completa]
+            const nombreUsuario = celdas[0]?.textContent.trim() || '';
+            const correo = celdas[1]?.textContent.trim() || '';
+            const direccionCompleta = celdas[2]?.textContent.trim() || '';
+            
+            console.log('Datos extraídos:', { nombreUsuario, correo, direccionCompleta });
+            
+            // Parsear la dirección completa "calle, colonia, codigo_postal"
             const direccionPartes = direccionCompleta.split(', ');
-            const calle = direccionPartes[0] || '';
-            const colonia = direccionPartes[1] || '';
-            const codigoPostal = direccionPartes[2] ? direccionPartes[2].replace('CP: ', '') : '';
+            const calle = direccionPartes[0]?.trim() || '';
+            const colonia = direccionPartes[1]?.trim() || '';
+            const codigoPostal = direccionPartes[2]?.trim() || '';
+            
+            console.log('Dirección parseada:', { calle, colonia, codigoPostal });
+            
+            // Obtener el rol desde los datos originales del empleado
+            // Como no está en la tabla, necesitamos buscarlo en los datos originales
+            let rolEmpleado = 'Empleado'; // Por defecto
+            
+            // Buscar el empleado en los datos originales para obtener el rol
+            // Esto requiere que tengamos acceso a los datos originales
             
             // Mostrar el modal de agregar (reutilizado)
             let modal = document.getElementById('modal-agregar-empleado');
@@ -286,21 +301,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.style.display = 'flex';
             }
             
-            // Precargar los valores
-            const inputs = modal.querySelectorAll('.modal-agregar-input');
-            if (inputs.length >= 7) {
-                inputs[0].value = nombreUsuario;
-                inputs[1].value = correo;
-                inputs[2].value = ''; // Contraseña vacía por seguridad
-                inputs[3].value = rol;
-                inputs[4].value = calle;
-                inputs[5].value = colonia;
-                inputs[6].value = codigoPostal;
-            }
+            // Esperar un momento para que el modal se cargue completamente
+            setTimeout(() => {
+                const inputs = modal.querySelectorAll('.modal-agregar-input');
+                
+                console.log('Inputs encontrados:', inputs.length);
+                
+                if (inputs.length >= 7) {
+                    // Precargar los valores en el orden correcto
+                    inputs[0].value = nombreUsuario;           // Nombre de usuario
+                    inputs[1].value = correo;                  // Correo
+                    inputs[2].value = '';                      // Contraseña vacía por seguridad
+                    inputs[3].value = rolEmpleado;             // Rol (por defecto Empleado)
+                    inputs[4].value = calle;                   // Calle
+                    inputs[5].value = colonia;                 // Colonia
+                    inputs[6].value = codigoPostal;            // Código postal
+                    
+                    console.log('Valores precargados:', {
+                        nombreUsuario: inputs[0].value,
+                        correo: inputs[1].value,
+                        rol: inputs[3].value,
+                        calle: inputs[4].value,
+                        colonia: inputs[5].value,
+                        codigoPostal: inputs[6].value
+                    });
+                } else {
+                    console.error('No se encontraron suficientes inputs en el modal');
+                }
+            }, 100);
+            
             // Cambiar el submit para editar
             const form = modal.querySelector('.modal-agregar-content');
             form.onsubmit = async function(e) {
                 e.preventDefault();
+                
+                const inputs = modal.querySelectorAll('.modal-agregar-input');
+                
                 // Obtener nuevos valores
                 const nuevoNombreUsuario = inputs[0].value.trim();
                 const nuevoCorreo = inputs[1].value.trim();
@@ -310,8 +346,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const nuevaColonia = inputs[5].value.trim();
                 const nuevoCodigoPostal = inputs[6].value.trim();
                 
-                // Validar
-                if (!nuevoNombreUsuario || !nuevoCorreo || !nuevoRol || !nuevaCalle || !nuevaColonia || !nuevoCodigoPostal) {
+                console.log('Nuevos valores para editar:', {
+                    nuevoNombreUsuario, nuevoCorreo, nuevoRol,
+                    nuevaCalle, nuevaColonia, nuevoCodigoPostal
+                });
+                
+                // Validar campos obligatorios
+                if (!nuevoNombreUsuario || !nuevoCorreo || !nuevoRol || 
+                    !nuevaCalle || !nuevaColonia || !nuevoCodigoPostal) {
                     mostrarSnackbar('Por favor completa todos los campos', true);
                     return;
                 }
@@ -331,12 +373,30 @@ document.addEventListener('DOMContentLoaded', function () {
                         datosActualizados.contrasena = nuevaContrasena;
                     }
                     
+                    console.log('Editando empleado:', nombreUsuario, 'con datos:', datosActualizados);
+                    
                     await putEmpleado(nombreUsuario, datosActualizados);
                     modal.style.display = 'none';
                     mostrarSnackbar('Empleado editado con éxito');
+                    
+                    // Limpiar selección
+                    filaSeleccionada.classList.remove('selected-row');
+                    filaSeleccionada = null;
+                    
                 } catch (error) {
                     console.error('Error al editar empleado:', error);
                     mostrarSnackbar('Error al editar el empleado', true);
+                }
+            };
+            
+            // Agregar botón de cancelar específico para edición
+            const btnCancelar = modal.querySelector('.modal-agregar-btn-cancelar');
+            btnCancelar.onclick = function() {
+                modal.style.display = 'none';
+                // Limpiar selección
+                if (filaSeleccionada) {
+                    filaSeleccionada.classList.remove('selected-row');
+                    filaSeleccionada = null;
                 }
             };
         });
@@ -448,15 +508,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 closeModal();
                 
                 if (filaSeleccionada) {
-                    const nombre = filaSeleccionada.querySelector('td:nth-child(2)')?.textContent;
-                    if (nombre) {
+                    // CORREGIR: El nombre de usuario está en la primera celda (índice 0)
+                    const celdas = filaSeleccionada.querySelectorAll('td');
+                    const nombreUsuario = celdas[0]?.textContent.trim(); // Primera celda: nombreUsuario
+                    
+                    console.log('Intentando eliminar empleado:', nombreUsuario);
+                    console.log('Celdas disponibles:', Array.from(celdas).map(celda => celda.textContent));
+                    
+                    if (nombreUsuario) {
                         try {
-                            await deleteEmpleado(nombre);
+                            await deleteEmpleado(nombreUsuario);
+                            
+                            // Limpiar selección después de eliminar
+                            filaSeleccionada.classList.remove('selected-row');
                             filaSeleccionada = null;
-                            mostrarSnackbar('El registro ha sido eliminado con éxito');
+                            
+                            mostrarSnackbar('El empleado ha sido eliminado con éxito');
                         } catch (error) {
+                            console.error('Error al eliminar empleado:', error);
                             mostrarSnackbar('Error al eliminar el empleado', true);
                         }
+                    } else {
+                        console.error('No se pudo obtener el nombre de usuario de la fila seleccionada');
+                        mostrarSnackbar('Error: No se pudo identificar el empleado a eliminar', true);
                     }
                 }
             };

@@ -2,8 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
     getEmpleados();
 });
 
-// URL base de tu API JAR con ID=1
-const API_BASE_URL = 'http://localhost:8080/negocio/1';
+// Función para obtener datos de sesión
+function obtenerDatosSesion() {
+    const sesionActiva = sessionStorage.getItem('clink_sesion_activa');
+    return sesionActiva ? JSON.parse(sesionActiva) : null;
+}
+
+// Función para obtener API URL dinámica
+function obtenerAPIBaseURL() {
+    const sesion = obtenerDatosSesion();
+    if (sesion && sesion.idNegocio) {
+        return `http://localhost:8080/negocio/${sesion.idNegocio}`;
+    }
+    return sessionStorage.getItem('clink_api_base_url') || 'http://localhost:8080/negocio/1';
+}
+
+// URL base dinámica
+const API_BASE_URL = obtenerAPIBaseURL();
 
 export async function getEmpleados() {
     const url_endpoint = `${API_BASE_URL}/empleados`;
@@ -14,24 +29,21 @@ export async function getEmpleados() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        const empleados = data.empleados; // <- accede a la propiedad correcta
+        const empleados = data.empleados;
         console.log('Empleados:', empleados);
 
         let tbody = document.querySelector('.products-table tbody');
-        tbody.innerHTML = ''; // Limpiar tabla antes de llenar
-        
-        empleados.forEach((empleado, index) => {
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${empleado.nombreUsuario || ''}</td>
-        <td>${empleado.correo || 'No especificado'}</td>
-        <td>${empleado.calle || ''}, ${empleado.colonia || ''}, CP: ${empleado.codigoPostal || ''}</td>
-        <td>${empleado.rol || 'Empleado'}</td>
-    `;
-    tbody.appendChild(fila);
-});
-
+        if (tbody) {
+            tbody.innerHTML = '';
+            empleados.forEach(empleado => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${empleado.nombreUsuario}</td>
+                    <td>${empleado.correo}</td>
+                    <td>${empleado.calle}, ${empleado.colonia}, ${empleado.codigoPostal}</td>
+                `;
+            });
+        }
     } catch (error) {
         console.error('Error fetching empleados:', error);
         mostrarError('Error al cargar los empleados');
@@ -42,6 +54,14 @@ export async function postEmpleado(datos) {
     const url_endpoint = `${API_BASE_URL}/empleado`;
 
     try {
+        // Obtener datos de la sesión actual
+        const sesion = obtenerDatosSesion();
+        
+        if (!sesion) {
+            throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
+        }
+
+        // Estructura que incluye el negocio como objeto anidado
         const empleadoData = {
             nombreUsuario: datos.nombreUsuario,
             correo: datos.correo,
@@ -49,10 +69,17 @@ export async function postEmpleado(datos) {
             rol: datos.rol,
             calle: datos.calle,
             colonia: datos.colonia,
-            codigoPostal: datos.codigoPostal
+            codigoPostal: datos.codigoPostal,
+            negocio: {
+                idNegocio: parseInt(sesion.idNegocio)
+            },
+            creador: {
+                nombreUsuario: sesion.nombreUsuario
+            }
         };
 
         console.log('Datos a enviar:', empleadoData);
+        console.log('Sesión actual:', sesion);
 
         const response = await fetch(url_endpoint, {
             method: 'POST',
@@ -62,16 +89,45 @@ export async function postEmpleado(datos) {
             body: JSON.stringify(empleadoData)
         });
 
+        console.log('Response status:', response.status);
+
         if (!response.ok) {
-            const errorText = await response.text();
+            let errorText;
+            try {
+                errorText = await response.text();
+            } catch (e) {
+                errorText = 'No se pudo leer la respuesta del servidor';
+            }
+            
             console.error('Error response:', errorText);
-            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
-        const resultado = await response.json();
+        // Verificar si la respuesta tiene contenido JSON válido
+        const contentType = response.headers.get('content-type');
+        let resultado;
+        
+        if (contentType && contentType.includes('application/json')) {
+            try {
+                resultado = await response.json();
+            } catch (e) {
+                resultado = { 
+                    message: 'Empleado creado exitosamente',
+                    nombreUsuario: empleadoData.nombreUsuario 
+                };
+            }
+        } else {
+            resultado = { 
+                message: 'Empleado creado exitosamente',
+                nombreUsuario: empleadoData.nombreUsuario 
+            };
+        }
+        
         console.log('Empleado creado:', resultado);
         await getEmpleados();
+        mostrarExito('Empleado creado exitosamente');
         return resultado;
+        
     } catch (error) {
         console.error('Error posting empleado:', error);
         mostrarError('Error al crear el empleado: ' + error.message);
@@ -83,6 +139,7 @@ export async function putEmpleado(nombre, datos) {
     const url_endpoint = `${API_BASE_URL}/empleado/${encodeURIComponent(nombre)}`;
 
     try {
+        // Estructura simplificada para actualización
         const empleadoData = {
             nombreUsuario: datos.nombreUsuario,
             correo: datos.correo,
@@ -93,9 +150,11 @@ export async function putEmpleado(nombre, datos) {
         };
 
         // Solo incluir contraseña si se proporcionó
-        if (datos.contrasena) {
+        if (datos.contrasena && datos.contrasena.trim() !== '') {
             empleadoData.contrasena = datos.contrasena;
         }
+
+        console.log('Datos a actualizar:', empleadoData);
 
         const response = await fetch(url_endpoint, {
             method: 'PUT',
@@ -106,19 +165,30 @@ export async function putEmpleado(nombre, datos) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorText;
+            try {
+                errorText = await response.text();
+            } catch (e) {
+                errorText = 'Error desconocido';
+            }
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
-        const resultado = await response.json();
-        console.log('Empleado actualizado:', resultado);
+        let resultado;
+        try {
+            resultado = await response.json();
+        } catch (e) {
+            resultado = { message: 'Empleado actualizado exitosamente' };
+        }
         
-        // Recargar la lista de empleados
+        console.log('Empleado actualizado:', resultado);
         await getEmpleados();
+        mostrarExito('Empleado actualizado exitosamente');
         
         return resultado;
     } catch (error) {
         console.error('Error updating empleado:', error);
-        mostrarError('Error al actualizar el empleado');
+        mostrarError('Error al actualizar el empleado: ' + error.message);
         throw error;
     }
 }
@@ -128,10 +198,7 @@ export async function deleteEmpleado(nombre) {
 
     try {
         const response = await fetch(url_endpoint, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'DELETE'
         });
 
         if (!response.ok) {
@@ -143,7 +210,7 @@ export async function deleteEmpleado(nombre) {
         // Recargar la lista de empleados
         await getEmpleados();
         
-        return true;
+        return { message: 'Empleado eliminado exitosamente' };
     } catch (error) {
         console.error('Error deleting empleado:', error);
         mostrarError('Error al eliminar el empleado');
@@ -151,51 +218,66 @@ export async function deleteEmpleado(nombre) {
     }
 }
 
-// Función auxiliar para mostrar errores
+// Función para mostrar mensajes de éxito
+function mostrarExito(mensaje) {
+    let snackbar = document.getElementById('snackbar-empleados');
+    if (!snackbar) {
+        snackbar = document.createElement('div');
+        snackbar.id = 'snackbar-empleados';
+        snackbar.className = 'snackbar-empleados';
+        snackbar.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            z-index: 9999;
+            max-width: 300px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: none;
+        `;
+        document.body.appendChild(snackbar);
+    }
+    
+    snackbar.style.background = '#4caf50';
+    snackbar.textContent = mensaje;
+    snackbar.style.display = 'block';
+    
+    setTimeout(() => {
+        snackbar.style.display = 'none';
+    }, 4000);
+}
+
+// Función auxiliar para mostrar errores (actualizada)
 function mostrarError(mensaje) {
     let snackbar = document.getElementById('snackbar-empleados');
     if (!snackbar) {
         snackbar = document.createElement('div');
         snackbar.id = 'snackbar-empleados';
         snackbar.className = 'snackbar-empleados';
+        snackbar.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #f44336;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            z-index: 9999;
+            max-width: 300px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: none;
+        `;
         document.body.appendChild(snackbar);
-        
-        if (!document.getElementById('snackbar-style-empleados')) {
-            const style = document.createElement('style');
-            style.id = 'snackbar-style-empleados';
-            style.textContent = `
-                .snackbar-empleados {
-                    min-width: 320px;
-                    max-width: 400px;
-                    background: #f44336;
-                    color: white;
-                    text-align: center;
-                    border-radius: 18px;
-                    padding: 18px 24px;
-                    position: fixed;
-                    z-index: 4000;
-                    right: 32px;
-                    bottom: 32px;
-                    font-size: 1.1rem;
-                    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-                    opacity: 0;
-                    pointer-events: none;
-                    transition: opacity 0.4s, bottom 0.4s;
-                }
-                .snackbar-empleados.show {
-                    opacity: 1;
-                    pointer-events: auto;
-                    bottom: 48px;
-                }
-            `;
-            document.head.appendChild(style);
-        }
     }
     
     snackbar.style.background = '#f44336';
     snackbar.textContent = mensaje;
-    snackbar.classList.add('show');
+    snackbar.style.display = 'block';
+    
     setTimeout(() => {
-        snackbar.classList.remove('show');
-    }, 3000);
+        snackbar.style.display = 'none';
+    }, 4000);
 }
