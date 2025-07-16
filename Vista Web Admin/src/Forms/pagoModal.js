@@ -29,6 +29,88 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         document.body.appendChild(modal);
     }
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Estilos para el modal de pago */
+        #modal-pago {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            align-items: center; justify-content: center;
+        }
+        #modal-pago .modal-overlay {
+            position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4);
+        }
+        #modal-pago .modal-content {
+            position: relative;
+            background: #e6e7c7;
+            border-radius: 24px;
+            padding: 32px 32px 24px 32px;
+            min-width: 340px;
+            min-height: 260px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            z-index: 2;
+        }
+        #modal-pago .modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        #modal-pago .modal-label {
+            font-weight: bold;
+            font-size: 1.15em;
+            background: #fff;
+            border-radius: 10px 0 0 10px;
+            padding: 8px 18px;
+            flex: 1;
+            text-align: left;
+        }
+        #modal-pago .modal-value, #modal-pago .modal-input {
+            background: #fff;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            padding: 8px 18px;
+            font-size: 1.15em;
+            flex: 1;
+            text-align: right;
+        }
+        #modal-pago .modal-input {
+            outline: none;
+        }
+        #modal-pago .modal-input-error {
+            border: 2px solid #e74c3c;
+            background: #ffeaea;
+        }
+        #modal-pago .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            margin-top: 12px;
+        }
+        #modal-pago .modal-btn-cancelar, #modal-pago .modal-btn-pagar {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #modal-pago .modal-btn-cancelar:hover {
+            background: #f2bcbc;
+        }
+        #modal-pago .modal-btn-pagar:hover {
+            background: #b8e6b8;
+        }`;
+    document.head.appendChild(style);
 
     // Mostrar el modal al hacer clic en el botón Pagar
     const btnPagar = document.querySelector('.btn-pay');
