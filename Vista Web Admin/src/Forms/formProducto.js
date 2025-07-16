@@ -449,7 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para abrir el modal de editar
   function abrirModalEditar() {
     if (!filaSeleccionada) {
-      alert("Por favor seleccione un producto para editar.");
+      mostrarAlertaVisual("Por favor seleccione un producto para editar.");
       return;
     }
 
@@ -484,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para eliminar producto
   function eliminarProducto() {
     if (!filaSeleccionada) {
-      alert("Por favor seleccione un producto para eliminar.");
+      mostrarAlertaVisual("Por favor seleccione un producto para eliminar.");
       return;
     }
 
@@ -535,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cargarProductos();
       cerrarModal();
       filaSeleccionada = null;
-      alert("Producto eliminado exitosamente.");
+      mostrarAlertaVisual("Producto eliminado exitosamente.");
     }
   }
 
@@ -619,20 +619,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const camposFaltantes = camposRequeridos.filter(campo => !nuevoProducto[campo]);
     
     if (camposFaltantes.length > 0) {
-      alert(`Por favor complete los siguientes campos: ${camposFaltantes.join(', ')}`);
+      mostrarAlertaVisual(`Por favor complete los siguientes campos: ${camposFaltantes.join(', ')}`);
       return;
     }
 
     // Verificar si el código ya existe
     if (productos.some(p => p.codigo === nuevoProducto.codigo)) {
-      alert("Ya existe un producto con este código.");
+      mostrarAlertaVisual("Ya existe un producto con este código.");
       return;
     }
 
     productos.push(nuevoProducto);
     cargarProductos();
     cerrarModal();
-    alert("Producto guardado exitosamente");
+    mostrarAlertaVisual("Producto guardado exitosamente");
     e.target.reset();
   }
 
@@ -661,7 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cargarProductos();
       cerrarModal();
       filaSeleccionada = null;
-      alert("Producto actualizado exitosamente");
+      mostrarAlertaVisual("Producto actualizado exitosamente");
     }
   }
 

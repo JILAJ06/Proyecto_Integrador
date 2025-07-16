@@ -452,7 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function abrirModalEditar(modal) {
     if (!filaSeleccionada) {
-      alert("Selecciona una fila para editar.");
+      mostrarAlertaVisual("Selecciona una fila para editar.");
       return;
     }
 
@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function abrirModalEliminar(modal) {
     if (!filaSeleccionada) {
-      alert("Selecciona una fila para eliminar.");
+      mostrarAlertaVisual("Selecciona una fila para eliminar.");
       return;
     }
     modal.classList.add("active");
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Verificar si el código ya existe
     if (inventario.some(item => item.codigo === nuevoProducto.codigo)) {
-      alert("Ya existe un producto con ese código.");
+      mostrarAlertaVisual("Ya existe un producto con ese código.");
       return;
     }
 
@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarInventario();
     cerrarModales([document.getElementById("modal-add")]);
     
-    alert("Producto agregado exitosamente.");
+    mostrarAlertaVisual("Producto agregado exitosamente.");
   }
 
   // Editar producto
@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cerrarModales([document.getElementById("modal-edit")]);
       filaSeleccionada = null;
       
-      alert("Producto modificado exitosamente.");
+      mostrarAlertaVisual("Producto modificado exitosamente.");
     }
   }
 
@@ -562,7 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cerrarModales([document.getElementById("modal-delete")]);
       filaSeleccionada = null;
       
-      alert("Producto eliminado exitosamente.");
+      mostrarAlertaVisual("Producto eliminado exitosamente.");
     }
   }
 

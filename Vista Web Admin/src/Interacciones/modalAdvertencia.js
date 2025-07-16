@@ -1,30 +1,61 @@
-    // Combobox funcionalidad para meses (ejecuta automáticamente al cargar)
-    document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('meses-combobox-btn');
-        const list = document.getElementById('meses-combobox-list');
-        const label = document.getElementById('meses-combobox-label');
-        if (!btn || !list) return;
-        btn.addEventListener('click', function(e) {
+// Combobox funcionalidad para meses y días (usando clase .active en el contenedor)
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Meses ---
+    const mesesDropdown = document.getElementById('meses-combobox');
+    const btnMes = document.getElementById('meses-combobox-btn');
+    const listMes = document.getElementById('meses-combobox-list');
+    const labelMes = document.getElementById('meses-combobox-label');
+    if (mesesDropdown && btnMes && listMes && labelMes) {
+        btnMes.addEventListener('click', function(e) {
             e.stopPropagation();
-            list.style.display = (list.style.display === 'block') ? 'none' : 'block';
+            mesesDropdown.classList.toggle('active');
         });
-        // Selección de mes
-        list.querySelectorAll('a').forEach(function(a) {
+        listMes.querySelectorAll('a').forEach(function(a) {
             a.addEventListener('click', function(e) {
                 e.preventDefault();
                 const mes = a.getAttribute('data-mes');
-                label.textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
-                list.style.display = 'none';
+                labelMes.textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
+                mesesDropdown.classList.remove('active');
+                listMes.querySelectorAll('a').forEach(a2 => a2.classList.remove('selected'));
+                a.classList.add('selected');
                 if (typeof window.filterByMonth === 'function') window.filterByMonth(mes);
             });
         });
-        // Cerrar al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            if (!btn.contains(e.target) && !list.contains(e.target)) {
-                list.style.display = 'none';
-            }
+    }
+
+    // --- Día ---
+    const diaDropdown = document.getElementById('dia-combobox');
+    const btnDia = document.getElementById('dia-combobox-btn');
+    const listDia = document.getElementById('dia-combobox-list');
+    const labelDia = document.getElementById('dia-combobox-label');
+    if (diaDropdown && btnDia && listDia && labelDia) {
+        btnDia.addEventListener('click', function(e) {
+            e.stopPropagation();
+            diaDropdown.classList.toggle('active');
         });
+        listDia.querySelectorAll('a').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const dia = a.getAttribute('data-dia');
+                labelDia.textContent = dia;
+                diaDropdown.classList.remove('active');
+                listDia.querySelectorAll('a').forEach(a2 => a2.classList.remove('selected'));
+                a.classList.add('selected');
+                if (typeof window.filterByDay === 'function') window.filterByDay(dia);
+            });
+        });
+    }
+
+    // Cerrar cualquier dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (mesesDropdown && !mesesDropdown.contains(e.target)) {
+            mesesDropdown.classList.remove('active');
+        }
+        if (diaDropdown && !diaDropdown.contains(e.target)) {
+            diaDropdown.classList.remove('active');
+        }
     });
+});
 
 // Script para mostrar el modal de advertencia al eliminar en historial
 // Incluye: selección de filas, advertencia de exportar, alerta visual y combobox de meses
@@ -155,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function openModal() {
         if (!filaSeleccionada) {
-            alert('Selecciona una fila de la tabla para eliminar.');
+            mostrarAlertaVisual('Selecciona una fila de la tabla para eliminar.');
             return;
         }
         modal.style.display = 'flex';

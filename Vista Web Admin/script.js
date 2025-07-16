@@ -1,3 +1,43 @@
+// Alerta visual global reutilizable (estilo historial)
+function mostrarAlertaVisual(mensaje) {
+    if (document.getElementById('alerta-descarga')) return;
+    const alerta = document.createElement('div');
+    alerta.id = 'alerta-descarga';
+    alerta.textContent = mensaje;
+    document.body.appendChild(alerta);
+    if (!document.getElementById('alerta-descarga-style')) {
+        const style = document.createElement('style');
+        style.id = 'alerta-descarga-style';
+        style.textContent = `
+            #alerta-descarga {
+                position: fixed;
+                right: 32px;
+                bottom: 32px;
+                background: #f6f7f2;
+                color: #444;
+                border-radius: 20px;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+                padding: 18px 32px;
+                font-size: 1.2rem;
+                z-index: 4000;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s;
+            }
+            #alerta-descarga.mostrar {
+                opacity: 1;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    setTimeout(() => {
+        alerta.classList.add('mostrar');
+    }, 50);
+    setTimeout(() => {
+        alerta.classList.remove('mostrar');
+        setTimeout(() => alerta.remove(), 400);
+    }, 2600);
+}
 document.addEventListener("DOMContentLoaded", () => {
   // Extrae sólo el nombre del archivo actual, ej: "inventario.html"
   const currentPage = window.location.pathname

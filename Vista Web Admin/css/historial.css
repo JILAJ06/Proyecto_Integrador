@@ -1,25 +1,89 @@
-#dia-combobox-btn {
-    min-width: 160px;
+
+/* Botón de filtro global (categoría, día, mes, etc.) */
+#dia-combobox-btn, #meses-combobox-btn, .btn-category, .btn-dropdown, .btn-filter, .btn-mes, .btn-dia {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 25px;
+    min-width: 140px;
+    padding: 10px 24px;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.10);
+    justify-content: center;
 }
-#dia-combobox-label {
-    flex: 1;
-    text-align: center;
+#dia-combobox-btn:hover, #meses-combobox-btn:hover, .btn-category:hover, .btn-dropdown:hover, .btn-filter:hover, .btn-mes:hover, .btn-dia:hover {
+    background: #f0f4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 106, 245, 0.13);
 }
-#dia-combobox-list {
-    min-width: 160px;
+
+/* Flecha animada global para todos los menús de filtro */
+.dropdown-arrow {
+    margin-left: 5px;
+    font-size: 16px;
+    transition: transform 0.3s cubic-bezier(.4,2,.6,1);
+}
+.dropdown-container.active .dropdown-arrow,
+.dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Menú desplegable global para todos los filtros (categoría, día, mes, etc.) */
+.dropdown-menu, .dropdown-content, #dia-combobox-list, #meses-combobox-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     background: white;
     border: 1px solid black;
     border-radius: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.10);
-    margin-top: 6px;
-    padding: 4px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    padding: 4px 0;
+    min-width: 160px;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f0;
 }
-#dia-combobox-list a {
+.dropdown-container.active .dropdown-menu,
+.dropdown.active .dropdown-content,
+.dropdown.active #dia-combobox-list,
+.dropdown.active #meses-combobox-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Scrollbar personalizado para todos los menús de filtro */
+.dropdown-menu::-webkit-scrollbar,
+.dropdown-content::-webkit-scrollbar,
+#dia-combobox-list::-webkit-scrollbar,
+#meses-combobox-list::-webkit-scrollbar {
+    width: 8px;
+    background: #f5f5f0;
+    border-radius: 8px;
+}
+.dropdown-menu::-webkit-scrollbar-thumb,
+.dropdown-content::-webkit-scrollbar-thumb,
+#dia-combobox-list::-webkit-scrollbar-thumb,
+#meses-combobox-list::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 8px;
+}
+
+/* Ítems de menú de filtro global (categoría, día, mes, etc.) */
+.dropdown-item, .dropdown-content a, #dia-combobox-list a, #meses-combobox-list a {
     color: black;
     padding: 10px 24px;
     text-decoration: none;
@@ -27,54 +91,19 @@
     align-items: center;
     gap: 8px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     transition: background 0.2s;
     margin: 2px 8px;
+    cursor: pointer;
+    border-bottom: none;
 }
-#dia-combobox-list a:hover {
+.dropdown-item:hover, .dropdown-content a:hover, #dia-combobox-list a:hover, #meses-combobox-list a:hover {
     background: #f0f4ff;
 }
-#meses-combobox-list {
-    min-width: 220px;
-    background: white;
-    border: 1px solid black;
-    border-radius: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.10);
-    margin-top: 6px;
-    padding: 4px 0;
-    z-index: 1000;
-}
-#meses-combobox-list a {
-    color: black;
-    padding: 10px 24px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
-    margin: 2px 8px;
-}
-#meses-combobox-list a:hover {
-    background: #f0f4ff;
-}
-/* Estilos para el combobox de meses */
-#meses-combobox-btn {
-    min-width: 220px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-#meses-combobox-label {
-    flex: 1;
-    text-align: center;
-}
-#meses-combobox-list {
-    min-width: 220px;
+.dropdown-item.selected, .dropdown-content a.selected, #dia-combobox-list a.selected, #meses-combobox-list a.selected {
+    background: #e1bee7;
+    font-weight: 600;
 }
 .historial-container {
     padding: 20px;

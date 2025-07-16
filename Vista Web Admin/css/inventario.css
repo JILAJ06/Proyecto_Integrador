@@ -176,16 +176,29 @@
     box-shadow: 0 4px 8px rgba(245, 124, 0, 0.2);
 }
 
-.btn-category {
+
+/* Botón de filtro global (categoría, día, mes, etc.) */
+.btn-category, .btn-dropdown, .btn-filter, .btn-mes, .btn-dia {
     background: white;
     color: black;
     border: 1px solid black;
+    border-radius: 25px;
+    min-width: 140px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.10);
 }
 
-.btn-category:hover {
-    background: #e1bee7;
+.btn-category:hover, .btn-dropdown:hover, .btn-filter:hover, .btn-mes:hover, .btn-dia:hover {
+    background: #f0f4ff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(123, 31, 162, 0.2);
+    box-shadow: 0 4px 12px rgba(45, 106, 245, 0.13);
 }
 
 .btn-delete:hover {
@@ -204,58 +217,90 @@
     display: inline-block;
 }
 
+
+/* Flecha animada global para todos los menús de filtro */
 .dropdown-arrow {
     margin-left: 5px;
-    font-size: 12px;
-    transition: transform 0.3s ease;
+    font-size: 16px;
+    transition: transform 0.3s cubic-bezier(.4,2,.6,1);
 }
-
-.dropdown-container.active .dropdown-arrow {
+.dropdown-container.active .dropdown-arrow,
+.dropdown.active .dropdown-arrow {
     transform: rotate(180deg);
 }
 
-.dropdown-menu {
+
+/* Menú desplegable global para todos los filtros (categoría, día, mes, etc.) */
+.dropdown-menu, .dropdown-content, #dia-combobox-list, #meses-combobox-list {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background: white;
     border: 1px solid black;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     z-index: 1000;
-    max-height: 200px;
+    max-height: 220px;
     overflow-y: auto;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.3s ease;
+    transition: all 0.3s;
+    padding: 4px 0;
+    min-width: 160px;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f0;
 }
-
-.dropdown-container.active .dropdown-menu {
+.dropdown-container.active .dropdown-menu,
+.dropdown.active .dropdown-content,
+.dropdown.active #dia-combobox-list,
+.dropdown.active #meses-combobox-list {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-.dropdown-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    border-bottom: 1px solid #eee;
+/* Scrollbar personalizado para todos los menús de filtro */
+.dropdown-menu::-webkit-scrollbar,
+.dropdown-content::-webkit-scrollbar,
+#dia-combobox-list::-webkit-scrollbar,
+#meses-combobox-list::-webkit-scrollbar {
+    width: 8px;
+    background: #f5f5f0;
+    border-radius: 8px;
+}
+.dropdown-menu::-webkit-scrollbar-thumb,
+.dropdown-content::-webkit-scrollbar-thumb,
+#dia-combobox-list::-webkit-scrollbar-thumb,
+#meses-combobox-list::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 8px;
 }
 
-.dropdown-item:last-child {
+
+/* Ítems de menú de filtro global (categoría, día, mes, etc.) */
+.dropdown-item, .dropdown-content a, #dia-combobox-list a, #meses-combobox-list a {
+    color: black;
+    padding: 10px 24px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background 0.2s;
+    margin: 2px 8px;
+    cursor: pointer;
     border-bottom: none;
 }
-
-.dropdown-item:hover {
-    background: #f5f5f0;
+.dropdown-item:hover, .dropdown-content a:hover, #dia-combobox-list a:hover, #meses-combobox-list a:hover {
+    background: #f0f4ff;
 }
-
-.dropdown-item.selected {
+.dropdown-item.selected, .dropdown-content a.selected, #dia-combobox-list a.selected, #meses-combobox-list a.selected {
     background: #e1bee7;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* Estilos para los modales */
