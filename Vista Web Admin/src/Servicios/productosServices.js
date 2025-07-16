@@ -139,20 +139,17 @@ export async function postProducto(datosProducto) {
             throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
         }
 
-        // Estructura del producto según las especificaciones del backend
+        // Estructura del producto según la guía JSON proporcionada
         const productoData = {
-            codigo: datosProducto.codigo,
-            nombre: datosProducto.nombre,
-            categoria: datosProducto.categoria,
-            marca: datosProducto.marca,
-            envase: datosProducto.envase,
+            codigoProducto: datosProducto.codigo,
+            nombreProducto: datosProducto.nombre,
+            nombreMarca: datosProducto.marca,
+            nombreEnvase: datosProducto.envase,
+            nombreCategoria: datosProducto.categoria,
             variedad: datosProducto.variedad,
-            contenido: datosProducto.contenido,
             medida: datosProducto.medida,
-            precio: parseFloat(datosProducto.precio),
-            negocio: {
-                idNegocio: parseInt(sesion.idNegocio)
-            }
+            contNeto: parseInt(datosProducto.contenido),
+            precioVenta: parseFloat(datosProducto.precio)
         };
 
         console.log('Datos del producto a enviar:', productoData);
@@ -189,15 +186,15 @@ export async function postProducto(datosProducto) {
             } catch (e) {
                 resultado = { 
                     message: 'Producto creado exitosamente',
-                    codigo: productoData.codigo,
-                    nombre: productoData.nombre
+                    codigoProducto: productoData.codigoProducto,
+                    nombreProducto: productoData.nombreProducto
                 };
             }
         } else {
             resultado = { 
                 message: 'Producto creado exitosamente',
-                codigo: productoData.codigo,
-                nombre: productoData.nombre
+                codigoProducto: productoData.codigoProducto,
+                nombreProducto: productoData.nombreProducto
             };
         }
         
@@ -212,9 +209,9 @@ export async function postProducto(datosProducto) {
     }
 }
 
-// Obtener productos (si existe endpoint GET)
+// Obtener productos usando el endpoint GET correcto
 export async function getProductos() {
-    const url_endpoint = `${API_BASE_URL}/productos`; // Asumiendo que existe
+    const url_endpoint = `${API_BASE_URL}/productos`;
     
     try {
         console.log('Obteniendo productos desde:', url_endpoint);
@@ -233,11 +230,23 @@ export async function getProductos() {
         const data = await response.json();
         console.log('Productos obtenidos:', data);
         
+        // Mapear la respuesta del backend al formato usado en el frontend
+        const productos = (data.productos || data || []).map(producto => ({
+            codigo: producto.codigoProducto,
+            nombre: producto.nombreProducto,
+            marca: producto.nombreMarca,
+            envase: producto.nombreEnvase,
+            categoria: producto.nombreCategoria,
+            variedad: producto.variedad,
+            medida: producto.medida,
+            contenido: producto.contNeto?.toString() || '0',
+            precio: producto.precioVenta
+        }));
+        
         // Llenar la tabla de productos si estamos en la página correcta
         const tbody = document.querySelector('.productos-table tbody');
         if (tbody) {
             tbody.innerHTML = '';
-            const productos = data.productos || data || [];
             
             productos.forEach(producto => {
                 const row = tbody.insertRow();
@@ -255,7 +264,7 @@ export async function getProductos() {
             });
         }
         
-        return data.productos || data || [];
+        return productos;
         
     } catch (error) {
         console.error('Error fetching productos:', error);
@@ -264,7 +273,7 @@ export async function getProductos() {
     }
 }
 
-// Editar producto (si existe endpoint PUT)
+// Editar producto usando el endpoint PUT correcto
 export async function putProducto(codigo, datosProducto) {
     const url_endpoint = `${API_BASE_URL}/producto/${codigo}`;
 
@@ -275,12 +284,17 @@ export async function putProducto(codigo, datosProducto) {
             throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
         }
 
+        // Estructura del producto según la guía JSON proporcionada
         const productoData = {
-            ...datosProducto,
-            precio: parseFloat(datosProducto.precio),
-            negocio: {
-                idNegocio: parseInt(sesion.idNegocio)
-            }
+            codigoProducto: datosProducto.codigo || codigo,
+            nombreProducto: datosProducto.nombre,
+            nombreMarca: datosProducto.marca,
+            nombreEnvase: datosProducto.envase,
+            nombreCategoria: datosProducto.categoria,
+            variedad: datosProducto.variedad,
+            medida: datosProducto.medida,
+            contNeto: parseInt(datosProducto.contenido),
+            precioVenta: parseFloat(datosProducto.precio)
         };
 
         console.log('Editando producto:', codigo, 'con datos:', productoData);
@@ -314,13 +328,13 @@ export async function putProducto(codigo, datosProducto) {
             } catch (e) {
                 resultado = { 
                     message: 'Producto editado exitosamente',
-                    codigo: codigo
+                    codigoProducto: codigo
                 };
             }
         } else {
             resultado = { 
                 message: 'Producto editado exitosamente',
-                codigo: codigo
+                codigoProducto: codigo
             };
         }
         
@@ -335,7 +349,7 @@ export async function putProducto(codigo, datosProducto) {
     }
 }
 
-// Eliminar producto (si existe endpoint DELETE)
+// Eliminar producto usando el endpoint DELETE correcto
 export async function deleteProducto(codigo) {
     const url_endpoint = `${API_BASE_URL}/producto/${codigo}`;
 
@@ -364,7 +378,7 @@ export async function deleteProducto(codigo) {
         console.log('Producto eliminado exitosamente');
         mostrarExito('Producto eliminado exitosamente');
         
-        // Recargar productos si existe la función
+        // Recargar productos después de eliminar
         if (typeof getProductos === 'function') {
             await getProductos();
         }

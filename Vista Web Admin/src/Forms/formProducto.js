@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let productos = [];
   let filaSeleccionada = null;
   let productosOriginales = []; // Copia de todos los productos
-  let productosFiltrados = []; // Productos que se muestran actualmente
 
   // Datos de ejemplo
   const datosEjemplo = [
@@ -498,7 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
     const overlay = modal.querySelector('.modal-advertencia-overlay');
 
-    // Función para cerrar modal con animación
+    // Función para cerrar modal with animación
     function cerrarModal() {
       modal.classList.remove('mostrar');
       setTimeout(() => { 
@@ -543,20 +542,307 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Confirmar eliminación
-  function confirmarEliminar() {
+  async function confirmarEliminar() {
     if (!filaSeleccionada) return;
 
     const celdas = filaSeleccionada.querySelectorAll("td");
     const codigo = celdas[0].textContent.trim();
-    const index = productos.findIndex(p => p.codigo === codigo);
 
-    if (index !== -1) {
-      productos.splice(index, 1);
-      cargarProductos();
-      cerrarModal();
+    try {
+      // **USAR EL SERVICIO REAL DEL BACKEND**
+      if (typeof window.deleteProducto === 'function') {
+        await window.deleteProducto(codigo);
+      } else {
+        // Fallback al método anterior si no está disponible el servicio
+        console.warn('Servicio deleteProducto no disponible, usando datos locales');
+      }
+      
+      // Actualizar el array local
+      const index = productos.findIndex(p => p.codigo === codigo);
+      if (index !== -1) {
+        productos.splice(index, 1);
+        cargarProductos();
+      }
+      
       filaSeleccionada = null;
       mostrarAlertaVisual("Producto eliminado exitosamente.");
+      
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      mostrarAlertaVisual('Error al eliminar el producto: ' + error.message);
     }
+  }
+
+  // Función para mostrar alerta visual
+  function mostrarAlertaVisual(mensaje) {
+    // Crear elemento de alerta si no existe
+    let alerta = document.getElementById('alerta-visual');
+    if (!alerta) {
+      alerta = document.createElement('div');
+      alerta.id = 'alerta-visual';
+      alerta.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 10001;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      `;
+      document.body.appendChild(alerta);
+    }
+    
+    alerta.textContent = mensaje;
+    alerta.style.opacity = '1';
+    
+    setTimeout(() => {
+      alerta.style.opacity = '0';
+    }, 3000);
+  }
+
+  // Función para capitalizar texto
+  function capitalizarTexto(texto) {
+    if (!texto) return '';
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+  }
+
+  // Función para abrir modal de agregar producto
+  function abrirModalProducto() {
+    console.log("Abriendo modal de producto...");
+    
+    // Crear modal
+    const modal = crearModalProducto();
+    
+    // Configurar eventos del modal
+    configurarEventosModal(modal, async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      const datosProducto = {
+        codigo: formData.get("codigo"),
+        nombre: formData.get("nombre"),
+        marca: formData.get("marca"),
+        variedad: formData.get("variedad"),
+        contenido: formData.get("contenido"),
+        categoria: formData.get("categoria"),
+        envase: formData.get("envase"),
+        medida: formData.get("medida"),
+        precio: parseFloat(formData.get("precio"))
+      };
+
+      console.log("Datos a enviar:", datosProducto);
+
+      try {
+        // Usar el servicio real del backend
+        if (typeof window.postProducto === 'function') {
+          await window.postProducto(datosProducto);
+        }
+        
+        // Agregar al array local
+        productos.push(datosProducto);
+        cargarProductos();
+        cerrarModal(modal);
+        mostrarAlertaVisual("Producto agregado exitosamente");
+        
+      } catch (error) {
+        console.error('Error al agregar producto:', error);
+        mostrarAlertaVisual('Error al agregar el producto: ' + error.message);
+      }
+    });
+
+    // Mostrar modal
+    mostrarModal(modal);
+  }
+
+  // Función para abrir modal de editar producto
+  function abrirModalEditar() {
+    if (!filaSeleccionada) {
+      mostrarAlertaVisual("Por favor, selecciona un producto para editar");
+      return;
+    }
+
+    console.log("Abriendo modal de editar...");
+    
+    // Obtener datos de la fila seleccionada
+    const celdas = filaSeleccionada.querySelectorAll("td");
+    const datosActuales = {
+      codigo: celdas[0].textContent.trim(),
+      categoria: celdas[1].textContent.trim().toLowerCase(),
+      marca: celdas[2].textContent.trim(),
+      nombre: celdas[3].textContent.trim(),
+      envase: celdas[4].textContent.trim().toLowerCase(),
+      variedad: celdas[5].textContent.trim(),
+      contenido: celdas[6].textContent.trim(),
+      medida: celdas[7].textContent.trim(),
+      precio: parseFloat(celdas[8].textContent.replace('$', ''))
+    };
+
+    // Crear modal de editar
+    const modal = crearModalEditar();
+    
+    // Llenar campos con datos actuales
+    document.getElementById("edit-codigo-producto").value = datosActuales.codigo;
+    document.getElementById("edit-nombre-producto").value = datosActuales.nombre;
+    document.getElementById("edit-marca-producto").value = datosActuales.marca;
+    document.getElementById("edit-variedad").value = datosActuales.variedad;
+    document.getElementById("edit-contenido").value = datosActuales.contenido;
+    document.getElementById("edit-categoria-producto").value = datosActuales.categoria;
+    document.getElementById("edit-envase").value = datosActuales.envase;
+    document.getElementById("edit-medida").value = datosActuales.medida;
+    document.getElementById("edit-precio").value = datosActuales.precio;
+
+    // Configurar eventos del modal
+    configurarEventosModal(modal, async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const codigo = formData.get("codigo");
+      
+      const datosProducto = {
+        codigo: codigo,
+        nombre: formData.get("nombre"),
+        marca: formData.get("marca"),
+        variedad: formData.get("variedad"),
+        contenido: formData.get("contenido"),
+        categoria: formData.get("categoria"),
+        envase: formData.get("envase"),
+        medida: formData.get("medida"),
+        precio: parseFloat(formData.get("precio"))
+      };
+
+      try {
+        // Usar el servicio real del backend
+        if (typeof window.putProducto === 'function') {
+          await window.putProducto(codigo, datosProducto);
+        }
+        
+        // Actualizar el array local
+        const index = productos.findIndex(p => p.codigo === codigo);
+        if (index !== -1) {
+          productos[index] = datosProducto;
+        }
+
+        cargarProductos();
+        cerrarModal(modal);
+        filaSeleccionada = null;
+        mostrarAlertaVisual("Producto actualizado exitosamente");
+        
+      } catch (error) {
+        console.error('Error al editar producto:', error);
+        mostrarAlertaVisual('Error al editar el producto: ' + error.message);
+      }
+    });
+
+    // Mostrar modal
+    mostrarModal(modal);
+  }
+
+  // Función para eliminar producto
+  function eliminarProducto() {
+    if (!filaSeleccionada) {
+      mostrarAlertaVisual("Por favor, selecciona un producto para eliminar");
+      return;
+    }
+
+    console.log("Abriendo modal de eliminar...");
+    crearModalEliminar();
+  }
+
+  // Función para configurar eventos de modal
+  function configurarEventosModal(modal, onSubmit) {
+    const form = modal.querySelector('form');
+    const btnClose = modal.querySelector('.modal-close');
+    const btnCancel = modal.querySelector('.btn-cancel');
+
+    // Evento de submit del formulario
+    if (form && onSubmit) {
+      form.addEventListener('submit', onSubmit);
+    }
+
+    // Eventos para cerrar modal
+    if (btnClose) {
+      btnClose.addEventListener('click', () => cerrarModal(modal));
+    }
+
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => cerrarModal(modal));
+    }
+
+    // Cerrar con Escape
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        cerrarModal(modal);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Cerrar al hacer clic en el overlay
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        cerrarModal(modal);
+      }
+    });
+  }
+
+  // Función para mostrar modal
+  function mostrarModal(modal) {
+    modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    
+    const container = modal.querySelector('.modal-container');
+    if (container) {
+      container.style.transform = 'scale(1)';
+    }
+  }
+
+  // Función para cerrar modal
+  function cerrarModal(modal) {
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    
+    const container = modal.querySelector('.modal-container');
+    if (container) {
+      container.style.transform = 'scale(0.9)';
+    }
+    
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.remove();
+      }
+    }, 300);
+  }
+
+  // Función para configurar selección de filas
+  function setupRowSelection() {
+    const tabla = document.querySelector('.productos-table tbody');
+    if (!tabla) return;
+
+    // Delegar eventos para las filas
+    tabla.addEventListener('click', (e) => {
+      const fila = e.target.closest('tr');
+      if (!fila) return;
+
+      seleccionarFila(fila);
+    });
+  }
+
+  // Función para seleccionar fila
+  function seleccionarFila(fila) {
+    // Quitar selección anterior
+    if (filaSeleccionada) {
+      filaSeleccionada.classList.remove('selected');
+    }
+
+    // Seleccionar nueva fila
+    filaSeleccionada = fila;
+    fila.classList.add('selected');
+    
+    console.log("Fila seleccionada:", fila);
   }
 
   // Cargar productos en la tabla
@@ -566,391 +852,21 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Guardar copia original
     productosOriginales = [...productos];
-    productosFiltrados = [...productos];
-    
-    // Usar la función de actualización
-    actualizarTablaProductos();
-  }
-
-  // Crear fila de producto
-  function crearFilaProducto(producto) {
-    const fila = document.createElement("tr");
-    
-    const campos = [
-      producto.codigo,
-      capitalizarTexto(producto.categoria),
-      producto.marca,
-      producto.nombre,
-      capitalizarTexto(producto.envase),
-      producto.variedad,
-      producto.contenido,
-      producto.medida,
-      `$${producto.precio.toFixed(2)}`
-    ];
-
-    campos.forEach(campo => {
-      const celda = document.createElement("td");
-      celda.textContent = campo;
-      fila.appendChild(celda);
-    });
-
-    return fila;
-  }
-
-  // Función para abrir el modal de agregar
-  async function abrirModalProducto() {
-    console.log("Abriendo modal de producto..."); // Debug
-    let modal = document.getElementById("modal-producto");
-    
-    if (!modal) {
-      modal = crearModalProducto();
-      setupModalEvents(modal);
-    }
-    
-    // Asegurar que el modal está en el DOM
-    if (!document.body.contains(modal)) {
-      document.body.appendChild(modal);
-    }
-    
-    // **CARGAR DATOS DEL BACKEND ANTES DE MOSTRAR EL MODAL**
-    if (typeof window.cargarDatosIniciales === 'function') {
-      try {
-        await window.cargarDatosIniciales();
-      } catch (error) {
-        console.error('Error cargando datos del backend:', error);
-      }
-    }
-    
-    document.getElementById("form-producto").reset();
-    modal.style.display = "flex";
-    modal.style.visibility = "visible";
-    modal.style.opacity = "1";
-    modal.classList.add("active");
-  }
-
-  // Función para abrir el modal de editar
-  function abrirModalEditar() {
-    if (!filaSeleccionada) {
-      mostrarAlertaVisual("Por favor seleccione un producto para editar.");
-      return;
-    }
-
-    let modal = document.getElementById("modal-editar-producto");
-    if (!modal) {
-      modal = crearModalEditar();
-    }
-    setupModalEvents(modal);
-
-    const celdas = filaSeleccionada.querySelectorAll("td");
-    const codigo = celdas[0].textContent.trim();
-    const producto = productos.find(p => p.codigo === codigo);
-
-    if (producto) {
-      document.getElementById("edit-codigo-producto").value = producto.codigo;
-      document.getElementById("edit-contenido").value = producto.contenido;
-      document.getElementById("edit-nombre-producto").value = producto.nombre;
-      document.getElementById("edit-categoria-producto").value = producto.categoria;
-      document.getElementById("edit-marca-producto").value = producto.marca;
-      document.getElementById("edit-envase").value = producto.envase;
-      document.getElementById("edit-variedad").value = producto.variedad;
-      document.getElementById("edit-medida").value = producto.medida;
-      document.getElementById("edit-precio").value = producto.precio;
-    }
-
-    modal.style.display = "flex";
-    modal.style.visibility = "visible";
-    modal.style.opacity = "1";
-    modal.classList.add("active");
-  }
-
-  // Función para eliminar producto
-  function eliminarProducto() {
-    if (!filaSeleccionada) {
-      mostrarAlertaVisual("Por favor seleccione un producto para eliminar.");
-      return;
-    }
-
-    crearModalEliminar();
-  }
-
-  // Configurar eventos específicos del modal de eliminar
-  function setupModalEliminarEvents(modal) {
-    // Cerrar haciendo click fuera del modal
-    modal.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) {
-        cerrarModal();
-      }
-    });
-
-    // Botón de confirmar eliminación (ahora es "Aceptar")
-    const acceptBtn = modal.querySelector(".btn-accept-advertencia");
-    if (acceptBtn) {
-      acceptBtn.addEventListener("click", confirmarEliminar);
-    }
-
-    // Cerrar con botón cancelar
-    const cancelBtn = modal.querySelector(".btn-cancel-advertencia");
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", cerrarModal);
-    }
-  }
-
-  // Función para cerrar modales
-  function cerrarModal() {
-    const modales = document.querySelectorAll(".modal-overlay");
-    modales.forEach(modal => {
-      modal.classList.remove("active");
-      setTimeout(() => {
-        modal.style.display = "none";
-        modal.style.visibility = "hidden";
-        modal.style.opacity = "0";
-      }, 300);
-    });
-  }
-
-  // Configurar eventos del modal
-  function setupModalEvents(modal) {
-    // Cerrar con botón X
-    const closeBtn = modal.querySelector(".modal-close");
-    if (closeBtn) {
-      closeBtn.removeEventListener("click", cerrarModal);
-      closeBtn.addEventListener("click", cerrarModal);
-    }
-
-    // Cerrar con botón cancelar
-    const cancelBtn = modal.querySelector(".btn-cancel");
-    if (cancelBtn) {
-      cancelBtn.removeEventListener("click", cerrarModal);
-      cancelBtn.addEventListener("click", cerrarModal);
-    }
-
-    // Cerrar haciendo click fuera del modal
-    modal.removeEventListener("click", handleModalClick);
-    modal.addEventListener("click", handleModalClick);
-
-    // Envío del formulario
-    const form = modal.querySelector("form");
-    if (form) {
-      form.removeEventListener("submit", handleFormSubmit);
-      form.addEventListener("submit", handleFormSubmit);
-    }
-  }
-
-  function handleModalClick(e) {
-    if (e.target === e.currentTarget) {
-      cerrarModal();
-    }
-  }
-
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    if (e.target.id === "form-producto") {
-      guardarProducto(e);
-    } else if (e.target.id === "form-editar-producto") {
-      editarProducto(e);
-    }
-  }
-
-  // Función para guardar el producto
-  async function guardarProducto(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const nuevoProducto = {
-      codigo: formData.get("codigo"),
-      nombre: formData.get("nombre"),
-      marca: formData.get("marca"),
-      variedad: formData.get("variedad"),
-      contenido: formData.get("contenido"),
-      categoria: formData.get("categoria"),
-      envase: formData.get("envase"),
-      medida: formData.get("medida"),
-      precio: parseFloat(formData.get("precio"))
-    };
-
-    // Validar campos requeridos
-    const camposRequeridos = ['codigo', 'nombre', 'marca', 'variedad', 'contenido', 'categoria', 'envase', 'medida', 'precio'];
-    const camposFaltantes = camposRequeridos.filter(campo => !nuevoProducto[campo]);
-    
-    if (camposFaltantes.length > 0) {
-      mostrarAlertaVisual(`Por favor complete los siguientes campos: ${camposFaltantes.join(', ')}`);
-      return;
-    }
-
-    // Verificar si el código ya existe en el array local
-    if (productos.some(p => p.codigo === nuevoProducto.codigo)) {
-      mostrarAlertaVisual("Ya existe un producto con este código.");
-      return;
-    }
-
-    try {
-      // **USAR EL SERVICIO REAL DEL BACKEND**
-      if (typeof window.postProducto === 'function') {
-        await window.postProducto(nuevoProducto);
-      } else {
-        // Fallback al método anterior si no está disponible el servicio
-        console.warn('Servicio postProducto no disponible, usando datos locales');
-      }
-      
-      // Agregar al array local para la tabla
-      productos.push({
-        ...nuevoProducto,
-        fechaCreacion: new Date().toISOString().split("T")[0]
-      });
-      
-      cargarProductos();
-      cerrarModal();
-      mostrarAlertaVisual("Producto guardado exitosamente");
-      e.target.reset();
-      
-    } catch (error) {
-      console.error('Error al guardar producto:', error);
-      mostrarAlertaVisual('Error al guardar el producto: ' + error.message);
-    }
-  }
-
-  // Función para editar producto
-  function editarProducto(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const codigo = formData.get("codigo");
-    const index = productos.findIndex(p => p.codigo === codigo);
-
-    if (index !== -1) {
-      productos[index] = {
-        codigo: codigo,
-        nombre: formData.get("nombre"),
-        marca: formData.get("marca"),
-        variedad: formData.get("variedad"),
-        contenido: formData.get("contenido"),
-        categoria: formData.get("categoria"),
-        envase: formData.get("envase"),
-        medida: formData.get("medida"),
-        precio: parseFloat(formData.get("precio")),
-        fechaCreacion: productos[index].fechaCreacion
-      };
-
-      cargarProductos();
-      cerrarModal();
-      filaSeleccionada = null;
-      mostrarAlertaVisual("Producto actualizado exitosamente");
-    }
-  }
-
-  // Configurar selección de filas
-  function setupRowSelection() {
-    const tabla = document.querySelector(".productos-table tbody");
-    tabla.addEventListener("click", (e) => {
-      const fila = e.target.closest("tr");
-      if (fila && fila.querySelector("td").textContent.trim()) {
-        seleccionarFila(fila);
-      }
-    });
-  }
-
-  // Seleccionar fila
-  function seleccionarFila(fila) {
-    document.querySelectorAll(".productos-table tbody tr").forEach(tr => {
-      tr.classList.remove("selected");
-    });
-    
-    fila.classList.add("selected");
-    filaSeleccionada = fila;
-  }
-
-  // Función para inicializar filtros
-  async function inicializarFiltros() {
-    try {
-        // Cargar categorías en el dropdown de filtro
-        if (typeof window.getCategorias === 'function') {
-            const categorias = await window.getCategorias();
-            const selectFiltro = document.getElementById('filtro-categoria');
-            
-            if (selectFiltro) {
-                // Limpiar opciones existentes excepto "Todas"
-                while (selectFiltro.children.length > 1) {
-                    selectFiltro.removeChild(selectFiltro.lastChild);
-                }
-                
-                // Agregar categorías
-                categorias.forEach(categoria => {
-                    const option = document.createElement('option');
-                    option.value = categoria.nombre || categoria;
-                    option.textContent = (categoria.nombre || categoria).charAt(0).toUpperCase() + 
-                                       (categoria.nombre || categoria).slice(1);
-                    selectFiltro.appendChild(option);
-                });
-                
-                // Configurar event listener
-                selectFiltro.addEventListener('change', filtrarPorCategoria);
-            }
-        }
-        
-        // Configurar botón limpiar filtros
-        const btnLimpiar = document.getElementById('limpiar-filtros');
-        if (btnLimpiar) {
-            btnLimpiar.addEventListener('click', limpiarFiltros);
-        }
-        
-    } catch (error) {
-        console.error('Error inicializando filtros:', error);
-    }
-}
-
-// Función para filtrar productos por categoría
-function filtrarPorCategoria() {
-    const selectFiltro = document.getElementById('filtro-categoria');
-    const categoriaSeleccionada = selectFiltro.value.toLowerCase();
-    
-    if (!categoriaSeleccionada) {
-        // Mostrar todos los productos
-        productosFiltrados = [...productosOriginales];
-    } else {
-        // Filtrar por categoría
-        productosFiltrados = productosOriginales.filter(producto => 
-            producto.categoria.toLowerCase() === categoriaSeleccionada
-        );
-    }
     
     // Actualizar la tabla
     actualizarTablaProductos();
-    
-    // Mostrar mensaje si no hay resultados
-    if (productosFiltrados.length === 0 && categoriaSeleccionada) {
-        mostrarMensajeSinResultados(categoriaSeleccionada);
-    }
-}
+  }
 
-// Función para limpiar todos los filtros
-function limpiarFiltros() {
-    const selectFiltro = document.getElementById('filtro-categoria');
-    if (selectFiltro) {
-        selectFiltro.value = '';
-    }
-    
-    // Mostrar todos los productos
-    productosFiltrados = [...productosOriginales];
-    actualizarTablaProductos();
-    
-    // Remover mensaje de sin resultados si existe
-    const mensajeSinResultados = document.getElementById('mensaje-sin-resultados');
-    if (mensajeSinResultados) {
-        mensajeSinResultados.remove();
-    }
-}
-
-// Función para actualizar la tabla con productos filtrados
-function actualizarTablaProductos() {
+  // Función para actualizar la tabla con productos
+  function actualizarTablaProductos() {
     const tbody = document.querySelector('.productos-table tbody');
     if (!tbody) return;
     
     // Limpiar tabla
     tbody.innerHTML = '';
     
-    // Agregar productos filtrados
-    productosFiltrados.forEach((producto, index) => {
+    // Agregar productos
+    productos.forEach((producto, index) => {
         const row = tbody.insertRow();
         row.innerHTML = `
             <td>${producto.codigo}</td>
@@ -963,58 +879,38 @@ function actualizarTablaProductos() {
             <td>${producto.medida}</td>
             <td>$${parseFloat(producto.precio).toFixed(2)}</td>
         `;
-        
-        // Mantener funcionalidad de selección de fila
-        row.addEventListener('click', () => seleccionarFila(row, index));
     });
-}
 
-// Función para mostrar mensaje cuando no hay resultados
-function mostrarMensajeSinResultados(categoria) {
-    const tbody = document.querySelector('.productos-table tbody');
-    if (!tbody) return;
-    
-    // Remover mensaje anterior si existe
-    const mensajeAnterior = document.getElementById('mensaje-sin-resultados');
-    if (mensajeAnterior) {
-        mensajeAnterior.remove();
-    }
-    
-    // Crear nuevo mensaje
-    const mensajeDiv = document.createElement('div');
-    mensajeDiv.id = 'mensaje-sin-resultados';
-    mensajeDiv.style.cssText = `
-        text-align: center;
-        padding: 40px;
-        color: #666;
-        font-style: italic;
-        background: #f8f9fa;
-        border: 1px dashed #ddd;
-        border-radius: 8px;
-        margin: 20px 0;
-    `;
-    mensajeDiv.innerHTML = `
-        <i class="fas fa-search" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i><br>
-        No se encontraron productos en la categoría "<strong>${categoria}</strong>"
-    `;
-    
-    // Insertar después de la tabla
-    const table = document.querySelector('.productos-table');
-    if (table && table.parentNode) {
-        table.parentNode.insertBefore(mensajeDiv, table.nextSibling);
-    }
-}
+    // Reconfigurar selección de filas después de cargar
+    setupRowSelection();
+  }
 
-// Función para inicializar el formulario
+  // Función para cargar productos desde el backend al inicializar
+  async function cargarProductosDesdeBackend() {
+    try {
+      if (typeof window.getProductos === 'function') {
+        const productosBackend = await window.getProductos();
+        productos = productosBackend;
+        cargarProductos();
+      }
+    } catch (error) {
+      console.error('Error cargando productos desde backend:', error);
+      // Mantener datos de ejemplo si falla la carga
+    }
+  }
+
+  // Función para inicializar el formulario
   function init() {
     console.log("Inicializando formProducto.js..."); // Debug
     
-    // Cargar datos de ejemplo
-    productos = [...datosEjemplo];
-    cargarProductos();
-
-    // Inicializar filtros
-    inicializarFiltros();
+    // Cargar datos desde el backend o usar datos de ejemplo
+    cargarProductosDesdeBackend().then(() => {
+      // Si no hay productos del backend, usar datos de ejemplo
+      if (productos.length === 0) {
+        productos = [...datosEjemplo];
+        cargarProductos();
+      }
+    });
 
     // Configurar event listeners de los botones del HTML
     const btnAgregar = document.querySelector(".btn-add");
