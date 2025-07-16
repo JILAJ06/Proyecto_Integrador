@@ -15,14 +15,25 @@
             <form class="register-form" id="registerForm">
                 <label for="username">Nombre de usuario</label>
                 <input type="text" id="username" name="username" required>
+                
                 <label for="negocio">Nombre del negocio</label>
                 <input type="text" id="negocio" name="negocio" required>
-                <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" name="direccion" required>
+                
+                <label for="calle">Calle</label>
+                <input type="text" id="calle" name="calle" placeholder="Ej: Av. Revolución 123" required>
+                
+                <label for="colonia">Colonia</label>
+                <input type="text" id="colonia" name="colonia" placeholder="Ej: Centro" required>
+                
+                <label for="codigoPostal">Código Postal</label>
+                <input type="text" id="codigoPostal" name="codigoPostal" placeholder="Ej: 12345" pattern="[0-9]{5}" maxlength="5" required>
+                
                 <label for="email">Correo electrónico</label>
                 <input type="email" id="email" name="email" required>
+                
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" required>
+                
                 <button type="submit" class="register-btn">Registrar</button>
             </form>
         </div>
