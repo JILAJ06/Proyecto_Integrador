@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Cargar datos iniciales si estamos en la página de productos
-    if (window.location.pathname.includes('producto')) {
+    if (window.location.pathname.includes('producto') || window.location.pathname.includes('productos')) {
         cargarDatosIniciales();
+        // Cargar productos inmediatamente
+        setTimeout(() => {
+            if (typeof getProductos === 'function') {
+                getProductos();
+            }
+        }, 100);
     }
 });
 
@@ -38,8 +44,9 @@ async function cargarDatosIniciales() {
 
 // ===== FUNCIONES PRINCIPALES DEL API =====
 
-// Obtener categorías disponibles
-export async function getCategorias() {
+// Obtener categorías disponibles - SIMPLIFICAR
+async function getCategorias() {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
     const url_endpoint = `${API_BASE_URL}/producto/categorias`;
     
     try {
@@ -57,19 +64,21 @@ export async function getCategorias() {
         }
         
         const data = await response.json();
-        console.log('Categorías obtenidas:', data);
+        console.log('Categorías RAW sin procesar:', data);
         
-        return data.categorias || data || [];
+        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
+        return data;
         
     } catch (error) {
         console.error('Error fetching categorías:', error);
-        mostrarError('Error al cargar las categorías');
-        return getCategoriasEjemplo(); // Fallback a datos de ejemplo
+        mostrarError('Error al cargar las categorías desde el servidor');
+        return [];
     }
 }
 
-// Obtener envases disponibles
-export async function getEnvases() {
+// Obtener envases disponibles - SIMPLIFICAR
+async function getEnvases() {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
     const url_endpoint = `${API_BASE_URL}/producto/envases`;
     
     try {
@@ -87,19 +96,21 @@ export async function getEnvases() {
         }
         
         const data = await response.json();
-        console.log('Envases obtenidos:', data);
+        console.log('Envases RAW sin procesar:', data);
         
-        return data.envases || data || [];
+        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
+        return data;
         
     } catch (error) {
         console.error('Error fetching envases:', error);
-        mostrarError('Error al cargar los envases');
-        return getEnvasesEjemplo(); // Fallback a datos de ejemplo
+        mostrarError('Error al cargar los envases desde el servidor');
+        return [];
     }
 }
 
-// Obtener marcas disponibles
-export async function getMarcas() {
+// Obtener marcas disponibles - SIMPLIFICAR
+async function getMarcas() {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
     const url_endpoint = `${API_BASE_URL}/producto/marcas`;
     
     try {
@@ -117,100 +128,21 @@ export async function getMarcas() {
         }
         
         const data = await response.json();
-        console.log('Marcas obtenidas:', data);
+        console.log('Marcas RAW sin procesar:', data);
         
-        return data.marcas || data || [];
+        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
+        return data;
         
     } catch (error) {
         console.error('Error fetching marcas:', error);
-        mostrarError('Error al cargar las marcas');
-        return getMarcasEjemplo(); // Fallback a datos de ejemplo
-    }
-}
-
-// Crear un nuevo producto
-export async function postProducto(datosProducto) {
-    const url_endpoint = `${API_BASE_URL}/producto`;
-
-    try {
-        const sesion = obtenerDatosSesion();
-        
-        if (!sesion) {
-            throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
-        }
-
-        // Estructura del producto según la guía JSON proporcionada
-        const productoData = {
-            codigoProducto: datosProducto.codigo,
-            nombreProducto: datosProducto.nombre,
-            nombreMarca: datosProducto.marca,
-            nombreEnvase: datosProducto.envase,
-            nombreCategoria: datosProducto.categoria,
-            variedad: datosProducto.variedad,
-            medida: datosProducto.medida,
-            contNeto: parseInt(datosProducto.contenido),
-            precioVenta: parseFloat(datosProducto.precio)
-        };
-
-        console.log('Datos del producto a enviar:', productoData);
-
-        const response = await fetch(url_endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(productoData)
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-            let errorText;
-            try {
-                errorText = await response.text();
-            } catch (e) {
-                errorText = 'No se pudo leer la respuesta del servidor';
-            }
-            
-            console.error('Error response:', errorText);
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
-
-        // Verificar si la respuesta tiene contenido JSON válido
-        const contentType = response.headers.get('content-type');
-        let resultado;
-        
-        if (contentType && contentType.includes('application/json')) {
-            try {
-                resultado = await response.json();
-            } catch (e) {
-                resultado = { 
-                    message: 'Producto creado exitosamente',
-                    codigoProducto: productoData.codigoProducto,
-                    nombreProducto: productoData.nombreProducto
-                };
-            }
-        } else {
-            resultado = { 
-                message: 'Producto creado exitosamente',
-                codigoProducto: productoData.codigoProducto,
-                nombreProducto: productoData.nombreProducto
-            };
-        }
-        
-        console.log('Producto creado:', resultado);
-        mostrarExito('Producto creado exitosamente');
-        return resultado;
-        
-    } catch (error) {
-        console.error('Error posting producto:', error);
-        mostrarError('Error al crear el producto: ' + error.message);
-        throw error;
+        mostrarError('Error al cargar las marcas desde el servidor');
+        return [];
     }
 }
 
 // Obtener productos usando el endpoint GET correcto
-export async function getProductos() {
+async function getProductos() {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
     const url_endpoint = `${API_BASE_URL}/productos`;
     
     try {
@@ -228,54 +160,170 @@ export async function getProductos() {
         }
         
         const data = await response.json();
-        console.log('Productos obtenidos:', data);
+        console.log('Productos obtenidos RAW:', data);
         
-        // Mapear la respuesta del backend al formato usado en el frontend
-        const productos = (data.productos || data || []).map(producto => ({
-            codigo: producto.codigoProducto,
-            nombre: producto.nombreProducto,
-            marca: producto.nombreMarca,
-            envase: producto.nombreEnvase,
-            categoria: producto.nombreCategoria,
-            variedad: producto.variedad,
-            medida: producto.medida,
-            contenido: producto.contNeto?.toString() || '0',
-            precio: producto.precioVenta
-        }));
+        // Mejorar el mapeo de la respuesta del backend
+        let productos = [];
         
-        // Llenar la tabla de productos si estamos en la página correcta
-        const tbody = document.querySelector('.productos-table tbody');
-        if (tbody) {
-            tbody.innerHTML = '';
-            
-            productos.forEach(producto => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${producto.codigo}</td>
-                    <td>${capitalizarTexto(producto.categoria)}</td>
-                    <td>${producto.marca}</td>
-                    <td>${producto.nombre}</td>
-                    <td>${capitalizarTexto(producto.envase)}</td>
-                    <td>${producto.variedad}</td>
-                    <td>${producto.contenido}</td>
-                    <td>${producto.medida}</td>
-                    <td>$${parseFloat(producto.precio).toFixed(2)}</td>
-                `;
-            });
+        // Si data es un array directamente
+        if (Array.isArray(data)) {
+            productos = data;
+        }
+        // Si data tiene una propiedad productos
+        else if (data && data.productos && Array.isArray(data.productos)) {
+            productos = data.productos;
+        }
+        // Si data es un objeto con los productos como propiedades
+        else if (data && typeof data === 'object') {
+            productos = [data];
         }
         
-        return productos;
+        // CORREGIR EL MAPEO para acceder correctamente a los objetos anidados
+        const productosFormateados = productos.map(producto => {
+            console.log('Procesando producto:', producto);
+            
+            // Extraer datos de los objetos anidados correctamente
+            return {
+                codigo: producto.codigoProducto || 'N/A',
+                nombre: producto.nombreComercial || 'Sin nombre',
+                marca: producto.marca ? producto.marca.nombreMarca : 'Sin marca',
+                envase: producto.envase ? producto.envase.nombreEnvase : 'Sin envase',
+                categoria: producto.categoria ? producto.categoria.nombreCategoria : 'Sin categoría',
+                variedad: producto.variedad || 'Sin variedad',
+                medida: producto.medida || 'pz',
+                contenido: producto.contNeto?.toString() || '0',
+                precio: producto.precioVenta || 0,
+                _original: producto
+            };
+        });
+        
+        console.log('Productos mapeados correctamente:', productosFormateados);
+        
+        // Actualizar la tabla directamente desde el servicio
+        actualizarTablaProductos(productosFormateados);
+        
+        return productosFormateados;
         
     } catch (error) {
         console.error('Error fetching productos:', error);
-        mostrarError('Error al cargar los productos');
+        mostrarError('Error al cargar los productos desde el servidor');
+        // Limpiar la tabla en caso de error
+        const tbody = document.querySelector('.productos-table tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Error al cargar productos</td></tr>';
+        }
         return [];
     }
 }
 
-// Editar producto usando el endpoint PUT correcto
-export async function putProducto(codigo, datosProducto) {
-    const url_endpoint = `${API_BASE_URL}/producto/${codigo}`;
+// Función auxiliar para extraer texto solo cuando sea realmente necesario
+function extraerTextoSeguro(valor) {
+    if (valor === null || valor === undefined) return '';
+    
+    // Si ya es string, devolverlo
+    if (typeof valor === 'string') return valor;
+    
+    // Si es número, convertir
+    if (typeof valor === 'number') return valor.toString();
+    
+    // Si es objeto, intentar extraer nombre pero sin forzar
+    if (typeof valor === 'object' && valor !== null) {
+        // Solo si realmente tiene una propiedad nombre
+        if (valor.nombre) return valor.nombre;
+        if (valor.value) return valor.value;
+        if (valor.text) return valor.text;
+    }
+    
+    // Si no podemos extraer nada útil, devolver string vacío
+    return '';
+}
+
+// Función para actualizar tabla de productos SIN sobre-formatear
+function actualizarTablaProductos(productos) {
+    const tbody = document.querySelector('.productos-table tbody');
+    if (!tbody) {
+      console.warn('No se encontró tbody de la tabla');
+      return;
+    }
+    
+    tbody.innerHTML = '';
+    
+    if (productos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No hay productos disponibles</td></tr>';
+        return;
+    }
+    
+    productos.forEach(producto => {
+        const row = tbody.insertRow();
+        
+        // USAR LOS VALORES DIRECTAMENTE SIN SOBRE-PROCESAR
+        const codigo = producto.codigo || 'N/A';
+        const categoria = producto.categoria || 'Sin categoría';
+        const marca = producto.marca || 'Sin marca';
+        const nombre = producto.nombre || 'Sin nombre';
+        const envase = producto.envase || 'Sin envase';
+        const variedad = producto.variedad || 'Sin variedad';
+        const contenido = producto.contenido || '0';
+        const medida = producto.medida || 'pz';
+        const precio = producto.precio || 0;
+        
+        row.innerHTML = `
+            <td>${codigo}</td>
+            <td>${categoria}</td>
+            <td>${marca}</td>
+            <td>${nombre}</td>
+            <td>${envase}</td>
+            <td>${variedad}</td>
+            <td>${contenido}</td>
+            <td>${medida}</td>
+            <td>$${parseFloat(precio).toFixed(2)}</td>
+        `;
+        
+        // IMPORTANTE: Agregar eventos de selección a cada fila
+        row.addEventListener('click', () => {
+            // Quitar selección anterior
+            const filaAnterior = tbody.querySelector('tr.selected');
+            if (filaAnterior) {
+                filaAnterior.classList.remove('selected');
+            }
+            
+            // Seleccionar nueva fila
+            row.classList.add('selected');
+            
+            // CRÍTICO: Actualizar la variable global en formProducto
+            if (window.formProducto && window.formProducto.setFilaSeleccionada) {
+                window.formProducto.setFilaSeleccionada(row);
+            }
+            
+            // También actualizar la variable local del formProducto si existe
+            if (window.seleccionarFilaProducto) {
+                window.seleccionarFilaProducto(row);
+            }
+            
+            console.log('Fila seleccionada:', row);
+        });
+        
+        // Agregar clase para hover
+        row.addEventListener('mouseenter', () => {
+            if (!row.classList.contains('selected')) {
+                row.style.backgroundColor = '#f5f5f5';
+            }
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            if (!row.classList.contains('selected')) {
+                row.style.backgroundColor = '';
+            }
+        });
+    });
+    
+    console.log(`Tabla actualizada con ${productos.length} productos SIN formateo excesivo`);
+}
+
+// Crear un nuevo producto - ESTRUCTURA CORREGIDA
+async function postProducto(datosProducto) {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
+    const url_endpoint = `${API_BASE_URL}/producto`;
 
     try {
         const sesion = obtenerDatosSesion();
@@ -284,20 +332,141 @@ export async function putProducto(codigo, datosProducto) {
             throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
         }
 
-        // Estructura del producto según la guía JSON proporcionada
+        // Validar datos requeridos
+        if (!datosProducto.codigo) {
+            throw new Error('El código del producto es requerido');
+        }
+        if (!datosProducto.nombre) {
+            throw new Error('El nombre del producto es requerido');
+        }
+        if (!datosProducto.marca) {
+            throw new Error('La marca del producto es requerida');
+        }
+        if (!datosProducto.categoria) {
+            throw new Error('La categoría del producto es requerida');
+        }
+        if (!datosProducto.envase) {
+            throw new Error('El envase del producto es requerido');
+        }
+
+        // ESTRUCTURA CORREGIDA según tu guía JSON
         const productoData = {
-            codigoProducto: datosProducto.codigo || codigo,
-            nombreProducto: datosProducto.nombre,
-            nombreMarca: datosProducto.marca,
-            nombreEnvase: datosProducto.envase,
-            nombreCategoria: datosProducto.categoria,
-            variedad: datosProducto.variedad,
-            medida: datosProducto.medida,
-            contNeto: parseInt(datosProducto.contenido),
-            precioVenta: parseFloat(datosProducto.precio)
+            codigoProducto: String(datosProducto.codigo).trim(),
+            nombreProducto: String(datosProducto.nombre).trim(),
+            nombreMarca: String(datosProducto.marca).trim(),
+            nombreEnvase: String(datosProducto.envase).trim(),
+            nombreCategoria: String(datosProducto.categoria).trim(),
+            variedad: String(datosProducto.variedad || 'Sin variedad').trim(),
+            medida: String(datosProducto.medida || 'pz').trim(),
+            contNeto: parseFloat(datosProducto.contenido) || 0,
+            precioVenta: parseFloat(datosProducto.precio) || 0
         };
 
-        console.log('Editando producto:', codigo, 'con datos:', productoData);
+        console.log('Datos del producto a enviar (ESTRUCTURA CORRECTA):', productoData);
+        console.log('URL endpoint:', url_endpoint);
+
+        const response = await fetch(url_endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productoData)
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+            let errorText;
+            try {
+                errorText = await response.text();
+                console.error('Error text:', errorText);
+            } catch (e) {
+                errorText = 'No se pudo leer la respuesta del servidor';
+            }
+            
+            throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        let resultado;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            try {
+                resultado = await response.json();
+            } catch (e) {
+                console.log('Respuesta no es JSON válido, pero la operación fue exitosa');
+                resultado = { 
+                    message: 'Producto creado exitosamente',
+                    codigoProducto: productoData.codigoProducto,
+                    nombreProducto: productoData.nombreProducto
+                };
+            }
+        } else {
+            resultado = { 
+                message: 'Producto creado exitosamente',
+                codigoProducto: productoData.codigoProducto,
+                nombreProducto: productoData.nombreProducto
+            };
+        }
+        
+        console.log('Producto creado:', resultado);
+        mostrarExito('Producto creado exitosamente');
+        
+        // Recargar productos después de crear
+        setTimeout(() => {
+            getProductos();
+        }, 500);
+        
+        return resultado;
+        
+    } catch (error) {
+        console.error('Error posting producto:', error);
+        mostrarError('Error al crear el producto: ' + error.message);
+        throw error;
+    }
+}
+
+// Editar producto - ESTRUCTURA CORREGIDA
+async function putProducto(codigo, datosProducto) {
+    // CORRECCIÓN: Usar el endpoint correcto del backend
+    const url_endpoint = `${API_BASE_URL}/producto`;
+
+    try {
+        const sesion = obtenerDatosSesion();
+        
+        if (!sesion) {
+            throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
+        }
+
+        // Validar datos requeridos
+        if (!datosProducto.nombre) {
+            throw new Error('El nombre del producto es requerido');
+        }
+        if (!datosProducto.marca) {
+            throw new Error('La marca del producto es requerida');
+        }
+        if (!datosProducto.categoria) {
+            throw new Error('La categoría del producto es requerida');
+        }
+        if (!datosProducto.envase) {
+            throw new Error('El envase del producto es requerido');
+        }
+
+        // ESTRUCTURA CORREGIDA según tu guía JSON
+        const productoData = {
+            codigoProducto: String(datosProducto.codigo || codigo).trim(),
+            nombreProducto: String(datosProducto.nombre).trim(),
+            nombreMarca: String(datosProducto.marca).trim(),
+            nombreEnvase: String(datosProducto.envase).trim(),
+            nombreCategoria: String(datosProducto.categoria).trim(),
+            variedad: String(datosProducto.variedad || 'Sin variedad').trim(),
+            medida: String(datosProducto.medida || 'pz').trim(),
+            contNeto: parseFloat(datosProducto.contenido) || 0,
+            precioVenta: parseFloat(datosProducto.precio) || 0
+        };
+
+        console.log('Editando producto con datos (ESTRUCTURA CORRECTA):', productoData);
+        console.log('URL endpoint:', url_endpoint);
 
         const response = await fetch(url_endpoint, {
             method: 'PUT',
@@ -311,21 +480,22 @@ export async function putProducto(codigo, datosProducto) {
             let errorText;
             try {
                 errorText = await response.text();
+                console.error('Error text:', errorText);
             } catch (e) {
                 errorText = 'No se pudo leer la respuesta del servidor';
             }
             
-            console.error('Error response:', errorText);
             throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
-        const contentType = response.headers.get('content-type');
         let resultado;
+        const contentType = response.headers.get('content-type');
         
         if (contentType && contentType.includes('application/json')) {
             try {
                 resultado = await response.json();
             } catch (e) {
+                console.log('Respuesta no es JSON válido, pero la operación fue exitosa');
                 resultado = { 
                     message: 'Producto editado exitosamente',
                     codigoProducto: codigo
@@ -340,6 +510,12 @@ export async function putProducto(codigo, datosProducto) {
         
         console.log('Producto editado:', resultado);
         mostrarExito('Producto editado exitosamente');
+        
+        // Recargar productos después de editar
+        setTimeout(() => {
+            getProductos();
+        }, 500);
+        
         return resultado;
         
     } catch (error) {
@@ -349,12 +525,14 @@ export async function putProducto(codigo, datosProducto) {
     }
 }
 
-// Eliminar producto usando el endpoint DELETE correcto
-export async function deleteProducto(codigo) {
+// Eliminar producto - YA ESTÁ CORRECTO  
+async function deleteProducto(codigo) {
+    // CORRECTO: /negocio/{id}/producto/{codigo}
     const url_endpoint = `${API_BASE_URL}/producto/${codigo}`;
 
     try {
         console.log('Eliminando producto:', codigo);
+        console.log('URL endpoint CORREGIDA:', url_endpoint);
 
         const response = await fetch(url_endpoint, {
             method: 'DELETE',
@@ -379,9 +557,7 @@ export async function deleteProducto(codigo) {
         mostrarExito('Producto eliminado exitosamente');
         
         // Recargar productos después de eliminar
-        if (typeof getProductos === 'function') {
-            await getProductos();
-        }
+        await getProductos();
         
         return { message: 'Producto eliminado exitosamente' };
         
@@ -396,7 +572,9 @@ export async function deleteProducto(codigo) {
 
 async function cargarCategorias() {
     try {
-        const categorias = await getCategorias();
+        const data = await getCategorias();
+        console.log('Data de categorías recibida:', data);
+        
         const selectCategorias = document.querySelectorAll('select[name="categoria"], #categoria-producto, #edit-categoria-producto');
         
         selectCategorias.forEach(select => {
@@ -407,16 +585,27 @@ async function cargarCategorias() {
                 select.appendChild(primeraOpcion);
             }
             
-            // Agregar nuevas opciones
+            // Procesar datos según la estructura que venga del backend
+            let categorias = [];
+            if (Array.isArray(data)) {
+                categorias = data;
+            } else if (data && data.categorias) {
+                categorias = data.categorias;
+            } else if (data && typeof data === 'object') {
+                categorias = [data];
+            }
+            
+            // Agregar opciones extrayendo el texto solo cuando sea necesario
             categorias.forEach(categoria => {
                 const option = document.createElement('option');
-                option.value = categoria.nombre || categoria.id || categoria;
-                option.textContent = categoria.nombre || categoria;
+                const texto = extraerTextoSeguro(categoria) || categoria;
+                option.value = texto;
+                option.textContent = texto;
                 select.appendChild(option);
             });
         });
         
-        console.log('Categorías cargadas en selects');
+        console.log('Categorías cargadas en selects sin formateo excesivo');
     } catch (error) {
         console.error('Error cargando categorías en selects:', error);
     }
@@ -424,7 +613,9 @@ async function cargarCategorias() {
 
 async function cargarEnvases() {
     try {
-        const envases = await getEnvases();
+        const data = await getEnvases();
+        console.log('Data de envases recibida:', data);
+        
         const selectEnvases = document.querySelectorAll('select[name="envase"], #envase, #edit-envase');
         
         selectEnvases.forEach(select => {
@@ -434,15 +625,27 @@ async function cargarEnvases() {
                 select.appendChild(primeraOpcion);
             }
             
+            // Procesar datos según la estructura que venga del backend
+            let envases = [];
+            if (Array.isArray(data)) {
+                envases = data;
+            } else if (data && data.envases) {
+                envases = data.envases;
+            } else if (data && typeof data === 'object') {
+                envases = [data];
+            }
+            
+            // Agregar opciones extrayendo el texto solo cuando sea necesario
             envases.forEach(envase => {
                 const option = document.createElement('option');
-                option.value = envase.nombre || envase.id || envase;
-                option.textContent = envase.nombre || envase;
+                const texto = extraerTextoSeguro(envase) || envase;
+                option.value = texto;
+                option.textContent = texto;
                 select.appendChild(option);
             });
         });
         
-        console.log('Envases cargados en selects');
+        console.log('Envases cargados en selects sin formateo excesivo');
     } catch (error) {
         console.error('Error cargando envases en selects:', error);
     }
@@ -450,79 +653,62 @@ async function cargarEnvases() {
 
 async function cargarMarcas() {
     try {
-        const marcas = await getMarcas();
+        const data = await getMarcas();
+        console.log('Data de marcas recibida:', data);
+        
         const inputsMarca = document.querySelectorAll('input[name="marca"], #marca-producto, #edit-marca-producto');
         
-        // Para marcas, podemos crear un datalist para autocompletado
-        let datalist = document.getElementById('marcas-datalist');
-        if (!datalist) {
-            datalist = document.createElement('datalist');
-            datalist.id = 'marcas-datalist';
-            document.body.appendChild(datalist);
+        // Procesar datos según la estructura que venga del backend
+        let marcas = [];
+        if (Array.isArray(data)) {
+            marcas = data;
+        } else if (data && data.marcas) {
+            marcas = data.marcas;
+        } else if (data && typeof data === 'object') {
+            marcas = [data];
         }
         
-        datalist.innerHTML = '';
-        marcas.forEach(marca => {
-            const option = document.createElement('option');
-            option.value = marca.nombre || marca;
-            datalist.appendChild(option);
-        });
+        if (marcas.length > 0) {
+            let datalist = document.getElementById('marcas-datalist');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'marcas-datalist';
+                document.body.appendChild(datalist);
+            }
+            
+            datalist.innerHTML = '';
+            marcas.forEach(marca => {
+                const option = document.createElement('option');
+                const texto = extraerTextoSeguro(marca) || marca;
+                option.value = texto;
+                datalist.appendChild(option);
+            });
+            
+            // Asociar datalist a los inputs de marca
+            inputsMarca.forEach(input => {
+                input.setAttribute('list', 'marcas-datalist');
+            });
+        }
         
-        // Asociar datalist a los inputs de marca
-        inputsMarca.forEach(input => {
-            input.setAttribute('list', 'marcas-datalist');
-        });
-        
-        console.log('Marcas cargadas en datalist');
+        console.log('Marcas cargadas en datalist sin formateo excesivo');
     } catch (error) {
         console.error('Error cargando marcas:', error);
     }
 }
 
-// ===== DATOS DE EJEMPLO COMO FALLBACK =====
-
-function getCategoriasEjemplo() {
-    return [
-        { nombre: 'bebidas' },
-        { nombre: 'snacks' },
-        { nombre: 'dulces' },
-        { nombre: 'lacteos' },
-        { nombre: 'panaderia' },
-        { nombre: 'limpieza' },
-        { nombre: 'higiene' }
-    ];
-}
-
-function getEnvasesEjemplo() {
-    return [
-        { nombre: 'botella' },
-        { nombre: 'lata' },
-        { nombre: 'bolsa' },
-        { nombre: 'caja' },
-        { nombre: 'frasco' },
-        { nombre: 'tetrapack' },
-        { nombre: 'sobre' }
-    ];
-}
-
-function getMarcasEjemplo() {
-    return [
-        { nombre: 'Coca Cola' },
-        { nombre: 'Pepsi' },
-        { nombre: 'Sabritas' },
-        { nombre: 'Bimbo' },
-        { nombre: 'Lala' },
-        { nombre: 'Cloralex' },
-        { nombre: 'Nestlé' },
-        { nombre: 'Barcel' }
-    ];
-}
-
 // ===== FUNCIONES DE UTILIDAD =====
 
 function capitalizarTexto(texto) {
-    if (!texto) return '';
-    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    // Validar que el texto sea válido y convertirlo a string
+    if (!texto || texto === null || texto === undefined) return '';
+    
+    // Convertir a string si no lo es
+    const textoStr = String(texto);
+    
+    // Verificar que no esté vacío después de la conversión
+    if (textoStr.length === 0) return '';
+    
+    return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
 }
 
 // Función para mostrar mensajes de éxito
@@ -532,7 +718,21 @@ function mostrarExito(mensaje) {
     } else {
         console.log(mensaje);
         // Crear alerta simple si no existe la función
-        alert(mensaje);
+        const alerta = document.createElement('div');
+        alerta.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 10001;
+            font-size: 14px;
+        `;
+        alerta.textContent = mensaje;
+        document.body.appendChild(alerta);
+        setTimeout(() => alerta.remove(), 3000);
     }
 }
 
@@ -543,11 +743,25 @@ function mostrarError(mensaje) {
     } else {
         console.error(mensaje);
         // Crear alerta simple si no existe la función
-        alert('Error: ' + mensaje);
+        const alerta = document.createElement('div');
+        alerta.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #f44336;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 10001;
+            font-size: 14px;
+        `;
+        alerta.textContent = mensaje;
+        document.body.appendChild(alerta);
+        setTimeout(() => alerta.remove(), 3000);
     }
 }
 
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL =====
+// ===== EXPORTAR FUNCIONES PARA USO GLOBAL - Sin export =====
 
 window.getCategorias = getCategorias;
 window.getEnvases = getEnvases;

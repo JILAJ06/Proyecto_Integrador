@@ -122,10 +122,11 @@ function verificarAutenticacionYRol() {
 }
 
 function mostrarInfoUsuario(sesion) {
-  // Actualizar información de sesión en el header si existe
+  // Actualizar información de sesión en el header
   const sessionInfo = document.querySelector('.session-info');
   if (sessionInfo) {
-    sessionInfo.innerHTML = `Sesión ${sesion.idNegocio}<br>${sesion.rol}`;
+    // CAMBIO: Mostrar nombre de usuario en lugar de "Sesión X"
+    sessionInfo.innerHTML = `${sesion.nombreUsuario}<br>${sesion.rol}`;
   }
   
   // Buscar elementos donde mostrar info del usuario

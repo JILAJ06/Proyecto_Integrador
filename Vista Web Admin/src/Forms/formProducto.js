@@ -4,31 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let filaSeleccionada = null;
   let productosOriginales = []; // Copia de todos los productos
 
-  // Datos de ejemplo
-  const datosEjemplo = [
-    {
-      codigo: "P001",
-      categoria: "limpieza",
-      marca: "Cloralex",
-      nombre: "Cloro",
-      envase: "botella",
-      variedad: "Gel",
-      contenido: "500",
-      medida: "ml",
-      precio: 25.50
-    },
-    {
-      codigo: "P002",
-      categoria: "bebidas",
-      marca: "Coca Cola",
-      nombre: "Refresco",
-      envase: "botella",
-      variedad: "Original",
-      contenido: "600",
-      medida: "ml",
-      precio: 20.00
-    }
-  ];
+  // ELIMINAR DATOS DE EJEMPLO COMPLETAMENTE
+  // const datosEjemplo = [...]; // ELIMINAR ESTA SECCIÓN
 
   // Crear modal para agregar producto
   function crearModalProducto() {
@@ -195,77 +172,95 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="form-row">
             <div class="form-group">
               <label>Código del producto</label>
-              <input type="text" id="edit-codigo-producto" name="codigo" required readonly>
+              <input type="text" id="edit-codigo-producto" name="codigo" readonly style="background-color: #f5f5f5;">
             </div>
             
             <div class="form-group">
               <label>Contenido</label>
-              <input type="text" id="edit-contenido" name="contenido" required>
+              <input type="text" id="edit-contenido" name="contenido" required placeholder="Ejem. 500">
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label>Nombre</label>
-              <input type="text" id="edit-nombre-producto" name="nombre" required>
+              <input type="text" id="edit-nombre-producto" name="nombre" required placeholder="Ejem. Cloro">
             </div>
             
             <div class="form-group">
               <label>Categoría</label>
-              <select id="edit-categoria-producto" name="categoria" required>
-                <option value="bebidas">Bebidas</option>
-                <option value="snacks">Snacks</option>
-                <option value="dulces">Dulces</option>
-                <option value="lacteos">Lácteos</option>
-                <option value="panaderia">Panadería</option>
-                <option value="limpieza">Limpieza</option>
-                <option value="higiene">Higiene Personal</option>
-              </select>
+              <div class="dropdown-field">
+                <select id="edit-categoria-producto" name="categoria" required>
+                  <option value="">Seleccionar categoría</option>
+                  <option value="bebidas">Bebidas</option>
+                  <option value="snacks">Snacks</option>
+                  <option value="dulces">Dulces</option>
+                  <option value="lacteos">Lácteos</option>
+                  <option value="panaderia">Panadería</option>
+                  <option value="limpieza">Limpieza</option>
+                  <option value="higiene">Higiene Personal</option>
+                  <option value="cocina">Cocina</option>
+                  <option value="frituras">Frituras</option>
+                </select>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+              </div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label>Marca</label>
-              <input type="text" id="edit-marca-producto" name="marca" required>
+              <input type="text" id="edit-marca-producto" name="marca" required placeholder="Ejem. Cloralex">
             </div>
             
             <div class="form-group">
               <label>Envase</label>
-              <select id="edit-envase" name="envase" required>
-                <option value="botella">Botella</option>
-                <option value="lata">Lata</option>
-                <option value="bolsa">Bolsa</option>
-                <option value="caja">Caja</option>
-                <option value="frasco">Frasco</option>
-                <option value="tetrapack">Tetrapack</option>
-                <option value="sobre">Sobre</option>
-              </select>
+              <div class="dropdown-field">
+                <select id="edit-envase" name="envase" required>
+                  <option value="">Seleccionar envase</option>
+                  <option value="botella">Botella</option>
+                  <option value="lata">Lata</option>
+                  <option value="bolsa">Bolsa</option>
+                  <option value="caja">Caja</option>
+                  <option value="frasco">Frasco</option>
+                  <option value="tetrapack">Tetrapack</option>
+                  <option value="sobre">Sobre</option>
+                </select>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+              </div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label>Variedad</label>
-              <input type="text" id="edit-variedad" name="variedad" required>
+              <input type="text" id="edit-variedad" name="variedad" required placeholder="Ejem. Gel">
             </div>
             
             <div class="form-group">
               <label>Medida</label>
-              <select id="edit-medida" name="medida" required>
-                <option value="ml">ml</option>
-                <option value="l">l</option>
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-                <option value="pz">pz</option>
-              </select>
+              <div class="medida-container">
+                <input type="text" value="Medida" readonly class="medida-label">
+                <div class="dropdown-field">
+                  <select id="edit-medida" name="medida" required>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="pz">pz</option>
+                    <option value="Ml">Ml</option>
+                    <option value="m">m</option>
+                  </select>
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Precio</label>
-              <input type="number" id="edit-precio" name="precio" step="0.01" required>
+              <input type="number" id="edit-precio" name="precio" step="0.01" required placeholder="0.00">
             </div>
           </div>
           
@@ -277,40 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    document.body.appendChild(modal);
-    
-    // Aplicar estilos inline consistentes
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    `;
-
-    const modalContainer = modal.querySelector('.modal-container');
-    if (modalContainer) {
-      modalContainer.style.cssText = `
-        background: #f5f5f0;
-        border-radius: 15px;
-        width: 90%;
-        max-width: 600px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-      `;
-    }
-    
     return modal;
   }
 
@@ -549,23 +510,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const codigo = celdas[0].textContent.trim();
 
     try {
-      // **USAR EL SERVICIO REAL DEL BACKEND**
+      // Usar el servicio real del backend
       if (typeof window.deleteProducto === 'function') {
         await window.deleteProducto(codigo);
+        filaSeleccionada = null;
+        mostrarAlertaVisual("Producto eliminado exitosamente.");
       } else {
-        // Fallback al método anterior si no está disponible el servicio
-        console.warn('Servicio deleteProducto no disponible, usando datos locales');
+        throw new Error('Servicio no disponible');
       }
-      
-      // Actualizar el array local
-      const index = productos.findIndex(p => p.codigo === codigo);
-      if (index !== -1) {
-        productos.splice(index, 1);
-        cargarProductos();
-      }
-      
-      filaSeleccionada = null;
-      mostrarAlertaVisual("Producto eliminado exitosamente.");
       
     } catch (error) {
       console.error('Error al eliminar producto:', error);
@@ -604,10 +556,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  // Función para capitalizar texto
+  // Función para capitalizar texto - CORREGIDA
   function capitalizarTexto(texto) {
-    if (!texto) return '';
-    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    // Validar que el texto sea válido y convertirlo a string
+    if (!texto || texto === null || texto === undefined) return '';
+    
+    // Convertir a string si no lo es
+    const textoStr = String(texto);
+    
+    // Verificar que no esté vacío después de la conversión
+    if (textoStr.length === 0) return '';
+    
+    return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
   }
 
   // Función para abrir modal de agregar producto
@@ -623,30 +583,50 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(e.target);
       
       const datosProducto = {
-        codigo: formData.get("codigo"),
-        nombre: formData.get("nombre"),
-        marca: formData.get("marca"),
-        variedad: formData.get("variedad"),
-        contenido: formData.get("contenido"),
-        categoria: formData.get("categoria"),
-        envase: formData.get("envase"),
-        medida: formData.get("medida"),
-        precio: parseFloat(formData.get("precio"))
+        codigo: (formData.get("codigo") || '').trim(),
+        nombre: (formData.get("nombre") || '').trim(),
+        marca: (formData.get("marca") || '').trim(),
+        variedad: (formData.get("variedad") || '').trim(),
+        contenido: (formData.get("contenido") || '0').trim(),
+        categoria: (formData.get("categoria") || '').trim(),
+        envase: (formData.get("envase") || '').trim(),
+        medida: (formData.get("medida") || 'pz').trim(),
+        precio: parseFloat(formData.get("precio")) || 0
       };
 
       console.log("Datos a enviar:", datosProducto);
+
+      // Validar datos antes de enviar
+      if (!datosProducto.codigo) {
+        mostrarAlertaVisual('Error: El código es requerido');
+        return;
+      }
+      if (!datosProducto.nombre) {
+        mostrarAlertaVisual('Error: El nombre es requerido');
+        return;
+      }
+      if (!datosProducto.marca) {
+        mostrarAlertaVisual('Error: La marca es requerida');
+        return;
+      }
+      if (!datosProducto.categoria) {
+        mostrarAlertaVisual('Error: La categoría es requerida');
+        return;
+      }
+      if (!datosProducto.envase) {
+        mostrarAlertaVisual('Error: El envase es requerido');
+        return;
+      }
 
       try {
         // Usar el servicio real del backend
         if (typeof window.postProducto === 'function') {
           await window.postProducto(datosProducto);
+          cerrarModal(modal);
+          mostrarAlertaVisual("Producto agregado exitosamente");
+        } else {
+          throw new Error('Servicio no disponible');
         }
-        
-        // Agregar al array local
-        productos.push(datosProducto);
-        cargarProductos();
-        cerrarModal(modal);
-        mostrarAlertaVisual("Producto agregado exitosamente");
         
       } catch (error) {
         console.error('Error al agregar producto:', error);
@@ -661,75 +641,141 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para abrir modal de editar producto
   function abrirModalEditar() {
     if (!filaSeleccionada) {
-      mostrarAlertaVisual("Por favor, selecciona un producto para editar");
+      mostrarAlertaVisual('Por favor selecciona un producto para editar');
       return;
     }
 
     console.log("Abriendo modal de editar...");
     
     // Obtener datos de la fila seleccionada
-    const celdas = filaSeleccionada.querySelectorAll("td");
+    const celdas = filaSeleccionada.querySelectorAll('td');
     const datosActuales = {
-      codigo: celdas[0].textContent.trim(),
-      categoria: celdas[1].textContent.trim().toLowerCase(),
-      marca: celdas[2].textContent.trim(),
-      nombre: celdas[3].textContent.trim(),
-      envase: celdas[4].textContent.trim().toLowerCase(),
-      variedad: celdas[5].textContent.trim(),
-      contenido: celdas[6].textContent.trim(),
-      medida: celdas[7].textContent.trim(),
-      precio: parseFloat(celdas[8].textContent.replace('$', ''))
+      codigo: celdas[0]?.textContent?.trim() || '',
+      categoria: celdas[1]?.textContent?.trim() || '',
+      marca: celdas[2]?.textContent?.trim() || '',
+      nombre: celdas[3]?.textContent?.trim() || '',
+      envase: celdas[4]?.textContent?.trim() || '',
+      variedad: celdas[5]?.textContent?.trim() || '',
+      contenido: celdas[6]?.textContent?.trim() || '',
+      medida: celdas[7]?.textContent?.trim() || '',
+      precio: celdas[8]?.textContent?.replace('$', '').trim() || ''
     };
 
-    // Crear modal de editar
+    console.log('Datos actuales extraídos:', datosActuales);
+
     const modal = crearModalEditar();
-    
-    // Llenar campos con datos actuales
-    document.getElementById("edit-codigo-producto").value = datosActuales.codigo;
-    document.getElementById("edit-nombre-producto").value = datosActuales.nombre;
-    document.getElementById("edit-marca-producto").value = datosActuales.marca;
-    document.getElementById("edit-variedad").value = datosActuales.variedad;
-    document.getElementById("edit-contenido").value = datosActuales.contenido;
-    document.getElementById("edit-categoria-producto").value = datosActuales.categoria;
-    document.getElementById("edit-envase").value = datosActuales.envase;
-    document.getElementById("edit-medida").value = datosActuales.medida;
-    document.getElementById("edit-precio").value = datosActuales.precio;
+    document.body.appendChild(modal);
+
+    // IMPORTANTE: Prellenar campos después de que el modal esté en el DOM
+    setTimeout(() => {
+      // Prellenar campos
+      const codigoInput = modal.querySelector('#edit-codigo-producto');
+      const nombreInput = modal.querySelector('#edit-nombre-producto');
+      const marcaInput = modal.querySelector('#edit-marca-producto');
+      const envaseSelect = modal.querySelector('#edit-envase');
+      const categoriaSelect = modal.querySelector('#edit-categoria-producto');
+      const variedadInput = modal.querySelector('#edit-variedad');
+      const contenidoInput = modal.querySelector('#edit-contenido');
+      const medidaSelect = modal.querySelector('#edit-medida');
+      const precioInput = modal.querySelector('#edit-precio');
+
+      if (codigoInput) codigoInput.value = datosActuales.codigo;
+      if (nombreInput) nombreInput.value = datosActuales.nombre;
+      if (marcaInput) marcaInput.value = datosActuales.marca;
+      if (variedadInput) variedadInput.value = datosActuales.variedad;
+      if (contenidoInput) contenidoInput.value = datosActuales.contenido;
+      if (precioInput) precioInput.value = datosActuales.precio;
+
+      // CRÍTICO: Asignar valores a los selects
+      if (envaseSelect && datosActuales.envase) {
+        // Buscar la opción que coincida con el valor actual
+        const opcionEnvase = Array.from(envaseSelect.options).find(option => 
+          option.textContent.toLowerCase().trim() === datosActuales.envase.toLowerCase().trim()
+        );
+        if (opcionEnvase) {
+          envaseSelect.value = opcionEnvase.value;
+        } else {
+          // Si no existe, crear una nueva opción
+          const newOption = document.createElement('option');
+          newOption.value = datosActuales.envase;
+          newOption.textContent = datosActuales.envase;
+          newOption.selected = true;
+          envaseSelect.appendChild(newOption);
+        }
+      }
+
+      // CRÍTICO: Asignar categoría
+      if (categoriaSelect && datosActuales.categoria) {
+        // Buscar la opción que coincida con el valor actual
+        const opcionCategoria = Array.from(categoriaSelect.options).find(option => 
+          option.textContent.toLowerCase().trim() === datosActuales.categoria.toLowerCase().trim()
+        );
+        if (opcionCategoria) {
+          categoriaSelect.value = opcionCategoria.value;
+        } else {
+          // Si no existe, crear una nueva opción
+          const newOption = document.createElement('option');
+          newOption.value = datosActuales.categoria;
+          newOption.textContent = datosActuales.categoria;
+          newOption.selected = true;
+          categoriaSelect.appendChild(newOption);
+        }
+      }
+
+      // CRÍTICO: Asignar medida
+      if (medidaSelect && datosActuales.medida) {
+        const opcionMedida = Array.from(medidaSelect.options).find(option => 
+          option.value.toLowerCase() === datosActuales.medida.toLowerCase()
+        );
+        if (opcionMedida) {
+          medidaSelect.value = opcionMedida.value;
+        } else {
+          // Si no existe, crear una nueva opción
+          const newOption = document.createElement('option');
+          newOption.value = datosActuales.medida;
+          newOption.textContent = datosActuales.medida;
+          newOption.selected = true;
+          medidaSelect.appendChild(newOption);
+        }
+      }
+
+      console.log('Campos prellenados correctamente');
+    }, 100);
 
     // Configurar eventos del modal
     configurarEventosModal(modal, async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const codigo = formData.get("codigo");
       
-      const datosProducto = {
-        codigo: codigo,
-        nombre: formData.get("nombre"),
-        marca: formData.get("marca"),
-        variedad: formData.get("variedad"),
-        contenido: formData.get("contenido"),
-        categoria: formData.get("categoria"),
-        envase: formData.get("envase"),
-        medida: formData.get("medida"),
-        precio: parseFloat(formData.get("precio"))
-      };
-
+      // Recoger datos del formulario
+      const formData = new FormData(e.target);
+      const datosProducto = {};
+      
+      for (let [key, value] of formData.entries()) {
+        datosProducto[key] = value;
+      }
+      
+      console.log('Datos del formulario para editar:', datosProducto);
+      
+      // VALIDACIÓN ADICIONAL antes de enviar
+      if (!datosProducto.categoria || datosProducto.categoria.trim() === '') {
+        mostrarAlertaVisual('Por favor selecciona una categoría');
+        return;
+      }
+      
+      if (!datosProducto.envase || datosProducto.envase.trim() === '') {
+        mostrarAlertaVisual('Por favor selecciona un envase');
+        return;
+      }
+      
       try {
-        // Usar el servicio real del backend
+        // Usar putProducto del servicio
         if (typeof window.putProducto === 'function') {
-          await window.putProducto(codigo, datosProducto);
+          await window.putProducto(datosActuales.codigo, datosProducto);
+          cerrarModal(modal);
+          mostrarAlertaVisual('Producto editado exitosamente');
+        } else {
+          throw new Error('Función putProducto no disponible');
         }
-        
-        // Actualizar el array local
-        const index = productos.findIndex(p => p.codigo === codigo);
-        if (index !== -1) {
-          productos[index] = datosProducto;
-        }
-
-        cargarProductos();
-        cerrarModal(modal);
-        filaSeleccionada = null;
-        mostrarAlertaVisual("Producto actualizado exitosamente");
-        
       } catch (error) {
         console.error('Error al editar producto:', error);
         mostrarAlertaVisual('Error al editar el producto: ' + error.message);
@@ -817,21 +863,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   }
 
-  // Función para configurar selección de filas
-  function setupRowSelection() {
-    const tabla = document.querySelector('.productos-table tbody');
-    if (!tabla) return;
-
-    // Delegar eventos para las filas
-    tabla.addEventListener('click', (e) => {
-      const fila = e.target.closest('tr');
-      if (!fila) return;
-
-      seleccionarFila(fila);
-    });
-  }
-
-  // Función para seleccionar fila
+  // Función para seleccionar fila (mejorada)
   function seleccionarFila(fila) {
     // Quitar selección anterior
     if (filaSeleccionada) {
@@ -843,59 +875,60 @@ document.addEventListener("DOMContentLoaded", () => {
     fila.classList.add('selected');
     
     console.log("Fila seleccionada:", fila);
+    
+    // Exponer la fila seleccionada globalmente
+    window.formProducto = window.formProducto || {};
+    window.formProducto.filaSeleccionada = fila;
   }
 
-  // Cargar productos en la tabla
+  // Función para configurar selección de filas (mejorada)
+  function setupRowSelection() {
+    // Esta función se llama desde el servicio después de actualizar la tabla
+    console.log('Configurando selección de filas...');
+  }
+
+  // Exponer función para que el servicio pueda actualizar la fila seleccionada
+  window.formProducto = window.formProducto || {};
+  window.formProducto.setFilaSeleccionada = function(fila) {
+    filaSeleccionada = fila;
+    console.log('Fila seleccionada actualizada desde servicio:', fila);
+  };
+
+  // NUEVO: Exponer función de selección globalmente
+  window.seleccionarFilaProducto = seleccionarFila;
+
+  // Función para cargar productos en la tabla - MODIFICADA para NO duplicar eventos
   function cargarProductos() {
+    console.log('Cargando productos en tabla...');
     const tbody = document.querySelector('.productos-table tbody');
-    if (!tbody) return;
+    if (!tbody) {
+      console.warn('No se encontró la tabla de productos');
+      return;
+    }
     
-    // Guardar copia original
-    productosOriginales = [...productos];
+    // NO agregar eventos aquí porque ya se agregan en productosServices.js
+    // Solo actualizar la variable productos local
+    productos = window.productosGlobales || [];
     
-    // Actualizar la tabla
-    actualizarTablaProductos();
-  }
-
-  // Función para actualizar la tabla con productos
-  function actualizarTablaProductos() {
-    const tbody = document.querySelector('.productos-table tbody');
-    if (!tbody) return;
-    
-    // Limpiar tabla
-    tbody.innerHTML = '';
-    
-    // Agregar productos
-    productos.forEach((producto, index) => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${producto.codigo}</td>
-            <td>${capitalizarTexto(producto.categoria)}</td>
-            <td>${producto.marca}</td>
-            <td>${producto.nombre}</td>
-            <td>${capitalizarTexto(producto.envase)}</td>
-            <td>${producto.variedad}</td>
-            <td>${producto.contenido}</td>
-            <td>${producto.medida}</td>
-            <td>$${parseFloat(producto.precio).toFixed(2)}</td>
-        `;
-    });
-
-    // Reconfigurar selección de filas después de cargar
-    setupRowSelection();
+    console.log(`Variable productos actualizada con ${productos.length} productos`);
   }
 
   // Función para cargar productos desde el backend al inicializar
   async function cargarProductosDesdeBackend() {
     try {
+      console.log('Cargando productos desde backend...');
       if (typeof window.getProductos === 'function') {
         const productosBackend = await window.getProductos();
-        productos = productosBackend;
-        cargarProductos();
+        productos = productosBackend || [];
+        window.productosGlobales = productos; // Exponer globalmente
+        console.log('Productos cargados:', productos);
+        // La tabla se actualiza automáticamente desde productosServices.js
+      } else {
+        console.warn('Función getProductos no disponible');
       }
     } catch (error) {
       console.error('Error cargando productos desde backend:', error);
-      // Mantener datos de ejemplo si falla la carga
+      mostrarAlertaVisual('Error al conectar con el servidor');
     }
   }
 
@@ -903,19 +936,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function init() {
     console.log("Inicializando formProducto.js..."); // Debug
     
-    // Cargar datos desde el backend o usar datos de ejemplo
-    cargarProductosDesdeBackend().then(() => {
-      // Si no hay productos del backend, usar datos de ejemplo
-      if (productos.length === 0) {
-        productos = [...datosEjemplo];
-        cargarProductos();
-      }
-    });
+    // Cargar datos desde el backend - SIN DATOS DE EJEMPLO
+    cargarProductosDesdeBackend();
 
     // Configurar event listeners de los botones del HTML
     const btnAgregar = document.querySelector(".btn-add");
     const btnEditar = document.querySelector(".btn-edit");
-    const btnEliminar = document.querySelector(".btn-category"); // Este es el botón eliminar según el HTML
+    const btnEliminar = document.querySelector(".btn-category");
 
     console.log("Botones encontrados:", { btnAgregar, btnEditar, btnEliminar }); // Debug
 
