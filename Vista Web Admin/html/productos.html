@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
     <link rel="stylesheet" href="/Vista Web Admin/css/productos.css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <title>Clink - Productos</title>
 </head>
 <body>
@@ -103,6 +102,17 @@
                     </button>
                 </div>
 
+                <!-- Agregar filtros -->
+                <div class="filtros-container">
+                    <div class="filtro-categoria">
+                        <label for="filtro-categoria">Filtrar por categoría:</label>
+                        <select id="filtro-categoria" class="filtro-select">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                    </div>
+                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+                </div>
+
             <table class="productos-table">
                 <thead>
                     <tr>
@@ -129,8 +139,8 @@
                 </tbody>
             </table> 
         </div>
+    <script src="/Vista Web Admin/src/Servicios/productosService.js"></script>
     <script src="/Vista Web Admin/src/Forms/formProducto.js"></script>
-
     <script src="/Vista Web Admin/script.js"></script>
 
     </body>
