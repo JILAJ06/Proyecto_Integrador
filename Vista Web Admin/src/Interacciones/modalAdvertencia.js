@@ -1,4 +1,33 @@
+    // Combobox funcionalidad para meses (ejecuta automáticamente al cargar)
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('meses-combobox-btn');
+        const list = document.getElementById('meses-combobox-list');
+        const label = document.getElementById('meses-combobox-label');
+        if (!btn || !list) return;
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            list.style.display = (list.style.display === 'block') ? 'none' : 'block';
+        });
+        // Selección de mes
+        list.querySelectorAll('a').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mes = a.getAttribute('data-mes');
+                label.textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
+                list.style.display = 'none';
+                if (typeof window.filterByMonth === 'function') window.filterByMonth(mes);
+            });
+        });
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!btn.contains(e.target) && !list.contains(e.target)) {
+                list.style.display = 'none';
+            }
+        });
+    });
+
 // Script para mostrar el modal de advertencia al eliminar en historial
+// Incluye: selección de filas, advertencia de exportar, alerta visual y combobox de meses
 // Autor: GitHub Copilot
 
 document.addEventListener('DOMContentLoaded', function () {
