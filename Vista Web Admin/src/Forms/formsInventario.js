@@ -108,37 +108,37 @@ document.addEventListener("DOMContentLoaded", () => {
             <label>Escanee o escriba el código del producto</label>
             <input type="text" id="codigo" name="codigo" required placeholder="Código del producto">
           </div>
-          
-          <div class="form-group">
-            <label>Nombre del producto</label>
-            <input type="text" id="producto" name="producto" required placeholder="Nombre del producto">
+
+           <div class="form-group">
+            <label>Ingrese la fecha de Entrada</label>
+            <input type="date" id="fechaEntrada" name="fechaEntrada" required>
           </div>
-          
-          <div class="form-group">
-            <label>Categoría</label>
-            <select id="categoria" name="categoria" required>
-              <option value="">Selecciona una categoría</option>
-              ${categorias.filter(cat => cat.value !== "all").map(cat => 
-                `<option value="${cat.value}">${cat.text}</option>`
-              ).join("")}
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Marca</label>
-            <input type="text" id="marca" name="marca" required placeholder="Marca del producto">
-          </div>
-          
+
           <div class="form-group">
             <label>Ingrese la fecha de caducidad</label>
             <input type="date" id="fechaCaducidad" name="fechaCaducidad" required>
           </div>
-          
+
           <div class="form-group">
-            <label>Precio unitario</label>
+            <label>Cantidad Mínima para Alerta</label>
+            <input type="number" id="stockMinimo" name="stockMinimo " step="0.01" required placeholder="0.00">
+          </div>
+
+           <div class="form-group">
+            <label>Precio de Compra</label>
+            <input type="number" id="precioCompra" name="precioCompra" step="0.01" required placeholder="0.00">
+          </div>
+
+          <div class="form-group">
+            <label>Precio por Unidad</label>
             <input type="number" id="precio" name="precio" step="0.01" required placeholder="0.00">
           </div>
           
+           <div class="form-group">
+            <label>Ganancia al Producto</label>
+            <input type="number" id="margenGanancia" name="margenGanancia" step="0.01" required placeholder="0.00">
+          </div>
+
           <div class="form-row">
             <div class="form-group">
               <label>Ingrese la cantidad en almacén</label>
