@@ -10,7 +10,7 @@
     display: flex;
     justify-content: flex-end;
     margin-bottom: 20px;
-    gap: 16px;
+    gap: 25px;
 }
 
 .btn-action {
@@ -22,7 +22,7 @@
     border-radius: 25px;
     background: #fff;
     color: #111;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -68,7 +68,7 @@
 }
 
 .btn-action i {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .clientes-table {
@@ -84,7 +84,7 @@
 
 .clientes-table thead {
     background-color: #D8D8C0;
-    color: #333;
+    color: #000000;
     border-bottom: 2px solid #111;
 }
 
@@ -125,25 +125,25 @@
     border: 1.5px solid #111;
     border-radius: 0;
     vertical-align: middle;
-    color: #333;
+    color: #000000;
     font-weight: 400;
     text-align: center;
     height: 50px;
 }
 
 .clientes-table td:first-child {
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 400;
+    color: #000000;
 }
 
 .clientes-table td:nth-child(2) {
     text-align: left;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .clientes-table td:nth-child(3) {
     font-family: 'Courier New', monospace;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 /* Responsive design */
