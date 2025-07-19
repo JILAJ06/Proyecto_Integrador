@@ -226,7 +226,8 @@
 
 /* Selección */
 .productos-table tbody tr.selected {
-  background: #d0ebff;
+  background-color: #e6f3fe !important;
+  border: 2.5px solid #2196f3 !important;
 }
 
 /* Overlay y modal */
@@ -277,8 +278,9 @@
     align-items: center;
     margin-bottom: 20px;
     padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    background-color: rgba(212, 197, 161, 0.2) !important;
+    transform: none;
+    box-shadow: none;
 }
 
 .filtro-categoria {
