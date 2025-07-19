@@ -128,7 +128,7 @@
 /* Estilos para los botones de acción */
 .action-buttons {
     display: flex;
-    gap: 45px;
+    gap: 25px;
     justify-content: flex-end;
     margin-bottom: 20px;
     flex-wrap: wrap;
