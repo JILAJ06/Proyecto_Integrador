@@ -36,7 +36,7 @@
     padding: 12px 8px;
     text-align: center;
     font-weight: 600;
-    font-size: 11px;
+    font-size: 14px;
     position: sticky;
     top: 0;
     text-transform: none;
@@ -71,35 +71,35 @@
     padding: 10px 8px;
     border: 1px solid black;
     vertical-align: middle;
-    color: #333;
+    color: #000000;
     font-weight: 400;
     text-align: center;
 }
 
 /* Estilos específicos para diferentes columnas */
 .productos-table td:first-child {
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 400;
+    color: #000000;
     font-family: inherit;
 }
 
 .productos-table td:nth-child(2),
 .productos-table td:nth-child(3),
 .productos-table td:nth-child(4) {
-    text-align: left;
+    text-align: center;
     font-weight: 500;
 }
 
 .productos-table td:nth-child(9) {
-    text-align: right;
-    font-weight: 600;
-    color: #27ae60;
+    text-align: center;
+    font-weight: 500;
+    color: #007e0a;
 }
 
 /* Estilos para los botones de acción */
 .action-buttons {
     display: flex;
-    gap: 45px;
+    gap: 25px;
     justify-content: flex-end;
     margin-bottom: 20px;
     flex-wrap: wrap;
@@ -158,7 +158,7 @@
 }
 
 .btn-action i {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 /* Responsive design */
@@ -234,7 +234,7 @@
 .modal-overlay {
   position: fixed; inset:0;
   background: rgba(0,0,0,0.4);
-  display: none; justify-content: flex-end;
+  display: none; justify-content: center;
   z-index: 1000;
 }
 .modal-overlay.show { display: flex; }
