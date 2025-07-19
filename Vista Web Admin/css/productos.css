@@ -87,7 +87,7 @@
 .productos-table td:nth-child(3),
 .productos-table td:nth-child(4) {
     text-align: center;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .productos-table td:nth-child(9) {
