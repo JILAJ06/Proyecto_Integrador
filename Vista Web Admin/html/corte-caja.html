@@ -118,23 +118,34 @@
                 </table>
                 <div class="corte-caja-actions">
                     <button class="corte-caja-btn" id="cargarCajaBtn">Cargar caja</button>
-                    <button class="corte-caja-btn">Cerrar caja</button>
+                    <button class="corte-caja-btn" id="toggleCajaBtn">Cerrar caja</button>
                 </div>
             </div>
         </section>
     </div>
-    <script>
-        document.getElementById('cargarCajaBtn').addEventListener('click', function() {
-            // Simulación de datos
-            const fecha = new Date();
-            const fechaStr = fecha.toLocaleDateString('es-MX');
-            document.getElementById('fecha').textContent = fechaStr;
-            document.getElementById('empleado').textContent = 'Juan Chin Chin';
-            document.getElementById('cantidadInicial').textContent = '$1,000.00';
-            document.getElementById('ingresos').textContent = '$2,500.00';
-            document.getElementById('ganancias').textContent = '$1,500.00';
-            document.getElementById('totalEntregar').textContent = '$2,500.00';
-        });
+    <!-- Modal para abrir caja -->
+    <div id="modalAbrirCaja" class="modal-abrir-caja" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Abrir Caja</span>
+                <span class="modal-close" id="cerrarModalAbrirCaja">&times;</span>
+            </div>
+            <form id="formAbrirCaja" autocomplete="off">
+                <div class="modal-body">
+                    <label for="cantidadInicialInput">¿Con cuánto se empieza?</label>
+                    <input type="number" min="0" step="0.01" id="cantidadInicialInput" name="cantidadInicialInput" placeholder="$0.00" required style="width:100%;font-size:1.2rem;padding:8px 12px;border-radius:8px;border:1.5px solid #bdbdbd;margin-top:8px;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn-cancelar" id="cancelarAbrirCaja">Cancelar</button>
+                    <button type="submit" class="modal-btn-aceptar">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- estilos movidos a corte-caja.css -->
+    <script type="module">
+        import { inicializarCorteCaja } from '/Vista Web Admin/src/Servicios/corteServices.js';
+        inicializarCorteCaja && inicializarCorteCaja();
     </script>
 </body>
 </html>
