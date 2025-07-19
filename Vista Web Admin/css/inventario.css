@@ -23,7 +23,7 @@
     padding: 12px 8px;
     text-align: center;
     font-weight: 600;
-    font-size: 11px;
+    font-size: 14px;
     position: sticky;
     top: 0;
     text-transform: none;
@@ -89,47 +89,47 @@
     padding: 10px 8px;
     border: 1px solid black;
     vertical-align: middle;
-    color: #333;
+    color: #000000;
     font-weight: 400;
     text-align: center;
 }
 
 /* Estilos específicos para diferentes columnas */
 .products-table td:first-child {
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 400;
+    color: #000000;
     font-family: inherit;
 }
 
 .products-table td:nth-child(2) {
-    font-weight: 500;
-    color: #2c3e50;
-    text-align: left;
+    font-weight: 400;
+    color: #000000;
+    text-align: center;
 }
 
 .products-table td:nth-child(3),
 .products-table td:nth-child(4) {
-    text-align: left;
+    text-align: center;
 }
 
 .products-table td:nth-child(9),
 .products-table td:nth-child(10) {
     text-align: center;
-    font-weight: 500;
-    color: #666;
+    font-weight: 400;
+    color: #000000;
 }
 
 .products-table td:nth-child(11) {
-    text-align: right;
-    font-weight: 600;
-    color: #27ae60;
+    text-align: center;
+    font-weight: 500;
+    color: #007e0a;
 }
 
 /* Estilos para los botones de acción */
 .action-buttons {
     display: flex;
     gap: 45px;
-    justify-content: center;
+    justify-content: flex-end;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -147,7 +147,7 @@
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     min-width: 140px;
-    justify-content: center;
+    justify-content: flex-end;
     position: relative;
 }
 
@@ -188,7 +188,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s, box-shadow 0.2s;
@@ -221,7 +221,7 @@
 /* Flecha animada global para todos los menús de filtro */
 .dropdown-arrow {
     margin-left: 5px;
-    font-size: 16px;
+    font-size: 15px;
     transition: transform 0.3s cubic-bezier(.4,2,.6,1);
 }
 .dropdown-container.active .dropdown-arrow,
@@ -448,7 +448,7 @@
     border: 2px solid #333;
     border-radius: 25px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 120px;
