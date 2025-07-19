@@ -79,23 +79,20 @@ function seleccionarFila(fila) {
         style.id = 'row-selection-styles';
         style.textContent = `
             .clientes-table tbody tr.selected {
-                background-color: rgba(212, 197, 161, 0.5) !important;
-                border-left: 4px solid #8B7355 !important;
-                box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2) !important;
+                background-color: #e6f3fe !important;
+                border: 2.5px solid #2196f3 !important;
+                box-shadow: none !important;
             }
-            
             .clientes-table tbody tr {
                 cursor: pointer !important;
                 transition: all 0.2s ease !important;
             }
-            
             .clientes-table tbody tr:hover {
                 background-color: rgba(212, 197, 161, 0.2) !important;
                 transform: translateY(-1px) !important;
             }
-            
             .clientes-table tbody tr.selected:hover {
-                background-color: rgba(212, 197, 161, 0.6) !important;
+                background-color: #d2eafd !important;
             }
         `;
         document.head.appendChild(style);
@@ -291,195 +288,164 @@ function aplicarEstilosModalFormularioClientes() {
     const style = document.createElement('style');
     style.id = 'modal-formulario-clientes-styles';
     style.textContent = `
-        /* Modal Overlay */
         .modal-overlay {
             display: none;
             position: fixed;
             z-index: 3000;
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-
         .modal-overlay.active {
             display: flex;
             opacity: 1;
         }
-
-        /* Modal Container */
         .modal-container {
-            background: #fff;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
+            background: #f8f8f2;
+            border-radius: 18px;
+            width: 95%;
+            max-width: 600px;
+            max-height: 95vh;
             overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            border: 2.5px solid #bfc0b0;
+            margin: 0 auto;
         }
-
-        .modal-overlay.active .modal-container {
-            transform: scale(1);
-        }
-
-        /* Modal Header */
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e5e5e5;
-            background: #f8f9fa;
-            border-radius: 12px 12px 0 0;
+            padding: 22px 28px 18px 28px;
+            background: #e6e7c7;
+            border-radius: 16px 16px 0 0;
+            border-bottom: 2px solid #bfc0b0;
         }
-
         .modal-header h3 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 600;
-            color: #333;
+            color: #222;
         }
-
         .modal-close {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
-            color: #666;
+            color: #222;
             padding: 0;
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: all 0.2s ease;
+            transition: background 0.2s;
         }
-
         .modal-close:hover {
             background: #e9ecef;
             color: #333;
         }
-
-        /* Modal Form */
         .modal-form {
-            padding: 24px;
+            padding: 28px 28px 18px 28px;
         }
-
-        /* Form Groups */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 6px;
             font-weight: 500;
-            color: #333;
-            font-size: 14px;
+            color: #222;
+            font-size: 15px;
         }
-
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 10px 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
+            border: 2px solid #222;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: border-color 0.2s;
             box-sizing: border-box;
+            background: #fff;
         }
-
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #8bbf8b;
+            box-shadow: 0 0 0 2px #e6e7c7;
         }
-
         .form-group input[readonly] {
             background-color: #f8f9fa;
             color: #6c757d;
         }
-
-        /* Modal Buttons */
         .modal-buttons {
             display: flex;
-            gap: 12px;
+            gap: 24px;
             justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e5e5;
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: none;
         }
-
         .btn-cancel,
         .btn-accept {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 12px 32px;
+            border: 2px solid #222;
+            border-radius: 24px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 100px;
+            transition: background 0.2s, color 0.2s;
+            min-width: 120px;
         }
-
         .btn-cancel {
-            background: #6c757d;
-            color: white;
+            background: #fff;
+            color: #222;
         }
-
         .btn-cancel:hover {
-            background: #5a6268;
+            background: #f2bcbc;
+            color: #222;
         }
-
         .btn-accept {
-            background: #007bff;
-            color: white;
+            background: #d8f5d0;
+            color: #222;
         }
-
         .btn-accept:hover {
-            background: #0056b3;
+            background: #b8e6b8;
+            color: #222;
         }
-
-        /* Responsive para pantallas pequeñas */
         @media (max-width: 768px) {
             .modal-container {
-                width: 95%;
-                margin: 20px;
+                width: 99%;
+                margin: 10px;
             }
-
             .modal-header {
-                padding: 16px 20px;
+                padding: 14px 16px 12px 16px;
             }
-
             .modal-header h3 {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
-
             .modal-form {
-                padding: 20px;
+                padding: 14px 14px 10px 14px;
             }
-
             .modal-buttons {
                 flex-direction: column;
+                gap: 10px;
             }
-
             .btn-cancel,
             .btn-accept {
                 width: 100%;
+                min-width: 0;
             }
         }
-
         @media (max-width: 480px) {
             .modal-container {
                 width: 100%;
@@ -487,13 +453,11 @@ function aplicarEstilosModalFormularioClientes() {
                 border-radius: 0;
                 max-height: 100vh;
             }
-
             .modal-header {
                 border-radius: 0;
             }
         }
     `;
-
     document.head.appendChild(style);
 }
 
