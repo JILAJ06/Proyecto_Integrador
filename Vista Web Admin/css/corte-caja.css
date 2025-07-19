@@ -1,9 +1,11 @@
        .corte-caja-section {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; 
             min-height: 70vh;
+            padding-top: 50px; 
         }
+
         .corte-caja-card {
             background: #e6e3c6;
             border-radius: 25px;
@@ -18,7 +20,7 @@
             margin-bottom: 30px;
         }
         .corte-caja-table td.label {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             padding: 12px 0 12px 10px;
             border-bottom: 2px solid #222;
@@ -37,12 +39,12 @@
         .corte-caja-actions {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 30px;
         }
         .corte-caja-btn {
             background: #fff;
             color: #222;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             border: none;
             border-radius: 15px;
