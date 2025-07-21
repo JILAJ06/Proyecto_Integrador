@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Vista Web Admin/css/clientes.css">
-    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/clientes.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
-    <script src="clientes.js"></script>
-    <script src="/Vista Web Admin/script.js"></script>
     <title>Clink - Clientes</title>
 </head>
 <body>
@@ -67,7 +65,6 @@
                     </a>
                 </div>
 
-
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
@@ -75,10 +72,11 @@
                 </div>
             </nav>
         </aside>
-         <main class="main-content">
+        
+        <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </div>
                 <div class="header-right">
@@ -88,8 +86,9 @@
                     </div>
                 </div>
             </header>
-        <div class="clientes-container">
-             <!-- Botón de agregar -->
+            
+            <div class="clientes-container">
+                <!-- Botón de agregar -->
                 <div class="action-buttons">
                     <button class="btn-action btn-add">
                         <i class="fas fa-plus"></i>
@@ -115,9 +114,16 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
             </div>
-            <script src="/Vista Web Admin/src/Forms/FormClientes.js"></script>
+        </main>
+    </div>
+
+    <!-- Scripts al final del body -->
+    <!-- IMPORTANTE: Cargar primero el script de sesión -->
+    <script src="/Vista Web Admin/session.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Forms/FormClientes.js"></script>
 </body>
 </html>

@@ -1,35 +1,18 @@
+import { getClientes, createCliente, updateCliente, deleteCliente, getClienteById } from '../Servicios/clientesServices.js';
+
 // Array para almacenar los clientes
 let clientes = [];
 let filaSeleccionada = null;
-
-// Datos de ejemplo para inicializar
-const datosEjemplo = [
-    {
-        id: 1,
-        nombre: "Juan Pérez",
-        telefono: "961-123-4567",
-        fechaRegistro: "2024-01-15"
-    },
-    {
-        id: 2,
-        nombre: "María González",
-        telefono: "961-987-6543",
-        fechaRegistro: "2024-01-20"
-    }
-];
 
 // Función principal que se ejecuta cuando el DOM está listo
 document.addEventListener("DOMContentLoaded", function() {
     console.log('Inicializando módulo de clientes...');
     
-    // Cargar datos iniciales
-    cargarClientesIniciales();
-    
     // Configurar eventos de botones
     setupEventListeners();
     
-    // Cargar tabla de clientes
-    cargarTablaClientes();
+    // Cargar tabla de clientes desde la API
+    cargarTablaClientesDesdeAPI();
 });
 
 // Configurar eventos de los botones
@@ -71,8 +54,152 @@ function setupEventListeners() {
     setupRowSelection();
 }
 
-// Seleccionar fila - CORREGIR ESTA FUNCIÓN
+// Cargar tabla de clientes desde la API
+async function cargarTablaClientesDesdeAPI() {
+    try {
+        console.log('=== CARGANDO CLIENTES DESDE API ===');
+        mostrarToast('Cargando clientes...', 'info');
+        const clientesAPI = await getClientes();
+        clientes = clientesAPI;
+        console.log('✓ Clientes cargados desde API:', clientes);
+        
+        // Esperar un poco para asegurar que la tabla esté actualizada
+        setTimeout(() => {
+            console.log('=== RECONFIGURANDO SELECCIÓN DESPUÉS DE CARGAR ===');
+            setupRowSelection(); // Reconfigurar selección después de cargar
+            mostrarToast('Clientes cargados exitosamente', 'success');
+        }, 300); // Aumenté el tiempo de espera
+        
+    } catch (error) {
+        console.error('✗ Error al cargar clientes:', error);
+        mostrarToast('Error al cargar clientes desde el servidor', 'error');
+    }
+}
+
+// Configurar selección de filas - MEJORADO
+function setupRowSelection() {
+    console.log('=== CONFIGURANDO SELECCIÓN DE FILAS ===');
+    
+    const tabla = document.querySelector('.clientes-table tbody');
+    if (!tabla) {
+        console.error('No se encontró la tabla de clientes para configurar selección');
+        return;
+    }
+
+    const filas = tabla.querySelectorAll('tr');
+    console.log(`Encontradas ${filas.length} filas en la tabla`);
+
+    // Verificar que hay filas válidas
+    const filasValidas = Array.from(filas).filter(fila => {
+        const primeraCelda = fila.children[0];
+        const contenido = primeraCelda ? primeraCelda.textContent.trim() : '';
+        return contenido && contenido !== 'No hay clientes registrados' && !isNaN(parseInt(contenido));
+    });
+
+    console.log(`Encontradas ${filasValidas.length} filas válidas`);
+
+    if (filasValidas.length === 0) {
+        console.warn('No hay filas válidas para configurar selección');
+        return;
+    }
+
+    // Remover listeners anteriores clonando la tabla
+    const nuevaTabla = tabla.cloneNode(true);
+    tabla.parentNode.replaceChild(nuevaTabla, tabla);
+
+    // Configurar cada fila individualmente
+    const nuevasFilas = nuevaTabla.querySelectorAll('tr');
+    console.log(`Configurando ${nuevasFilas.length} filas nuevas`);
+
+    nuevasFilas.forEach((fila, index) => {
+        const primeraCelda = fila.children[0];
+        if (!primeraCelda) return;
+
+        const contenidoCelda = primeraCelda.textContent.trim();
+        
+        // Solo configurar filas válidas
+        if (contenidoCelda && 
+            contenidoCelda !== 'No hay clientes registrados' && 
+            !isNaN(parseInt(contenidoCelda))) {
+            
+            console.log(`Configurando fila ${index} con ID: ${contenidoCelda}`);
+            
+            // Asegurar que los datos estén en la fila
+            const clienteId = parseInt(contenidoCelda);
+            if (!fila.clienteId) {
+                fila.clienteId = clienteId;
+                fila.setAttribute('data-cliente-id', clienteId.toString());
+            }
+            if (!fila.clienteNombre && fila.children[1]) {
+                fila.clienteNombre = fila.children[1].textContent.trim();
+                fila.setAttribute('data-cliente-nombre', fila.clienteNombre);
+            }
+            if (!fila.clienteTelefono && fila.children[2]) {
+                fila.clienteTelefono = fila.children[2].textContent.trim();
+                fila.setAttribute('data-cliente-telefono', fila.clienteTelefono);
+            }
+
+            // Agregar evento de click
+            fila.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('=== CLICK EN FILA ===');
+                console.log('Fila clickeada:', this);
+                console.log('Cliente ID:', this.clienteId);
+                console.log('Data Cliente ID:', this.getAttribute('data-cliente-id'));
+                handleRowClick(this);
+            });
+
+            // Agregar estilos de hover
+            fila.style.cursor = 'pointer';
+            fila.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = 'rgba(212, 197, 161, 0.2)';
+                }
+            });
+            fila.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = '';
+                }
+            });
+        }
+    });
+    
+    console.log('=== SELECCIÓN DE FILAS CONFIGURADA ===');
+}
+
+function handleRowClick(fila) {
+    console.log('=== MANEJANDO CLICK EN FILA ===');
+    console.log('Fila recibida:', fila);
+    
+    // Verificar que la fila tenga contenido válido
+    const primeraCelda = fila.children[0];
+    if (!primeraCelda) {
+        console.log('ERROR: No se encontró primera celda');
+        return;
+    }
+
+    const contenidoCelda = primeraCelda.textContent.trim();
+    console.log('Contenido de la primera celda:', contenidoCelda);
+    
+    // Verificar que sea una fila válida con datos de cliente
+    if (contenidoCelda && 
+        contenidoCelda !== '' && 
+        contenidoCelda !== 'No hay clientes registrados' &&
+        !isNaN(parseInt(contenidoCelda))) {
+        
+        console.log('✓ Fila válida, seleccionando...');
+        seleccionarFila(fila);
+    } else {
+        console.log('✗ Fila no válida para selección:', contenidoCelda);
+    }
+}
+
+// Seleccionar fila - CORREGIDO para manejar IDs como enteros
 function seleccionarFila(fila) {
+    console.log('=== SELECCIONANDO FILA ===');
+    console.log('Fila a seleccionar:', fila);
+    
     // Asegurar que los estilos CSS para selección existan
     if (!document.getElementById('row-selection-styles')) {
         const style = document.createElement('style');
@@ -81,21 +208,24 @@ function seleccionarFila(fila) {
             .clientes-table tbody tr.selected {
                 background-color: #e6f3fe !important;
                 border: 2.5px solid #2196f3 !important;
-                box-shadow: none !important;
+                box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3) !important;
             }
             .clientes-table tbody tr {
                 cursor: pointer !important;
                 transition: all 0.2s ease !important;
+                border: 2px solid transparent;
             }
             .clientes-table tbody tr:hover {
                 background-color: rgba(212, 197, 161, 0.2) !important;
                 transform: translateY(-1px) !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
             }
             .clientes-table tbody tr.selected:hover {
                 background-color: #d2eafd !important;
             }
         `;
         document.head.appendChild(style);
+        console.log('✓ Estilos de selección aplicados');
     }
     
     // Remover selección anterior
@@ -107,47 +237,69 @@ function seleccionarFila(fila) {
     fila.classList.add('selected');
     filaSeleccionada = fila;
     
-    console.log('Fila seleccionada:', filaSeleccionada); // Para debug
+    console.log('✓ Fila seleccionada asignada:', filaSeleccionada);
     
-    // Obtener datos del cliente seleccionado
-    const celdas = fila.querySelectorAll('td');
-    if (celdas.length >= 3) {
-        const clienteData = {
-            id: celdas[0].textContent,
-            nombre: celdas[1].textContent,
-            telefono: celdas[2].textContent
-        };
-        console.log('Cliente seleccionado:', clienteData); // Para debug
+    // Obtener datos del cliente seleccionado - MÉTODO MEJORADO
+    let clienteId = null;
+    let clienteNombre = '';
+    let clienteTelefono = '';
+    
+    // Método 1: Usar propiedades directas del elemento
+    if (fila.clienteId) {
+        clienteId = fila.clienteId;
+        clienteNombre = fila.clienteNombre || '';
+        clienteTelefono = fila.clienteTelefono || '';
+        console.log('✓ Datos obtenidos de propiedades directas');
     }
+    // Método 2: Usar data attributes
+    else if (fila.getAttribute('data-cliente-id')) {
+        clienteId = parseInt(fila.getAttribute('data-cliente-id'));
+        clienteNombre = fila.getAttribute('data-cliente-nombre') || '';
+        clienteTelefono = fila.getAttribute('data-cliente-telefono') || '';
+        console.log('✓ Datos obtenidos de data attributes');
+    }
+    // Método 3: Leer directamente de las celdas
+    else {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length >= 3) {
+            clienteId = parseInt(celdas[0].textContent.trim());
+            clienteNombre = celdas[1].textContent.trim();
+            clienteTelefono = celdas[2].textContent.trim();
+            console.log('✓ Datos obtenidos de las celdas directamente');
+            
+            // Guardar en propiedades para uso futuro
+            fila.clienteId = clienteId;
+            fila.clienteNombre = clienteNombre;
+            fila.clienteTelefono = clienteTelefono;
+            fila.setAttribute('data-cliente-id', clienteId.toString());
+            fila.setAttribute('data-cliente-nombre', clienteNombre);
+            fila.setAttribute('data-cliente-telefono', clienteTelefono);
+        }
+    }
+    
+    // Validar que el ID sea un entero válido
+    if (isNaN(clienteId) || clienteId <= 0) {
+        console.error('✗ ID de cliente inválido:', clienteId);
+        mostrarToast('Error: ID de cliente inválido', 'error');
+        return;
+    }
+    
+    const clienteData = {
+        id: clienteId,  // Ya es un entero
+        nombre: clienteNombre,
+        telefono: clienteTelefono
+    };
+    
+    console.log('✓ Cliente seleccionado (datos finales):', clienteData);
+    console.log('✓ Tipo de ID:', typeof clienteData.id, 'Valor:', clienteData.id);
+    
+    // Guardar datos del cliente seleccionado globalmente
+    window.clienteSeleccionado = clienteData;
+    
+    console.log('=== SELECCIÓN COMPLETADA ===');
 }
 
-// Configurar selección de filas - MEJORAR ESTA FUNCIÓN
-function setupRowSelection() {
-    const tabla = document.querySelector('.clientes-table tbody');
-    if (tabla) {
-        tabla.addEventListener('click', function(e) {
-            const fila = e.target.closest('tr');
-            if (fila && fila.children.length > 0) {
-                const primeraCelda = fila.children[0];
-                const contenidoCelda = primeraCelda.textContent.trim();
-                
-                // Solo seleccionar si la fila tiene contenido real (no está vacía)
-                if (contenidoCelda && 
-                    contenidoCelda !== '' && 
-                    contenidoCelda !== '\u00A0' && 
-                    contenidoCelda !== '&nbsp;' &&
-                    !isNaN(parseInt(contenidoCelda))) { // Verificar que sea un ID válido
-                    
-                    seleccionarFila(fila);
-                }
-            }
-        });
-    } else {
-        console.error('No se encontró la tabla de clientes para configurar selección');
-    }
-}
-
-// Función para crear el modal de agregar cliente (ACTUALIZADA con diseño de formsInventario.js)
+// Función para crear el modal de agregar cliente
 function crearModalCliente() {
     console.log('Creando modal de cliente...');
     
@@ -157,7 +309,6 @@ function crearModalCliente() {
         modalExistente.remove();
     }
 
-    // Crear el modal con el diseño de formsInventario.js
     const modal = document.createElement('div');
     modal.id = 'modal-add-cliente';
     modal.className = 'modal-overlay';
@@ -187,95 +338,500 @@ function crearModalCliente() {
     `;
     
     document.body.appendChild(modal);
-    
-    // Aplicar estilos del formulario de inventario
     aplicarEstilosModalFormularioClientes();
-    
-    // Configurar eventos del modal
     setupModalFormularioEventsClientes(modal);
-    
-    // Mostrar modal
     modal.classList.add('active');
     
-    // Auto-enfocar primer input
     setTimeout(() => {
         const primerInput = modal.querySelector('input[name="nombre"]');
         if (primerInput) primerInput.focus();
     }, 300);
 }
 
-// Función para crear el modal de editar cliente (ACTUALIZADA con diseño de formsInventario.js)
-function crearModalEditarCliente() {
+// Función para crear el modal de editar cliente - CORREGIDO
+async function crearModalEditarCliente() {
+    console.log('Creando modal de editar cliente...');
+    console.log('Fila seleccionada:', filaSeleccionada);
+    
     if (!filaSeleccionada) {
         mostrarToast('Por favor, selecciona un cliente para editar', 'warning');
         return;
     }
 
-    const celdas = filaSeleccionada.querySelectorAll('td');
-    const clienteId = parseInt(celdas[0].textContent);
-    const cliente = clientes.find(c => c.id === clienteId);
+    // Obtener ID del cliente usando el método mejorado
+    let clienteId = null;
+    
+    // Método 1: Propiedad directa
+    if (filaSeleccionada.clienteId) {
+        clienteId = filaSeleccionada.clienteId;
+    }
+    // Método 2: Data attribute
+    else if (filaSeleccionada.getAttribute('data-cliente-id')) {
+        clienteId = parseInt(filaSeleccionada.getAttribute('data-cliente-id'));
+    }
+    // Método 3: Primera celda
+    else {
+        const celdas = filaSeleccionada.querySelectorAll('td');
+        if (celdas.length > 0) {
+            clienteId = parseInt(celdas[0].textContent.trim());
+        }
+    }
+    
+    console.log('ID obtenido para editar:', clienteId, 'Tipo:', typeof clienteId);
+    
+    if (!clienteId || isNaN(clienteId) || clienteId <= 0) {
+        console.error('ID de cliente inválido para editar:', clienteId);
+        mostrarToast('Error: No se pudo obtener un ID válido del cliente', 'error');
+        return;
+    }
+    
+    try {
+        // Obtener cliente desde la API
+        const cliente = await getClienteById(clienteId);
+        
+        if (!cliente) {
+            mostrarToast('Cliente no encontrado', 'error');
+            return;
+        }
 
-    if (!cliente) {
-        mostrarToast('Cliente no encontrado', 'error');
+        console.log('Cliente obtenido de la API para editar:', cliente);
+
+        // Verificar si ya existe un modal
+        const modalExistente = document.getElementById('modal-edit-cliente');
+        if (modalExistente) {
+            modalExistente.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'modal-edit-cliente';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h3>Modificar Cliente</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <form id="form-edit-cliente" class="modal-form">
+                    <div class="form-group">
+                        <label>ID del cliente</label>
+                        <input type="number" name="id" value="${cliente.id}" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nombre del cliente</label>
+                        <input type="text" name="nombre" value="${cliente.nombre || ''}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" name="telefono" value="${cliente.telefono || ''}" required>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel">Cancelar</button>
+                        <button type="submit" class="btn-accept" data-id="${cliente.id}">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        aplicarEstilosModalFormularioClientes();
+        setupModalFormularioEventsClientes(modal);
+        modal.classList.add('active');
+        
+        setTimeout(() => {
+            const primerInput = modal.querySelector('input[name="nombre"]');
+            if (primerInput) primerInput.focus();
+        }, 300);
+        
+    } catch (error) {
+        console.error('Error al obtener cliente:', error);
+        mostrarToast('Error al cargar datos del cliente', 'error');
+    }
+}
+
+// Función para crear el modal de eliminar cliente - CORREGIDO
+async function crearModalEliminarCliente() {
+    console.log('Creando modal de eliminar cliente...');
+    console.log('Fila seleccionada:', filaSeleccionada);
+    
+    if (!filaSeleccionada) {
+        mostrarToast('Por favor, selecciona un cliente para eliminar', 'warning');
         return;
     }
 
-    // Verificar si ya existe un modal
-    const modalExistente = document.getElementById('modal-edit-cliente');
-    if (modalExistente) {
-        modalExistente.remove();
+    // Obtener ID del cliente usando el método mejorado
+    let clienteId = null;
+    
+    // Método 1: Propiedad directa
+    if (filaSeleccionada.clienteId) {
+        clienteId = filaSeleccionada.clienteId;
+    }
+    // Método 2: Data attribute
+    else if (filaSeleccionada.getAttribute('data-cliente-id')) {
+        clienteId = parseInt(filaSeleccionada.getAttribute('data-cliente-id'));
+    }
+    // Método 3: Primera celda
+    else {
+        const celdas = filaSeleccionada.querySelectorAll('td');
+        if (celdas.length > 0) {
+            clienteId = parseInt(celdas[0].textContent.trim());
+        }
+    }
+    
+    console.log('ID obtenido para eliminar:', clienteId, 'Tipo:', typeof clienteId);
+    
+    if (!clienteId || isNaN(clienteId) || clienteId <= 0) {
+        console.error('ID de cliente inválido para eliminar:', clienteId);
+        mostrarToast('Error: No se pudo obtener un ID válido del cliente', 'error');
+        return;
+    }
+    
+    try {
+        const cliente = await getClienteById(clienteId);
+
+        if (!cliente) {
+            mostrarToast('Cliente no encontrado', 'error');
+            return;
+        }
+
+        console.log('Cliente obtenido de la API para eliminar:', cliente);
+
+        // Verificar si ya existe un modal
+        const modalExistente = document.getElementById('modal-advertencia');
+        if (modalExistente) {
+            modalExistente.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'modal-advertencia';
+        modal.innerHTML = `
+            <div class="modal-advertencia-overlay"></div>
+            <div class="modal-advertencia-content">
+                <div class="modal-advertencia-icon">&#9888;</div>
+                <div class="modal-advertencia-title">Advertencia</div>
+                <div class="modal-advertencia-text">Está a punto de eliminar al cliente<br>"${cliente.nombre}" de esta sección,<br>¿está seguro de querer realizar esta acción?</div>
+                <div class="modal-advertencia-actions">
+                    <button class="modal-advertencia-btn-aceptar" data-id="${cliente.id}">Aceptar</button>
+                    <button class="modal-advertencia-btn-cancelar">Cancelar</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        aplicarEstilosModalAdvertencia();
+        setupModalAdvertenciaEvents(modal);
+        
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('mostrar'), 10);
+        
+    } catch (error) {
+        console.error('Error al obtener cliente:', error);
+        mostrarToast('Error al cargar datos del cliente', 'error');
+    }
+}
+
+// Configurar eventos del modal
+function setupModalFormularioEventsClientes(modal) {
+    const closeBtn = modal.querySelector(".modal-close");
+    const cancelBtns = modal.querySelectorAll(".btn-cancel");
+    const form = modal.querySelector("form");
+    
+    // Cerrar con X
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => cerrarModalCliente(modal));
+    }
+    
+    // Cerrar con botón cancelar
+    cancelBtns.forEach(btn => {
+        btn.addEventListener("click", () => cerrarModalCliente(modal));
+    });
+    
+    // Cerrar haciendo click fuera
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            cerrarModalCliente(modal);
+        }
+    });
+    
+    // Cerrar con Escape
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("active")) {
+            cerrarModalCliente(modal);
+        }
+    });
+
+    // Manejar envío del formulario
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const isEdit = form.id === 'form-edit-cliente';
+            
+            if (isEdit) {
+                // Lógica para editar cliente usando API
+                const clienteIdInput = formData.get("id");
+                const clienteId = parseInt(clienteIdInput);
+                const nombre = formData.get("nombre").trim();
+                const telefono = formData.get("telefono").trim();
+
+                console.log('=== INICIANDO EDICIÓN DE CLIENTE ===');
+                console.log('Datos del formulario de edición:');
+                console.log('- ID (input):', clienteIdInput, 'Tipo:', typeof clienteIdInput);
+                console.log('- ID (parseado):', clienteId, 'Tipo:', typeof clienteId);
+                console.log('- Nombre:', nombre);
+                console.log('- Teléfono:', telefono);
+
+                // Validar que el ID sea un entero válido
+                if (isNaN(clienteId) || clienteId <= 0) {
+                    mostrarToast('Error: ID del cliente no válido', 'error');
+                    console.error('ID inválido:', clienteId);
+                    return;
+                }
+
+                // Validar campos
+                if (!nombre) {
+                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
+                    return;
+                }
+
+                if (!telefono) {
+                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
+                    return;
+                }
+
+                // Validar formato de teléfono
+                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
+                if (!telefonoRegex.test(telefono)) {
+                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
+                    return;
+                }
+
+                try {
+                    // Mostrar toast de carga
+                    const toastCarga = mostrarToast('Actualizando cliente...', 'info');
+                    
+                    // Actualizar cliente usando API
+                    const datosActualizados = {
+                        nombre: nombre,
+                        telefono: telefono
+                    };
+
+                    console.log('Enviando actualización con ID:', clienteId, 'Datos:', datosActualizados);
+                    const clienteActualizado = await updateCliente(clienteId, datosActualizados);
+                    
+                    console.log('✓ Cliente actualizado exitosamente:', clienteActualizado);
+                    
+                    // Cerrar toast de carga si existe
+                    if (toastCarga && toastCarga.parentNode) {
+                        cerrarToast(toastCarga);
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    mostrarToast('Cliente actualizado exitosamente', 'success');
+                    
+                    // CAMBIO: No llamar a cargarTablaClientesDesdeAPI() aquí
+                    // porque updateCliente ya actualiza la fila específica
+                    
+                    // Limpiar selección
+                    filaSeleccionada = null;
+                    
+                    // Cerrar modal
+                    cerrarModalCliente(modal);
+                    
+                    console.log('=== EDICIÓN DE CLIENTE COMPLETADA ===');
+                    
+                } catch (error) {
+                    console.error('Error al actualizar cliente:', error);
+                    
+                    // Determinar el tipo de error
+                    let mensajeError = 'Error al actualizar el cliente';
+                    
+                    if (error.message.includes('400')) {
+                        mensajeError = 'Datos del cliente inválidos';
+                    } else if (error.message.includes('404')) {
+                        mensajeError = 'Cliente no encontrado';
+                    } else if (error.message.includes('500')) {
+                        mensajeError = 'Error del servidor. Inténtalo más tarde';
+                    } else if (error.message.includes('fetch') || error.message.includes('network')) {
+                        mensajeError = 'Error de conexión. Verifica tu red';
+                    }
+                    
+                    mostrarToast(mensajeError, 'error');
+                }
+            } else {
+                 // Lógica para agregar cliente usando API
+    const nombre = formData.get("nombre").trim();
+    const telefono = formData.get("telefono").trim();
+
+    // Validar campos
+    if (!nombre) {
+        mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
+        return;
     }
 
-    // Crear el modal con el diseño de formsInventario.js
-    const modal = document.createElement('div');
-    modal.id = 'modal-edit-cliente';
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3>Modificar Cliente</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <form id="form-edit-cliente" class="modal-form">
-                <div class="form-group">
-                    <label>ID del cliente</label>
-                    <input type="text" name="id" value="${cliente.id}" required readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label>Nombre del cliente</label>
-                    <input type="text" name="nombre" value="${cliente.nombre}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Teléfono</label>
-                    <input type="tel" name="telefono" value="${cliente.telefono}" required>
-                </div>
-                
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel">Cancelar</button>
-                    <button type="submit" class="btn-accept" data-id="${cliente.id}">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Aplicar estilos del formulario de inventario
-    aplicarEstilosModalFormularioClientes();
-    
-    // Configurar eventos del modal
-    setupModalFormularioEventsClientes(modal);
-    
-    // Mostrar modal
-    modal.classList.add('active');
-    
-    // Auto-enfocar primer input editable
-    setTimeout(() => {
-        const primerInput = modal.querySelector('input[name="nombre"]');
-        if (primerInput) primerInput.focus();
-    }, 300);
+    if (!telefono) {
+        mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
+        return;
+    }
+
+    // Validar formato de teléfono
+    const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
+    if (!telefonoRegex.test(telefono)) {
+        mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
+        return;
+    }
+
+    try {
+        console.log('=== INICIANDO CREACIÓN DE CLIENTE ===');
+        
+        // Mostrar toast de carga
+        const toastCarga = mostrarToast('Creando cliente...', 'info');
+        
+        // Crear cliente usando API
+        const nuevoCliente = {
+            nombre: nombre,
+            telefono: telefono
+        };
+
+        console.log('Datos del nuevo cliente:', nuevoCliente);
+        
+        const clienteCreado = await createCliente(nuevoCliente);
+        
+        console.log('✓ Cliente creado exitosamente:', clienteCreado);
+        
+        // Cerrar toast de carga si existe
+        if (toastCarga && toastCarga.parentNode) {
+            cerrarToast(toastCarga);
+        }
+        
+        // Mostrar mensaje de éxito
+        mostrarToast('Cliente agregado exitosamente', 'success');
+
+        // Cerrar modal
+        cerrarModalCliente(modal);
+        
+        console.log('=== CREACIÓN DE CLIENTE COMPLETADA ===');
+        
+    } catch (error) {
+        console.error('Error al crear cliente:', error);
+        
+        // Determinar el tipo de error
+        let mensajeError = 'Error al agregar el cliente';
+        
+        if (error.message.includes('400')) {
+            mensajeError = 'Datos del cliente inválidos';
+        } else if (error.message.includes('409')) {
+            mensajeError = 'El cliente ya existe';
+        } else if (error.message.includes('500')) {
+            mensajeError = 'Error del servidor. Inténtalo más tarde';
+        } else if (error.message.includes('fetch') || error.message.includes('network')) {
+            mensajeError = 'Error de conexión. Verifica tu red';
+            
+            // En caso de error de red, intentar recargar la tabla por si el cliente se creó
+            console.warn('Error de red - verificando si el cliente se creó...');
+            setTimeout(async () => {
+                try {
+                    await cargarTablaClientesDesdeAPI();
+                    mostrarToast('Se ha verificado la lista de clientes', 'info');
+                } catch (reloadError) {
+                    console.warn('No se pudo verificar:', reloadError);
+                }
+            }, 2000);
+        }
+        
+        mostrarToast(mensajeError, 'error');
+    }
+}
+        });
+    }
+}
+
+// Configurar eventos del modal de advertencia
+function setupModalAdvertenciaEvents(modal) {
+    const btnAceptar = modal.querySelector('.modal-advertencia-btn-aceptar');
+    const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
+    const overlay = modal.querySelector('.modal-advertencia-overlay');
+    const clienteId = parseInt(btnAceptar.getAttribute('data-id'));
+
+    function cerrarModal() {
+        modal.classList.remove('mostrar');
+        setTimeout(() => { 
+            if (modal.parentNode) {
+                modal.remove(); 
+            }
+        }, 280);
+    }
+
+    function handleEscape(e) {
+        if (e.key === 'Escape') {
+            cerrarModal();
+        }
+    }
+
+    document.addEventListener('keydown', handleEscape);
+
+    btnAceptar.onclick = async function() {
+        try {
+            console.log('=== INICIANDO ELIMINACIÓN DE CLIENTE ===');
+            console.log('ID del cliente a eliminar:', clienteId);
+            
+            // Mostrar toast de carga
+            const toastCarga = mostrarToast('Eliminando cliente...', 'info');
+            
+            const resultado = await deleteCliente(clienteId);
+            
+            console.log('✓ Cliente eliminado exitosamente:', resultado);
+            
+            // Cerrar toast de carga si existe
+            if (toastCarga && toastCarga.parentNode) {
+                cerrarToast(toastCarga);
+            }
+            
+            mostrarToast('Cliente eliminado exitosamente', 'success');
+            filaSeleccionada = null;
+            cerrarModal();
+            
+            console.log('=== ELIMINACIÓN DE CLIENTE COMPLETADA ===');
+            
+        } catch (error) {
+            console.error('Error al eliminar cliente:', error);
+            
+            // Determinar el tipo de error
+            let mensajeError = 'Error al eliminar el cliente';
+            
+            if (error.message.includes('404')) {
+                mensajeError = 'Cliente no encontrado';
+            } else if (error.message.includes('409')) {
+                mensajeError = 'No se puede eliminar: el cliente tiene registros asociados';
+            } else if (error.message.includes('500')) {
+                mensajeError = 'Error del servidor. Inténtalo más tarde';
+            } else if (error.message.includes('fetch') || error.message.includes('network')) {
+                mensajeError = 'Error de conexión. Verifica tu red';
+            }
+            
+            mostrarToast(mensajeError, 'error');
+        }
+        
+        document.removeEventListener('keydown', handleEscape);
+    };
+
+    btnCancelar.onclick = function() {
+        cerrarModal();
+        document.removeEventListener('keydown', handleEscape);
+    };
+
+    overlay.onclick = function() {
+        cerrarModal();
+        document.removeEventListener('keydown', handleEscape);
+    };
+}
+
+// Función para cerrar modal
+function cerrarModalCliente(modal) {
+    modal.classList.remove("active");
 }
 
 // Función para aplicar estilos del formulario (copiado de formsInventario.js)
@@ -461,204 +1017,7 @@ function aplicarEstilosModalFormularioClientes() {
     document.head.appendChild(style);
 }
 
-// Función para configurar eventos del modal (copiado de formsInventario.js)
-function setupModalFormularioEventsClientes(modal) {
-    const closeBtn = modal.querySelector(".modal-close");
-    const cancelBtns = modal.querySelectorAll(".btn-cancel");
-    const form = modal.querySelector("form");
-    
-    // Cerrar con X
-    if (closeBtn) {
-        closeBtn.addEventListener("click", () => cerrarModalCliente(modal));
-    }
-    
-    // Cerrar con botón cancelar
-    cancelBtns.forEach(btn => {
-        btn.addEventListener("click", () => cerrarModalCliente(modal));
-    });
-    
-    // Cerrar haciendo click fuera
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            cerrarModalCliente(modal);
-        }
-    });
-    
-    // Cerrar con Escape
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && modal.classList.contains("active")) {
-            cerrarModalCliente(modal);
-        }
-    });
-
-    // Manejar envío del formulario
-    if (form) {
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            const isEdit = form.id === 'form-edit-cliente';
-            
-            if (isEdit) {
-                // Lógica para editar cliente
-                const clienteId = parseInt(formData.get("id"));
-                const nombre = formData.get("nombre").trim();
-                const telefono = formData.get("telefono").trim();
-
-                // Validar campos
-                if (!nombre) {
-                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
-                    return;
-                }
-
-                if (!telefono) {
-                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
-                    return;
-                }
-
-                // Validar formato de teléfono
-                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
-                if (!telefonoRegex.test(telefono)) {
-                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
-                    return;
-                }
-
-                // Actualizar cliente
-                const datosActualizados = {
-                    nombre: nombre,
-                    telefono: telefono
-                };
-
-                const clienteActualizado = editarCliente(clienteId, datosActualizados);
-                
-                if (clienteActualizado) {
-                    console.log('Cliente actualizado:', clienteActualizado);
-                    
-                    // Actualizar la tabla
-                    cargarTablaClientes();
-                    
-                    // Mostrar mensaje de éxito
-                    mostrarToast('Cliente actualizado exitosamente', 'success');
-                    
-                    // Limpiar selección
-                    filaSeleccionada = null;
-                    
-                    // Cerrar modal
-                    cerrarModalCliente(modal);
-                } else {
-                    mostrarToast('Error al actualizar el cliente', 'error');
-                }
-            } else {
-                // Lógica para agregar cliente
-                const nombre = formData.get("nombre").trim();
-                const telefono = formData.get("telefono").trim();
-
-                // Validar campos
-                if (!nombre) {
-                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
-                    return;
-                }
-
-                if (!telefono) {
-                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
-                    return;
-                }
-
-                // Validar formato de teléfono
-                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
-                if (!telefonoRegex.test(telefono)) {
-                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
-                    return;
-                }
-
-                // Crear objeto cliente
-                const nuevoCliente = {
-                    id: Date.now(), // ID único basado en timestamp
-                    nombre: nombre,
-                    telefono: telefono,
-                    fechaRegistro: new Date().toLocaleDateString()
-                };
-
-                // Agregar cliente al array
-                clientes.push(nuevoCliente);
-                
-                // Guardar en localStorage
-                localStorage.setItem('clientes', JSON.stringify(clientes));
-
-                console.log('Cliente agregado:', nuevoCliente);
-
-                // Actualizar la tabla
-                cargarTablaClientes();
-
-                // Mostrar mensaje de éxito
-                mostrarToast('Cliente agregado exitosamente', 'success');
-
-                // Cerrar modal
-                cerrarModalCliente(modal);
-            }
-        });
-    }
-}
-
-// Función para cerrar modal
-function cerrarModalCliente(modal) {
-    modal.classList.remove("active");
-}
-
-// Función para crear el modal de eliminar cliente
-function crearModalEliminarCliente() {
-    if (!filaSeleccionada) {
-        mostrarToast('Por favor, selecciona un cliente para eliminar', 'warning');
-        return;
-    }
-
-    const celdas = filaSeleccionada.querySelectorAll('td');
-    const clienteId = parseInt(celdas[0].textContent);
-    const cliente = clientes.find(c => c.id === clienteId);
-
-    if (!cliente) {
-        mostrarToast('Cliente no encontrado', 'error');
-        return;
-    }
-
-    // Verificar si ya existe un modal
-    const modalExistente = document.getElementById('modal-advertencia');
-    if (modalExistente) {
-        modalExistente.remove();
-    }
-
-    // Crear el modal usando el mismo diseño que modalAdvertencia.js
-    const modal = document.createElement('div');
-    modal.id = 'modal-advertencia';
-    modal.innerHTML = `
-        <div class="modal-advertencia-overlay"></div>
-        <div class="modal-advertencia-content">
-            <div class="modal-advertencia-icon">&#9888;</div>
-            <div class="modal-advertencia-title">Advertencia</div>
-            <div class="modal-advertencia-text">Está a punto de eliminar al cliente<br>"${cliente.nombre}" de esta sección,<br>¿está seguro de querer realizar esta acción?</div>
-            <div class="modal-advertencia-actions">
-                <button class="modal-advertencia-btn-aceptar" data-id="${cliente.id}">Aceptar</button>
-                <button class="modal-advertencia-btn-cancelar">Cancelar</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Aplicar estilos del modal de advertencia
-    aplicarEstilosModalAdvertencia();
-    
-    // Configurar eventos del modal de eliminar
-    setupModalAdvertenciaEvents(modal);
-    
-    // Mostrar modal con animación
-    modal.style.display = 'flex';
-    setTimeout(() => modal.classList.add('mostrar'), 10);
-}
-
-// Función para aplicar estilos específicos del modal de advertencia
 function aplicarEstilosModalAdvertencia() {
-    // Verificar si ya existen los estilos
     if (document.getElementById('modal-advertencia-styles')) {
         return;
     }
@@ -759,7 +1118,6 @@ function aplicarEstilosModalAdvertencia() {
             background: #f2bcbc;
         }
 
-        /* Responsive para pantallas pequeñas */
         @media (max-width: 480px) {
             #modal-advertencia .modal-advertencia-content {
                 min-width: 320px;
@@ -794,354 +1152,8 @@ function aplicarEstilosModalAdvertencia() {
     document.head.appendChild(style);
 }
 
-// Función para configurar eventos del modal de advertencia
-function setupModalAdvertenciaEvents(modal) {
-    const btnAceptar = modal.querySelector('.modal-advertencia-btn-aceptar');
-    const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
-    const overlay = modal.querySelector('.modal-advertencia-overlay');
-    const clienteId = parseInt(btnAceptar.getAttribute('data-id'));
-
-    // Función para cerrar modal con animación
-    function cerrarModal() {
-        modal.classList.remove('mostrar');
-        setTimeout(() => { 
-            if (modal.parentNode) {
-                modal.remove(); 
-            }
-        }, 280);
-    }
-
-    // Evento para cerrar modal con Escape
-    function handleEscape(e) {
-        if (e.key === 'Escape') {
-            cerrarModal();
-        }
-    }
-
-    document.addEventListener('keydown', handleEscape);
-
-    // Limpiar listeners previos
-    btnAceptar.onclick = null;
-    btnCancelar.onclick = null;
-    overlay.onclick = null;
-
-    // Evento del botón aceptar (confirmar eliminación)
-    btnAceptar.onclick = function() {
-        const cliente = clientes.find(c => c.id === clienteId);
-        const nombreCliente = cliente ? cliente.nombre : 'Cliente';
-        
-        if (eliminarCliente(clienteId)) {
-            mostrarToast(`Cliente "${nombreCliente}" eliminado exitosamente`, 'success');
-            filaSeleccionada = null; // Limpiar selección
-            cerrarModal();
-        } else {
-            mostrarToast('Error al eliminar el cliente', 'error');
-        }
-        
-        // Limpiar event listener
-        document.removeEventListener('keydown', handleEscape);
-    };
-
-    // Evento del botón cancelar
-    btnCancelar.onclick = function() {
-        cerrarModal();
-        document.removeEventListener('keydown', handleEscape);
-    };
-
-    // Evento para cerrar modal al hacer clic en overlay
-    overlay.onclick = function() {
-        cerrarModal();
-        document.removeEventListener('keydown', handleEscape);
-    };
-}
-
-// Función para aplicar estilos al modal - ACTUALIZAR PARA QUITAR ESTILOS DUPLICADOS
-function aplicarEstilosModal() {
-    // Verificar si ya existen los estilos
-    if (document.getElementById('cliente-modal-styles')) {
-        return;
-    }
-
-    const style = document.createElement('style');
-    style.id = 'cliente-modal-styles';
-    style.textContent = `
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-      }
-
-      .modal-overlay.active {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .cliente-modal {
-        background: #D4C5A1 !important;
-        border: 4px solid #8B7355 !important;
-        border-radius: 20px !important;
-        width: 400px !important;
-        height: auto !important;
-        min-height: 300px !important;
-        text-align: center !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        padding: 40px !important;
-        box-sizing: border-box !important;
-        transform: scale(0.7);
-        transition: all 0.3s ease;
-      }
-
-      .modal-overlay.active .cliente-modal {
-        transform: scale(1);
-      }
-
-      .cliente-modal .modal-content {
-        padding: 0 !important;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 25px;
-      }
-
-      .cliente-modal .form-group {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 0;
-      }
-
-      .cliente-modal .form-group label {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10px;
-        font-family: Arial, sans-serif;
-        text-align: center;
-      }
-
-      .cliente-modal .form-input {
-        width: 300px;
-        padding: 12px 15px;
-        border: none;
-        border-radius: 10px;
-        background: white;
-        font-size: 14px;
-        color: #333;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        font-family: Arial, sans-serif;
-        border-bottom: 3px solid #8B7355;
-        outline: none;
-        transition: all 0.2s ease;
-      }
-
-      .cliente-modal .form-input:focus {
-        border-bottom: 3px solid #6B5635;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        transform: translateY(-1px);
-      }
-
-      .cliente-modal .form-input::placeholder {
-        color: #888;
-        font-style: italic;
-      }
-
-      .cliente-modal .modal-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 10px;
-      }
-
-      .btn-accept-cliente,
-      .btn-cancel-cliente {
-        background: white;
-        color: #333;
-        border: none;
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        min-width: 100px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        font-family: Arial, sans-serif;
-      }
-
-      .btn-accept-cliente:hover,
-      .btn-cancel-cliente:hover {
-        background: #f0f0f0;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .btn-accept-cliente:active,
-      .btn-cancel-cliente:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      /* Estilos para la tabla */
-      .clientes-table tbody tr {
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-      }
-
-      .clientes-table tbody tr:hover {
-        background-color: rgba(212, 197, 161, 0.1);
-      }
-
-      .clientes-table tbody tr.selected {
-        background-color: rgba(212, 197, 161, 0.3);
-        border-left: 4px solid #8B7355;
-      }
-
-      /* Responsive para pantallas pequeñas */
-      @media (max-width: 450px) {
-        .cliente-modal {
-          width: 90vw !important;
-          padding: 30px !important;
-        }
-        
-        .cliente-modal .form-input {
-          width: 100%;
-          max-width: 280px;
-        }
-        
-        .btn-accept-cliente,
-        .btn-cancel-cliente {
-          padding: 10px 20px;
-          font-size: 14px;
-          min-width: 80px;
-        }
-      }
-    `;
-
-    document.head.appendChild(style);
-}
-
-// Función para cargar datos iniciales
-function cargarClientesIniciales() {
-    const clientesGuardados = localStorage.getItem('clientes');
-    if (clientesGuardados) {
-        clientes = JSON.parse(clientesGuardados);
-    } else {
-        // Cargar datos de ejemplo si no hay datos guardados
-        clientes = [...datosEjemplo];
-        localStorage.setItem('clientes', JSON.stringify(clientes));
-    }
-    console.log('Clientes cargados:', clientes);
-}
-
-// Función para cargar la tabla de clientes
-function cargarTablaClientes() {
-    const tbody = document.querySelector('.clientes-table tbody');
-    if (!tbody) {
-        console.error('No se encontró la tabla de clientes');
-        return;
-    }
-
-    tbody.innerHTML = '';
-
-    clientes.forEach(cliente => {
-        const fila = crearFilaCliente(cliente);
-        tbody.appendChild(fila);
-    });
-
-    // Agregar filas vacías si es necesario (máximo 8 filas visibles)
-    const filasVacias = Math.max(0, 8 - clientes.length);
-    for (let i = 0; i < filasVacias; i++) {
-        const filaVacia = document.createElement('tr');
-        filaVacia.innerHTML = `
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-        `;
-        tbody.appendChild(filaVacia);
-    }
-}
-
-// Función para crear una fila de cliente
-function crearFilaCliente(cliente) {
-    const fila = document.createElement('tr');
-    
-    const campos = [
-        cliente.id,
-        cliente.nombre,
-        cliente.telefono
-    ];
-
-    campos.forEach(campo => {
-        const celda = document.createElement('td');
-        celda.textContent = campo;
-        fila.appendChild(celda);
-    });
-
-    return fila;
-}
-
-// Función para cargar clientes desde localStorage
-function cargarClientes() {
-    cargarClientesIniciales();
-    cargarTablaClientes();
-}
-
-// Función para obtener todos los clientes
-function obtenerClientes() {
-    return clientes;
-}
-
-// Función para buscar cliente por ID
-function buscarClientePorId(id) {
-    return clientes.find(cliente => cliente.id === id);
-}
-
-// Función para eliminar cliente
-function eliminarCliente(id) {
-    const index = clientes.findIndex(cliente => cliente.id === id);
-    if (index !== -1) {
-        clientes.splice(index, 1);
-        localStorage.setItem('clientes', JSON.stringify(clientes));
-        cargarTablaClientes(); // Actualizar tabla
-        return true;
-    }
-    return false;
-}
-
-// Función para editar cliente
-function editarCliente(id, datosActualizados) {
-    const index = clientes.findIndex(cliente => cliente.id === id);
-    if (index !== -1) {
-        clientes[index] = { ...clientes[index], ...datosActualizados };
-        localStorage.setItem('clientes', JSON.stringify(clientes));
-        return clientes[index];
-    }
-    return null;
-}
-
-// Cargar clientes al inicializar
-// (Eliminado porque ya se maneja en DOMContentLoaded)
-
 // Sistema de notificaciones Toast
 function mostrarToast(mensaje, tipo = 'info') {
-    // Crear contenedor de toast si no existe
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
         toastContainer = document.createElement('div');
@@ -1159,11 +1171,9 @@ function mostrarToast(mensaje, tipo = 'info') {
         document.body.appendChild(toastContainer);
     }
 
-    // Crear el toast
     const toast = document.createElement('div');
     toast.className = `toast toast-${tipo}`;
     
-    // Iconos según el tipo
     const iconos = {
         success: 'fas fa-check-circle',
         error: 'fas fa-times-circle',
@@ -1171,7 +1181,6 @@ function mostrarToast(mensaje, tipo = 'info') {
         info: 'fas fa-info-circle'
     };
 
-    // Colores según el tipo
     const colores = {
         success: { bg: '#d4edda', border: '#c3e6cb', color: '#155724', icon: '#28a745' },
         error: { bg: '#f8d7da', border: '#f5c6cb', color: '#721c24', icon: '#dc3545' },
@@ -1199,42 +1208,36 @@ function mostrarToast(mensaje, tipo = 'info') {
         padding: 12px 16px;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateX(100%);
+        transform: translateX(400px);
+        transition: transform 0.3s ease, opacity 0.3s ease;
         opacity: 0;
-        transition: all 0.3s ease;
-        font-family: Arial, sans-serif;
-        min-width: 300px;
-        word-wrap: break-word;
     `;
 
-    // Agregar toast al contenedor
+    // Configurar cierre del toast
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => cerrarToast(toast));
+
     toastContainer.appendChild(toast);
 
-    // Configurar botón de cerrar
-    const closeBtn = toast.querySelector('.toast-close');
-    closeBtn.addEventListener('click', () => {
-        cerrarToast(toast);
-    });
-
-    // Mostrar toast con animación
+    // Animar entrada
     setTimeout(() => {
         toast.style.transform = 'translateX(0)';
         toast.style.opacity = '1';
     }, 10);
 
-    // Auto-cerrar después de 4 segundos
+    // Auto cerrar después de 5 segundos
     setTimeout(() => {
-        if (toast.parentNode) {
-            cerrarToast(toast);
-        }
-    }, 4000);
+        cerrarToast(toast);
+    }, 5000);
 
-    return toast;
+    return toast; // Devolver el toast para poder cerrarlo manualmente
 }
 
-// Función para cerrar toast
+// Función para cerrar toast - AÑADIDA
 function cerrarToast(toast) {
-    toast.style.transform = 'translateX(100%)';
+    if (!toast || !toast.parentNode) return;
+    
+    toast.style.transform = 'translateX(400px)';
     toast.style.opacity = '0';
     
     setTimeout(() => {
@@ -1244,14 +1247,10 @@ function cerrarToast(toast) {
     }, 300);
 }
 
-// Exportar funciones para uso en otros archivos
-window.crearModalCliente = crearModalCliente;
 window.crearModalEditarCliente = crearModalEditarCliente;
 window.crearModalEliminarCliente = crearModalEliminarCliente;
-window.obtenerClientes = obtenerClientes;
-window.buscarClientePorId = buscarClientePorId;
-window.eliminarCliente = eliminarCliente;
-window.editarCliente = editarCliente;
-window.cargarClientes = cargarClientes;
-window.cargarTablaClientes = cargarTablaClientes;
 window.mostrarToast = mostrarToast;
+window.setupRowSelection = setupRowSelection;
+window.seleccionarFila = seleccionarFila;
+window.handleRowClick = handleRowClick;
+window.cargarTablaClientesDesdeAPI = cargarTablaClientesDesdeAPI;
