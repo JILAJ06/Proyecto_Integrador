@@ -613,6 +613,12 @@ function setupModalFormularioEventsClientes(modal) {
                     // Mostrar toast de carga
                     const toastCarga = mostrarToast('Actualizando cliente...', 'info');
                     
+                    // CAMBIO: Verificar que estamos editando, no creando
+                    console.log('=== CONFIRMANDO OPERACIÓN DE EDICIÓN ===');
+                    console.log('Método HTTP: PUT');
+                    console.log('Endpoint: /cliente/' + clienteId);
+                    console.log('Es edición (no creación): true');
+                    
                     // Actualizar cliente usando API
                     const datosActualizados = {
                         nombre: nombre,
@@ -620,9 +626,21 @@ function setupModalFormularioEventsClientes(modal) {
                     };
 
                     console.log('Enviando actualización con ID:', clienteId, 'Datos:', datosActualizados);
+                    
+                    // OPCIONAL: Usar función de debug primero
+                    // const debugResult = await debugUpdateCliente(clienteId, datosActualizados);
+                    // console.log('Debug result:', debugResult);
+                    
                     const clienteActualizado = await updateCliente(clienteId, datosActualizados);
                     
                     console.log('✓ Cliente actualizado exitosamente:', clienteActualizado);
+                    
+                    // Verificar que el ID del cliente actualizado coincide
+                    if (clienteActualizado.id !== clienteId) {
+                        console.warn('⚠️ ADVERTENCIA: El ID del cliente actualizado no coincide!');
+                        console.warn('ID original:', clienteId);
+                        console.warn('ID devuelto:', clienteActualizado.id);
+                    }
                     
                     // Cerrar toast de carga si existe
                     if (toastCarga && toastCarga.parentNode) {
@@ -631,9 +649,6 @@ function setupModalFormularioEventsClientes(modal) {
                     
                     // Mostrar mensaje de éxito
                     mostrarToast('Cliente actualizado exitosamente', 'success');
-                    
-                    // CAMBIO: No llamar a cargarTablaClientesDesdeAPI() aquí
-                    // porque updateCliente ya actualiza la fila específica
                     
                     // Limpiar selección
                     filaSeleccionada = null;
@@ -646,14 +661,21 @@ function setupModalFormularioEventsClientes(modal) {
                 } catch (error) {
                     console.error('Error al actualizar cliente:', error);
                     
+                    // Cerrar toast de carga si existe
+                    if (toastCarga && toastCarga.parentNode) {
+                        cerrarToast(toastCarga);
+                    }
+                    
                     // Determinar el tipo de error
                     let mensajeError = 'Error al actualizar el cliente';
                     
-                    if (error.message.includes('400')) {
-                        mensajeError = 'Datos del cliente inválidos';
-                    } else if (error.message.includes('404')) {
+                    if (error.message.includes('CONSTRAINT_ERROR')) {
+                        mensajeError = 'Error: No se puede actualizar debido a registros relacionados';
+                    } else if (error.message.includes('NOT_FOUND')) {
                         mensajeError = 'Cliente no encontrado';
-                    } else if (error.message.includes('500')) {
+                    } else if (error.message.includes('BAD_REQUEST')) {
+                        mensajeError = 'Datos del cliente inválidos';
+                    } else if (error.message.includes('SERVER_ERROR')) {
                         mensajeError = 'Error del servidor. Inténtalo más tarde';
                     } else if (error.message.includes('fetch') || error.message.includes('network')) {
                         mensajeError = 'Error de conexión. Verifica tu red';
