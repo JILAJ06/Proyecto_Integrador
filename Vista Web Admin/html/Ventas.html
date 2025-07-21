@@ -120,14 +120,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>19198398</td>
-                                <td>Leche no se qué</td>
-                                <td>12.5</td>
-                                <td>2</td>
-                                <td>25</td>
-                            </tr>
-                            <!-- Más filas se pueden agregar aquí -->
+                            <!-- Los productos se cargarán dinámicamente aquí -->
                         </tbody>
                     </table>
                 </div>
@@ -136,15 +129,19 @@
                 <div class="payment-section">
                     <div class="total-container">
                         <span class="total-label">Total</span>
-                        <span class="total-amount">$ 156.5</span>
+                        <span class="total-amount">$ 0.00</span>
                     </div>
                     <button class="btn-pay">Pagar</button>
                 </div>
             </div>
         </main>
     </div>
+    <!-- Scripts para el sistema de ventas -->
+    <script src="/Vista Web Admin/src/test-javalin-endpoints.js"></script>
+    <script src="/Vista Web Admin/src/Servicios/ventasServices.js"></script>
+    <script src="/Vista Web Admin/src/Forms/formsVentas.js"></script>
+    
     <script src="/Vista Web Admin/src/Forms/pagoModal.js"></script>
-
     <script src="/Vista Web Admin/script.js"></script>
 </body>
 </html>
