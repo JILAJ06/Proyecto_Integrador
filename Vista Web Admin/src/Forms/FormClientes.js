@@ -412,9 +412,11 @@ async function crearModalEditarCliente() {
                     <button class="modal-close">&times;</button>
                 </div>
                 <form id="form-edit-cliente" class="modal-form">
+                    <input type="hidden" name="id" value="${cliente.id}">
+                    
                     <div class="form-group">
                         <label>ID del cliente</label>
-                        <input type="number" name="id" value="${cliente.id}" required readonly>
+                        <input type="number" value="${cliente.id}" readonly>
                     </div>
                     
                     <div class="form-group">
@@ -429,7 +431,7 @@ async function crearModalEditarCliente() {
                     
                     <div class="modal-buttons">
                         <button type="button" class="btn-cancel">Cancelar</button>
-                        <button type="submit" class="btn-accept" data-id="${cliente.id}">Guardar Cambios</button>
+                        <button type="submit" class="btn-accept">Guardar Cambios</button>
                     </div>
                 </form>
             </div>
@@ -555,12 +557,16 @@ function setupModalFormularioEventsClientes(modal) {
         }
     });
     
-    // Cerrar con Escape
-    document.addEventListener("keydown", (e) => {
+    // Función para manejar la tecla Escape
+    const handleEscape = (e) => {
         if (e.key === "Escape" && modal.classList.contains("active")) {
             cerrarModalCliente(modal);
+            document.removeEventListener("keydown", handleEscape);
         }
-    });
+    };
+    
+    // Cerrar con Escape
+    document.addEventListener("keydown", handleEscape);
 
     // Manejar envío del formulario
     if (form) {
@@ -572,22 +578,32 @@ function setupModalFormularioEventsClientes(modal) {
             
             if (isEdit) {
                 // Lógica para editar cliente usando API
-                const clienteIdInput = formData.get("id");
-                const clienteId = parseInt(clienteIdInput);
+                const clienteId = parseInt(formData.get("id")); // Usar el campo hidden
                 const nombre = formData.get("nombre").trim();
                 const telefono = formData.get("telefono").trim();
 
-                console.log('=== INICIANDO EDICIÓN DE CLIENTE ===');
+                console.log('=== INICIANDO EDICIÓN DE CLIENTE DESDE FORMULARIO ===');
                 console.log('Datos del formulario de edición:');
-                console.log('- ID (input):', clienteIdInput, 'Tipo:', typeof clienteIdInput);
-                console.log('- ID (parseado):', clienteId, 'Tipo:', typeof clienteId);
+                console.log('- ID (hidden field):', formData.get("id"), 'Tipo:', typeof formData.get("id"));
+                console.log('- ID parseado:', clienteId, 'Tipo:', typeof clienteId);
                 console.log('- Nombre:', nombre);
                 console.log('- Teléfono:', telefono);
+                console.log('- filaSeleccionada:', filaSeleccionada);
+                console.log('- filaSeleccionada.clienteId:', filaSeleccionada?.clienteId);
 
                 // Validar que el ID sea un entero válido
                 if (isNaN(clienteId) || clienteId <= 0) {
                     mostrarToast('Error: ID del cliente no válido', 'error');
                     console.error('ID inválido:', clienteId);
+                    return;
+                }
+                
+                // DOBLE VERIFICACIÓN: Comparar con el ID de la fila seleccionada
+                const idFilaSeleccionada = filaSeleccionada?.clienteId || parseInt(filaSeleccionada?.getAttribute('data-cliente-id'));
+                if (idFilaSeleccionada && idFilaSeleccionada !== clienteId) {
+                    console.error('¡INCONSISTENCIA! ID del formulario no coincide con fila seleccionada');
+                    console.error('ID formulario:', clienteId, 'ID fila:', idFilaSeleccionada);
+                    mostrarToast('Error: Inconsistencia en el ID del cliente', 'error');
                     return;
                 }
 
@@ -619,10 +635,36 @@ function setupModalFormularioEventsClientes(modal) {
                         telefono: telefono
                     };
 
-                    console.log('Enviando actualización con ID:', clienteId, 'Datos:', datosActualizados);
+                    console.log('=== ENVIANDO DATOS DE ACTUALIZACIÓN ===');
+                    console.log('ID a actualizar:', clienteId);
+                    console.log('Datos a enviar:', datosActualizados);
+                    
                     const clienteActualizado = await updateCliente(clienteId, datosActualizados);
                     
-                    console.log('✓ Cliente actualizado exitosamente:', clienteActualizado);
+                    console.log('=== RESPUESTA DEL SERVIDOR ===');
+                    console.log('Cliente actualizado recibido:', clienteActualizado);
+                    console.log('ID original vs ID actualizado:', clienteId, 'vs', clienteActualizado.id);
+                    
+                    // VERIFICACIÓN CRÍTICA: El ID debe mantenerse igual
+                    if (clienteActualizado.id !== clienteId) {
+                        console.error('¡PROBLEMA CRÍTICO! El servidor cambió el ID del cliente');
+                        console.error('Esto indica que se creó un nuevo cliente en lugar de actualizar');
+                        console.error('ID enviado:', clienteId, 'ID recibido:', clienteActualizado.id);
+                        
+                        // Mostrar advertencia al usuario
+                        mostrarToast('Advertencia: El servidor creó un nuevo cliente en lugar de actualizar', 'warning');
+                        
+                        // Recargar la tabla para mostrar el estado real
+                        setTimeout(async () => {
+                            try {
+                                await cargarTablaClientesDesdeAPI();
+                            } catch (error) {
+                                console.error('Error al recargar tabla:', error);
+                            }
+                        }, 1000);
+                    } else {
+                        console.log('✓ ID mantenido correctamente, actualización exitosa');
+                    }
                     
                     // Cerrar toast de carga si existe
                     if (toastCarga && toastCarga.parentNode) {
@@ -632,11 +674,11 @@ function setupModalFormularioEventsClientes(modal) {
                     // Mostrar mensaje de éxito
                     mostrarToast('Cliente actualizado exitosamente', 'success');
                     
-                    // CAMBIO: No llamar a cargarTablaClientesDesdeAPI() aquí
-                    // porque updateCliente ya actualiza la fila específica
-                    
                     // Limpiar selección
                     filaSeleccionada = null;
+                    
+                    // Remover listener de escape
+                    document.removeEventListener("keydown", handleEscape);
                     
                     // Cerrar modal
                     cerrarModalCliente(modal);
@@ -662,89 +704,92 @@ function setupModalFormularioEventsClientes(modal) {
                     mostrarToast(mensajeError, 'error');
                 }
             } else {
-                 // Lógica para agregar cliente usando API
-    const nombre = formData.get("nombre").trim();
-    const telefono = formData.get("telefono").trim();
+                // Lógica para agregar cliente usando API
+                const nombre = formData.get("nombre").trim();
+                const telefono = formData.get("telefono").trim();
 
-    // Validar campos
-    if (!nombre) {
-        mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
-        return;
-    }
-
-    if (!telefono) {
-        mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
-        return;
-    }
-
-    // Validar formato de teléfono
-    const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
-    if (!telefonoRegex.test(telefono)) {
-        mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
-        return;
-    }
-
-    try {
-        console.log('=== INICIANDO CREACIÓN DE CLIENTE ===');
-        
-        // Mostrar toast de carga
-        const toastCarga = mostrarToast('Creando cliente...', 'info');
-        
-        // Crear cliente usando API
-        const nuevoCliente = {
-            nombre: nombre,
-            telefono: telefono
-        };
-
-        console.log('Datos del nuevo cliente:', nuevoCliente);
-        
-        const clienteCreado = await createCliente(nuevoCliente);
-        
-        console.log('✓ Cliente creado exitosamente:', clienteCreado);
-        
-        // Cerrar toast de carga si existe
-        if (toastCarga && toastCarga.parentNode) {
-            cerrarToast(toastCarga);
-        }
-        
-        // Mostrar mensaje de éxito
-        mostrarToast('Cliente agregado exitosamente', 'success');
-
-        // Cerrar modal
-        cerrarModalCliente(modal);
-        
-        console.log('=== CREACIÓN DE CLIENTE COMPLETADA ===');
-        
-    } catch (error) {
-        console.error('Error al crear cliente:', error);
-        
-        // Determinar el tipo de error
-        let mensajeError = 'Error al agregar el cliente';
-        
-        if (error.message.includes('400')) {
-            mensajeError = 'Datos del cliente inválidos';
-        } else if (error.message.includes('409')) {
-            mensajeError = 'El cliente ya existe';
-        } else if (error.message.includes('500')) {
-            mensajeError = 'Error del servidor. Inténtalo más tarde';
-        } else if (error.message.includes('fetch') || error.message.includes('network')) {
-            mensajeError = 'Error de conexión. Verifica tu red';
-            
-            // En caso de error de red, intentar recargar la tabla por si el cliente se creó
-            console.warn('Error de red - verificando si el cliente se creó...');
-            setTimeout(async () => {
-                try {
-                    await cargarTablaClientesDesdeAPI();
-                    mostrarToast('Se ha verificado la lista de clientes', 'info');
-                } catch (reloadError) {
-                    console.warn('No se pudo verificar:', reloadError);
+                // Validar campos
+                if (!nombre) {
+                    mostrarToast('Por favor, ingresa el nombre del cliente', 'warning');
+                    return;
                 }
-            }, 2000);
-        }
-        
-        mostrarToast(mensajeError, 'error');
-    }
-}
+
+                if (!telefono) {
+                    mostrarToast('Por favor, ingresa el teléfono del cliente', 'warning');
+                    return;
+                }
+
+                // Validar formato de teléfono
+                const telefonoRegex = /^[0-9\-\(\)\s\+]+$/;
+                if (!telefonoRegex.test(telefono)) {
+                    mostrarToast('Por favor, ingresa un teléfono válido', 'warning');
+                    return;
+                }
+
+                try {
+                    console.log('=== INICIANDO CREACIÓN DE CLIENTE ===');
+                    
+                    // Mostrar toast de carga
+                    const toastCarga = mostrarToast('Creando cliente...', 'info');
+                    
+                    // Crear cliente usando API
+                    const nuevoCliente = {
+                        nombre: nombre,
+                        telefono: telefono
+                    };
+
+                    console.log('Datos del nuevo cliente:', nuevoCliente);
+                    
+                    const clienteCreado = await createCliente(nuevoCliente);
+                    
+                    console.log('✓ Cliente creado exitosamente:', clienteCreado);
+                    
+                    // Cerrar toast de carga si existe
+                    if (toastCarga && toastCarga.parentNode) {
+                        cerrarToast(toastCarga);
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    mostrarToast('Cliente agregado exitosamente', 'success');
+
+                    // Remover listener de escape
+                    document.removeEventListener("keydown", handleEscape);
+
+                    // Cerrar modal
+                    cerrarModalCliente(modal);
+                    
+                    console.log('=== CREACIÓN DE CLIENTE COMPLETADA ===');
+                    
+                } catch (error) {
+                    console.error('Error al crear cliente:', error);
+                    
+                    // Determinar el tipo de error
+                    let mensajeError = 'Error al agregar el cliente';
+                    
+                    if (error.message.includes('400')) {
+                        mensajeError = 'Datos del cliente inválidos';
+                    } else if (error.message.includes('409')) {
+                        mensajeError = 'El cliente ya existe';
+                    } else if (error.message.includes('500')) {
+                        mensajeError = 'Error del servidor. Inténtalo más tarde';
+                    } else if (error.message.includes('fetch') || error.message.includes('network')) {
+                        mensajeError = 'Error de conexión. Verifica tu red';
+                        
+                        // En caso de error de red, intentar recargar la tabla por si el cliente se creó
+                        console.warn('Error de red - verificando si el cliente se creó...');
+                        setTimeout(async () => {
+                            try {
+                                await cargarTablaClientesDesdeAPI();
+                                mostrarToast('Se ha verificado la lista de clientes', 'info');
+                            } catch (reloadError) {
+                                console.warn('No se pudo verificar:', reloadError);
+                            }
+                        }, 2000);
+                    }
+                    
+                    mostrarToast(mensajeError, 'error');
+                }
+            }
         });
     }
 }
@@ -829,12 +874,19 @@ function setupModalAdvertenciaEvents(modal) {
     };
 }
 
-// Función para cerrar modal
+// Función para cerrar modal - CORREGIDA
 function cerrarModalCliente(modal) {
     modal.classList.remove("active");
+    // Agregar tiempo para la transición y luego ocultar/remover el modal
+    setTimeout(() => {
+        modal.style.display = 'none';
+        if (modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+    }, 300); // Tiempo que coincide con la transición CSS
 }
 
-// Función para aplicar estilos del formulario (copiado de formsInventario.js)
+// Función para aplicar estilos del formulario - ACTUALIZADA
 function aplicarEstilosModalFormularioClientes() {
     // Verificar si ya existen los estilos
     if (document.getElementById('modal-formulario-clientes-styles')) {
@@ -872,6 +924,11 @@ function aplicarEstilosModalFormularioClientes() {
             box-shadow: 0 8px 32px rgba(0,0,0,0.18);
             border: 2.5px solid #bfc0b0;
             margin: 0 auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
         }
         .modal-header {
             display: flex;
