@@ -41,7 +41,6 @@ export async function getClientes() {
         }
         
         const clientes = await response.json();
-        console.log('Clientes obtenidos desde API:', clientes);
 
         // Actualizar tabla
         actualizarTablaClientes(clientes);
@@ -88,8 +87,6 @@ function actualizarTablaClientes(clientes) {
             telefono: cliente.telefono
         };
         
-        console.log('Cliente original:', cliente);
-        console.log('Cliente normalizado:', clienteNormalizado);
         
         // Asegurar que el ID sea un entero
         const clienteId = parseInt(clienteNormalizado.id);
@@ -119,13 +116,11 @@ function actualizarTablaClientes(clientes) {
         tbody.appendChild(fila);
     });
 
-    console.log(`Tabla actualizada con ${clientes.length} clientes`);
-    console.log('Verificando filas creadas:');
     
     // Verificar que las filas tienen los datos correctos
     const filasCreadas = tbody.querySelectorAll('tr');
     filasCreadas.forEach((fila, index) => {
-        console.log(`Fila ${index}:`, {
+        (`Fila ${index}:`, {
             clienteId: fila.clienteId,
             dataClienteId: fila.getAttribute('data-cliente-id'),
             primeraCelda: fila.children[0]?.textContent
@@ -360,7 +355,9 @@ export async function updateCliente(clienteId, datos) {
         const url = `${BASE_URL}/negocio/${NEGOCIO_ID}/cliente/${clienteId}`;
         console.log('Actualizando cliente:', clienteId, datos);
         console.log('URL:', url);
-        
+        console.log("→ Ejecutando updateCliente con ID:", clienteId);
+        console.trace("Traza de stack:");
+
         const response = await fetch(url, {
             method: 'PUT',
             headers: {

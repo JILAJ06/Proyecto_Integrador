@@ -79,18 +79,22 @@ export const VentasServices = {
     },
 
     mapearProductoADetalleVenta(producto, cantidad) {
-        const precioUnitario = parseFloat(producto.precioVentaActual || 0);
-        const subtotal = parseFloat((cantidad * precioUnitario).toFixed(2));
+    const precioUnitario = parseFloat(
+        producto.precioVentaActual || producto.precio || producto.Precio || 0
+    );
+    const subtotal = parseFloat((cantidad * precioUnitario).toFixed(2));
 
-        return {
-            idRegistro: producto.idRegistro || Date.now(), // fallback temporal
-            codigoProducto: producto.codigoProducto,
-            nombreProducto: producto.nombreProducto,
-            precioUnitario,
-            cantidad,
-            subtotal
-        };
-    },
+    return {
+        idRegistro: producto.idRegistro || producto.ID_Registro || producto.idRegistroLote || Date.now(),
+        codigoProducto: producto.codigoProducto || producto.Codigo_Prod || producto.codigo || producto.codigoBarras,
+        nombreProducto: producto.nombreProducto || producto.Nombre_Prod || producto.nombre,
+        precioUnitario,
+        cantidad,
+        subtotal
+    };
+},
+
+
 
     calcularTotales(lista) {
         const subtotal = lista.reduce((sum, item) => sum + item.subtotal, 0);
