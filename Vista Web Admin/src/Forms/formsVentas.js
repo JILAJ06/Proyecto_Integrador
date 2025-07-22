@@ -12,9 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let ventaId = null;
     let listaProductos = []; // Array con formato específico para detalles de venta
     let contadorProductos = {}; // Para contar cuántas veces se escanea cada producto
-
-    // Input invisible para capturar escaneos
     let inputEscaneo = null;
+    // Referencias para el modal de pago
+    let modalPago = null;
+    let inputPago = null;
+    let modalTotal = null;
+    let modalCambio = null;
+    let btnPagarModal = null;
+    let btnCancelarModal = null;
 
     // Inicializar aplicación
     async function init() {
@@ -76,6 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar event listeners
     function setupEventListeners() {
         btnPagar.addEventListener("click", procesarPago);
+        // Event listener para el botón pagar/cancelar del modal
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.classList.contains('modal-btn-pagar')) {
+                confirmarPagoModal();
+            }
+            if (e.target && e.target.classList.contains('modal-btn-cancelar')) {
+                cerrarModalPago();
+            }
+        });
         
         // Event listener para selección manual de productos (opcional)
         tabla.addEventListener("click", (e) => {
@@ -236,56 +250,140 @@ document.addEventListener("DOMContentLoaded", () => {
             mostrarNotificacion('No hay productos en la venta', 'warning');
             return;
         }
-
-        const modalPago = crearModalPago();
-        document.body.appendChild(modalPago);
+        if (!modalPago) crearModalPago();
+        // Mostrar el modal visualmente
+        modalPago.style.display = "flex";
+        // Rellenar el total
+        const total = VentasServices.calcularTotales(listaProductos).total;
+        if (modalTotal) modalTotal.textContent = `$${total.toFixed(2)}`;
+        if (totalAmount) totalAmount.textContent = `$${total.toFixed(2)}`;
+        // Reiniciar el campo de pago y cambio
+        if (inputPago) inputPago.value = "";
+        if (modalCambio) modalCambio.textContent = "$0.00";
     }
 
+    // ===== MODAL DE PAGO DINÁMICO =====
     function crearModalPago() {
-        const totales = VentasServices.calcularTotales(listaProductos);
-        
-        const modal = document.createElement("div");
-        modal.className = "modal-overlay";
-        modal.innerHTML = `
-            <div class="modal-container modal-pago">
-                <div class="modal-header">
-                    <h3>💳 Confirmar Pago</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="resumen-venta">
-                        <h4>📊 Resumen de la Venta</h4>
-                        <div class="productos-resumen">
-                            ${listaProductos.map(item => `
-                                <div class="producto-resumen">
-                                    <span>${item.nombreProducto}</span>
-                                    <span>x${item.cantidad}</span>
-                                    <span>${VentasServices.formatearPrecio(item.subtotal)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="totales">
-                            <p>Subtotal: <span>${VentasServices.formatearPrecio(totales.subtotal)}</span></p>
-                            <p>Impuestos (16%): <span>${VentasServices.formatearPrecio(totales.impuestos)}</span></p>
-                            <p class="total-final">Total: <span>${VentasServices.formatearPrecio(totales.total)}</span></p>
-                            <p>Productos: <span>${totales.cantidadItems} unidades</span></p>
-                        </div>
+        if (document.getElementById('modal-pago')) {
+            modalPago = document.getElementById('modal-pago');
+        } else {
+            modalPago = document.createElement('div');
+            modalPago.id = 'modal-pago';
+            modalPago.innerHTML = `
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-row">
+                        <span class="modal-label">Total</span>
+                        <span class="modal-value" id="modal-total"></span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Pagó</span>
+                        <input type="number" min="0" step="0.01" class="modal-input" id="modal-pago-input" placeholder="$">
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Cambio</span>
+                        <span class="modal-value" id="modal-cambio">$0.00</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn-cancelar">Cancelar</button>
+                        <button class="modal-btn-pagar">Pagar</button>
                     </div>
                 </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel">❌ Cancelar Venta</button>
-                    <button type="button" class="btn-accept">✅ Confirmar Pago</button>
+            `;
+            document.body.appendChild(modalPago);
+        }
+        modalTotal = modalPago.querySelector('#modal-total');
+        inputPago = modalPago.querySelector('#modal-pago-input');
+        modalCambio = modalPago.querySelector('#modal-cambio');
+        btnPagarModal = modalPago.querySelector('.modal-btn-pagar');
+        btnCancelarModal = modalPago.querySelector('.modal-btn-cancelar');
+        // Estilos para el modal de pago
+        if (!document.getElementById('modal-pago-style')) {
+            const style = document.createElement('style');
+            style.id = 'modal-pago-style';
+            style.textContent = `
+                #modal-pago { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh; align-items: center; justify-content: center; }
+                #modal-pago .modal-overlay { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); }
+                #modal-pago .modal-content { position: relative; background: #e6e7c7; border-radius: 24px; padding: 32px 32px 24px 32px; min-width: 340px; min-height: 260px; box-shadow: 0 4px 32px rgba(0,0,0,0.18); display: flex; flex-direction: column; gap: 18px; z-index: 2; }
+                #modal-pago .modal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+                #modal-pago .modal-label { font-weight: bold; font-size: 1.15em; background: #fff; border-radius: 10px 0 0 10px; padding: 8px 18px; flex: 1; text-align: left; }
+                #modal-pago .modal-value, #modal-pago .modal-input { background: #fff; border: none; border-radius: 0 10px 10px 0; padding: 8px 18px; font-size: 1.15em; flex: 1; text-align: right; }
+                #modal-pago .modal-input { outline: none; }
+                #modal-pago .modal-input-error { border: 2px solid #e74c3c; background: #ffeaea; }
+                #modal-pago .modal-actions { display: flex; justify-content: space-between; gap: 24px; margin-top: 12px; }
+                #modal-pago .modal-btn-cancelar, #modal-pago .modal-btn-pagar { flex: 1; padding: 10px 0; border: none; border-radius: 12px; background: #fff; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: background 0.2s; }
+                #modal-pago .modal-btn-cancelar:hover { background: #f2bcbc; }
+                #modal-pago .modal-btn-pagar:hover { background: #b8e6b8; }
+            `;
+            document.head.appendChild(style);
+        }
+        // Calcular cambio en tiempo real
+        inputPago.addEventListener('input', function () {
+            let total = modalTotal.textContent.replace(/[^\d.]/g, '');
+            let pagado = parseFloat(inputPago.value) || 0;
+            let cambio = pagado - parseFloat(total);
+            modalCambio.textContent = cambio >= 0 ? `$${cambio.toFixed(2)}` : '$0.00';
+        });
+        // Quitar error al escribir
+        inputPago.addEventListener('focus', function () {
+            inputPago.classList.remove('modal-input-error');
+        });
+    }
+
+    function cerrarModalPago() {
+        if (modalPago) modalPago.style.display = 'none';
+    }
+
+    async function confirmarPagoModal() {
+        const total = modalTotal.textContent.replace(/[^\d.]/g, '');
+        const pagado = parseFloat(inputPago.value) || 0;
+        if (pagado < parseFloat(total)) {
+            inputPago.classList.add('modal-input-error');
+            inputPago.focus();
+            return;
+        }
+        try {
+            await VentasServices.guardarDetallesVenta(listaProductos);
+            cerrarModalPago();
+            mostrarVentaExitosa();
+        } catch (err) {
+            alert("❌ Error al guardar la venta: " + err.message);
+        }
+    }
+
+    // MODAL DE VENTA EXITOSA
+    function mostrarVentaExitosa() {
+        let modalSuccess = document.getElementById('modal-venta-exitosa');
+        if (!modalSuccess) {
+            modalSuccess = document.createElement('div');
+            modalSuccess.id = 'modal-venta-exitosa';
+            modalSuccess.innerHTML = `
+                <div class="modal-success-overlay"></div>
+                <div class="modal-success-content">
+                    <div class="modal-success-icon">✔</div>
+                    <div class="modal-success-text">VENTA EXITOSA</div>
                 </div>
-            </div>
-        `;
-
-        // Configurar eventos
-        const btnCancel = modal.querySelector(".btn-cancel");
-        const btnConfirm = modal.querySelector(".btn-accept");
-
-        btnCancel.addEventListener("click", () => cancelarVentaCompleta(modal));
-        btnConfirm.addEventListener("click", () => confirmarPagoFinal(modal));
-
-        return modal;
+            `;
+            document.body.appendChild(modalSuccess);
+            if (!document.getElementById('modal-success-style')) {
+                const style = document.createElement('style');
+                style.id = 'modal-success-style';
+                style.textContent = `
+                    #modal-venta-exitosa { display: flex; position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; align-items: center; justify-content: center; }
+                    #modal-venta-exitosa .modal-success-overlay { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); }
+                    #modal-venta-exitosa .modal-success-content { position: relative; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
+                    #modal-venta-exitosa .modal-success-icon { font-size: 5rem; color: #111; background: #fff; border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.18); }
+                    #modal-venta-exitosa .modal-success-text { color: #fff; font-size: 2.8rem; font-weight: bold; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.18); letter-spacing: 2px; }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        modalSuccess.style.display = 'flex';
+        setTimeout(() => {
+            modalSuccess.style.display = 'none';
+            mostrarTicketVenta(VentasServices.calcularTotales(listaProductos));
+            resetearVenta();
+        }, 1800);
     }
 
     // ===== CONFIRMAR PAGO FINAL =====

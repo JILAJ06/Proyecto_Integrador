@@ -33,6 +33,7 @@ export const VentasServices = {
     async consultarProductoPorCodigo(codigoProducto) {
         const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
         const res = await fetch(url);
+        console.log(res);
 
         if (!res.ok) {
             throw new Error("Producto no encontrado");
@@ -80,8 +81,9 @@ export const VentasServices = {
 
     mapearProductoADetalleVenta(producto, cantidad) {
     const precioUnitario = parseFloat(
-        producto.precioVentaActual || producto.precio || producto.Precio || 0
+    producto.precioVentaActual || producto.precio || producto.Precio || producto.precio_unitario || producto.precioUnitario || 0
     );
+
     const subtotal = parseFloat((cantidad * precioUnitario).toFixed(2));
 
     return {

@@ -1,6 +1,9 @@
 // Script para el modal de pago en Ventas.html
 // Autor: GitHub Copilot
 
+// Importa el servicio (asegúrate que tu HTML use type="module" en el script)
+import { VentasServices } from '../Servicios/ventasServices.js';
+
 document.addEventListener('DOMContentLoaded', function () {
     // Crear el modal dinámicamente si no existe
     if (!document.getElementById('modal-pago')) {
@@ -124,8 +127,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalCambio = modal.querySelector('#modal-cambio');
 
     function openModal() {
-        // Obtener el total actual
-        let total = totalSpan ? totalSpan.textContent.replace(/[^\d.]/g, '') : '0';
+        // Calcula el total usando la lista de productos escaneados
+        let total = 0;
+        if (window.listaDetallesVenta && Array.isArray(window.listaDetallesVenta)) {
+            const totales = VentasServices.calcularTotales(window.listaDetallesVenta);
+            total = totales.total;
+        } else {
+            total = totalSpan ? parseFloat(totalSpan.textContent.replace(/[^\d.]/g, '')) : 0;
+        }
         modalTotal.textContent = `$${parseFloat(total).toFixed(2)}`;
         inputPago.value = '';
         modalCambio.textContent = '$0.00';
@@ -142,25 +151,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Calcular cambio en tiempo real
     inputPago.addEventListener('input', function () {
-        let total = totalSpan ? parseFloat(totalSpan.textContent.replace(/[^\d.]/g, '')) : 0;
+        let total = modalTotal.textContent.replace(/[^\d.]/g, '');
         let pagado = parseFloat(inputPago.value) || 0;
-        let cambio = pagado - total;
+        let cambio = pagado - parseFloat(total);
         modalCambio.textContent = cambio >= 0 ? `$${cambio.toFixed(2)}` : '$0.00';
     });
 
     // Acción al hacer clic en "Pagar" dentro del modal
-    btnPagarModal.addEventListener('click', function () {
-        let total = totalSpan ? parseFloat(totalSpan.textContent.replace(/[^\d.]/g, '')) : 0;
-        let pagado = parseFloat(inputPago.value) || 0;
-        if (pagado < total) {
-            inputPago.classList.add('modal-input-error');
-            inputPago.focus();
-            return;
-        }
-        // Aquí puedes agregar la lógica para finalizar la venta
+    btnPagarModal.addEventListener('click', async function () {
+    const total = parseFloat(totalSpan.textContent.replace(/[^\d.]/g, ''));
+    const pagado = parseFloat(inputPago.value) || 0;
+
+    if (pagado < total) {
+        inputPago.classList.add('modal-input-error');
+        inputPago.focus();
+        return;
+    }
+
+    try {
+        // Guardar los detalles de la venta en el backend
+        await VentasServices.guardarDetallesVenta(listaProductos);
+        mostrarVentaExitosa();  // Muestra el modal visual de éxito
+    } catch (err) {
+        alert("❌ Error al guardar la venta: " + err.message);
+    }
+
+    // Cerrar el modal
         closeModal();
-        mostrarVentaExitosa();
     });
+
 
     // Quitar error al escribir
     inputPago.addEventListener('focus', function () {
