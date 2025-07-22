@@ -44,98 +44,104 @@ async function cargarDatosIniciales() {
 
 // ===== FUNCIONES PRINCIPALES DEL API =====
 
-// Obtener categorías disponibles - SIMPLIFICAR
+// Obtener categorías disponibles - CORREGIDO
+// Función para extraer categorías únicas de todos los productos
 async function getCategorias() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/categorias`;
-    
     try {
-        console.log('Obteniendo categorías desde:', url_endpoint);
+        console.log('Obteniendo categorías desde productos...');
         
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer categorías');
+            return [];
         }
         
-        const data = await response.json();
-        console.log('Categorías RAW sin procesar:', data);
+        // Extraer categorías únicas
+        const categorias = productos
+            .map(producto => {
+                if (producto && producto.categoria && producto.categoria.nombreCategoria) {
+                    return producto.categoria.nombreCategoria;
+                }
+                return null;
+            })
+            .filter(categoria => categoria && categoria.trim() !== '')
+            .filter((categoria, index, array) => array.indexOf(categoria) === index); // Remover duplicados
         
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
+        console.log('Categorías extraídas:', categorias);
+        return categorias;
         
     } catch (error) {
-        console.error('Error fetching categorías:', error);
-        mostrarError('Error al cargar las categorías desde el servidor');
+        console.error('Error extrayendo categorías:', error);
         return [];
     }
 }
 
-// Obtener envases disponibles - SIMPLIFICAR
-async function getEnvases() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/envases`;
-    
-    try {
-        console.log('Obteniendo envases desde:', url_endpoint);
-        
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Envases RAW sin procesar:', data);
-        
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
-        
-    } catch (error) {
-        console.error('Error fetching envases:', error);
-        mostrarError('Error al cargar los envases desde el servidor');
-        return [];
-    }
-}
-
-// Obtener marcas disponibles - SIMPLIFICAR
+// Obtener marcas disponibles - CORREGIDO
+// Función para extraer marcas únicas de todos los productos
 async function getMarcas() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/marcas`;
-    
     try {
-        console.log('Obteniendo marcas desde:', url_endpoint);
+        console.log('Obteniendo marcas desde productos...');
         
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer marcas');
+            return [];
         }
         
-        const data = await response.json();
-        console.log('Marcas RAW sin procesar:', data);
+        // Extraer marcas únicas
+        const marcas = productos
+            .map(producto => {
+                if (producto && producto.marca && producto.marca.nombreMarca) {
+                    return producto.marca.nombreMarca;
+                }
+                return null;
+            })
+            .filter(marca => marca && marca.trim() !== '')
+            .filter((marca, index, array) => array.indexOf(marca) === index); // Remover duplicados
         
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
+        console.log('Marcas extraídas:', marcas);
+        return marcas;
         
     } catch (error) {
-        console.error('Error fetching marcas:', error);
-        mostrarError('Error al cargar las marcas desde el servidor');
+        console.error('Error extrayendo marcas:', error);
+        return [];
+    }
+}
+
+// Obtener envases disponibles - CORREGIDO
+// Función para extraer envases únicos de todos los productos
+async function getEnvases() {
+    try {
+        console.log('Obteniendo envases desde productos...');
+        
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer envases');
+            return [];
+        }
+        
+        // Extraer envases únicos
+        const envases = productos
+            .map(producto => {
+                if (producto && producto.envase && producto.envase.nombreEnvase) {
+                    return producto.envase.nombreEnvase;
+                }
+                return null;
+            })
+            .filter(envase => envase && envase.trim() !== '')
+            .filter((envase, index, array) => array.indexOf(envase) === index); // Remover duplicados
+        
+        console.log('Envases extraídos:', envases);
+        return envases;
+        
+    } catch (error) {
+        console.error('Error extrayendo envases:', error);
         return [];
     }
 }
@@ -761,15 +767,14 @@ function mostrarError(mensaje) {
     }
 }
 
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL - Sin export =====
-
+// Al final del archivo, agrega estas líneas para exponer las funciones globalmente:
 window.getCategorias = getCategorias;
-window.getEnvases = getEnvases;
 window.getMarcas = getMarcas;
+window.getEnvases = getEnvases;
 window.postProducto = postProducto;
-window.getProductos = getProductos;
 window.putProducto = putProducto;
 window.deleteProducto = deleteProducto;
+window.getProductos = getProductos;
 window.cargarDatosIniciales = cargarDatosIniciales;
 window.capitalizarTexto = capitalizarTexto;
 

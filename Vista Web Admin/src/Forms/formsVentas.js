@@ -1,4 +1,5 @@
 // formsVentas.js - Sistema de ventas optimizado para escaneo directo
+import { VentasServices } from '../Servicios/ventasServices.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     // Elementos del DOM
