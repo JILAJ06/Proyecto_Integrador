@@ -54,7 +54,14 @@ export const VentasServices = {
             throw new Error("Error al guardar detalles de venta");
         }
 
-        return await res.json();
+        const text = await res.text();
+
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            return { mensaje: text }; // lo que haya devuelto el servidor
+        }
+
     },
 
     async cancelarVenta() {
@@ -100,11 +107,10 @@ export const VentasServices = {
 
     calcularTotales(lista) {
         const subtotal = lista.reduce((sum, item) => sum + item.subtotal, 0);
-        const impuestos = +(subtotal * 0.16).toFixed(2);
-        const total = +(subtotal + impuestos).toFixed(2);
+        const total = +(subtotal).toFixed(2);
         const cantidadItems = lista.reduce((sum, item) => sum + item.cantidad, 0);
 
-        return { subtotal, impuestos, total, cantidadItems };
+        return { subtotal, total, cantidadItems };
     },
 
     formatearPrecio(valor) {

@@ -4,7 +4,7 @@
 
 export const GraficasServices = {
     async obtenerVentasPorSemana(idNegocio, año) {
-        const url = `http://localhost:8080/negocio/${idNegocio}/graficasventa/${año}`;
+        const url = `http://localhost:8080/negocio/${idNegocio}/graficasventa/2025`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Error al obtener ventas por semana");
         return await res.json();
@@ -13,8 +13,11 @@ export const GraficasServices = {
     async obtenerProductosPorSemana(idNegocio, año) {
         const url = `http://localhost:8080/negocio/${idNegocio}/graficasproducto/${año}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Error al obtener productos más vendidos");
-        return await res.json();
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error("Error al obtener productos más vendidos: " + text);
+        }
+
     }
 };
 
@@ -75,14 +78,15 @@ function generarGraficaVentasPorSemana(data) {
 // === Gráfica de Producto más vendido por Semana ===
 function generarGraficaProductosPorSemana(data) {
     console.log("📦 Datos recibidos:", data);
-    const dias = data.map(item => item.dia);
-    const cantidades = data.map(item => item.cantidad);
-    const nombres = data.map(item => item.producto);
+
+    const semanas = Object.keys(data); // ["1", "2", "3", ...]
+    const cantidades = semanas.map(sem => data[sem].cantidadVendida);
+    const nombres = semanas.map(sem => data[sem].nombreProducto + " (" + data[sem].variedad + ")");
 
     new Chart(document.getElementById("graficaProductosSemana"), {
         type: "bar",
         data: {
-            labels: dias,
+            labels: semanas.map(s => `Semana ${s}`),
             datasets: [{
                 label: "Unidades vendidas",
                 data: cantidades,
