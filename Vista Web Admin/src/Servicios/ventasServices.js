@@ -33,6 +33,7 @@ export const VentasServices = {
     async consultarProductoPorCodigo(codigoProducto) {
         const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
         const res = await fetch(url);
+        console.log(res);
 
         if (!res.ok) {
             throw new Error("Producto no encontrado");
@@ -53,7 +54,14 @@ export const VentasServices = {
             throw new Error("Error al guardar detalles de venta");
         }
 
-        return await res.json();
+        const text = await res.text();
+
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            return { mensaje: text }; // lo que haya devuelto el servidor
+        }
+
     },
 
     async cancelarVenta() {
@@ -80,8 +88,9 @@ export const VentasServices = {
 
     mapearProductoADetalleVenta(producto, cantidad) {
     const precioUnitario = parseFloat(
-        producto.precioVentaActual || producto.precio || producto.Precio || 0
+    producto.precioVentaActual || producto.precio || producto.Precio || producto.precio_unitario || producto.precioUnitario || 0
     );
+
     const subtotal = parseFloat((cantidad * precioUnitario).toFixed(2));
 
     return {
@@ -98,11 +107,10 @@ export const VentasServices = {
 
     calcularTotales(lista) {
         const subtotal = lista.reduce((sum, item) => sum + item.subtotal, 0);
-        const impuestos = +(subtotal * 0.16).toFixed(2);
-        const total = +(subtotal + impuestos).toFixed(2);
+        const total = +(subtotal).toFixed(2);
         const cantidadItems = lista.reduce((sum, item) => sum + item.cantidad, 0);
 
-        return { subtotal, impuestos, total, cantidadItems };
+        return { subtotal, total, cantidadItems };
     },
 
     formatearPrecio(valor) {

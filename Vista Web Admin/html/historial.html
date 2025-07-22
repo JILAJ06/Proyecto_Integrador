@@ -129,15 +129,9 @@
                             <a href="#" data-mes="todos"><i class="fas fa-list"></i> Todos los meses</a>
                         </div>
                     </div>
-
-                    <!-- Botón Eliminar -->
-                    <button class="btn-action btn-delete">
-                        <i class="fas fa-trash"></i>
-                        Eliminar
-                    </button>
                 </div>
 
-                <table class="products-table">
+                <table id="tablaHistorial"  class="products-table">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -148,22 +142,13 @@
                             <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tbody id="bodyHistorial">
+
                     </tbody>
                 </table>
             </div>
         </main>
-
-        <script src="dropdown.js"></script>
+        <script type="module" src="/Vista Web Admin/src/Forms/formsHistorial.js"></script>
         <script>
         // Dropdown funcionalidad para Día
         (function() {

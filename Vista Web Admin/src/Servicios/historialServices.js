@@ -1,23 +1,51 @@
-document.addEventListener('DOMContentLoaded', () =>{
-    getHistorial();
-});
+const BASE_URL = "http://localhost:8080"; // Ajusta el puerto o dominio si es necesario
 
-export async function getHistorial() {
-    const url_endpoint = 'https://jsonplaceholder.typicode.com/users'; // Replace with your actual API endpoint
+function getNegocioId() {
+    // Intentar usar la función global primero
+    if (typeof window !== 'undefined' && window.obtenerIdNegocio) {
+        return window.obtenerIdNegocio();
+    }
+    
+    // Fallback: buscar directamente en sessionStorage
+    let negocioId = sessionStorage.getItem('negocioId') || 
+                   sessionStorage.getItem('idNegocio') ||
+                   sessionStorage.getItem('id_negocio');
+    
+    if (!negocioId) {
+        console.error('No se encontró el ID del negocio en sessionStorage');
+        console.log('Creando ID de negocio por defecto...');
+        negocioId = 1; // Valor por defecto
+        sessionStorage.setItem('negocioId', negocioId.toString());
+    }
+    
+    const resultado = parseInt(negocioId);
+    console.log('ID de negocio para API:', resultado);
+    return resultado;
+}
 
+// Obtener historial de ventas para un negocio específico
+export async function obtenerHistorialVentas() {
+    const negocioId = getNegocioId(); // Obtener el ID del negocio desde sessionStorage
     try {
-        const response = await fetch(url_endpoint);
-        const empleados = await response.json();
-
-        let tbody = document.querySelector('.historial-table tbody');
-        empleados.forEach(h => {
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-            <td>${h.fecha}</td><td>${h.id_venta}</td><td>${h.producto}</td><td>${h.categoria}</td><td>${h.cantidad}</td><td>${h.total}</td>`
-            tbody.appendChild(fila);
-        });
+        const response = await fetch(`${BASE_URL}/negocio/${negocioId}/historial`);
+        console.log(response);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
     } catch (error) {
-        console.error('Error fetching historial:', error);
+        console.error("Error al obtener historial de ventas:", error);
+        return null;
     }
 }
 
+// Obtener resumen mensual de ventas
+export async function obtenerResumenMensual() {
+    const negocioId = getNegocioId(); // Obtener el ID del negocio desde sessionStorage
+    try {
+        const response = await fetch(`${BASE_URL}/negocio/${negocioId}/historial/mensual`);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error("Error al obtener resumen mensual:", error);
+        return null;
+    }
+}

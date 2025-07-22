@@ -109,7 +109,7 @@ function obtenerDatosSesion() {
 
 // Función para configurar el botón de cerrar sesión
 function configurarBotonCerrarSesion() {
-  const botonCerrarSesion = document.querySelector('#btnCerrarSesion, .btn-logout, [data-action="logout"]');
+  const botonCerrarSesion = document.querySelector('.logout-btn');
   
   if (botonCerrarSesion) {
     botonCerrarSesion.addEventListener('click', (e) => {

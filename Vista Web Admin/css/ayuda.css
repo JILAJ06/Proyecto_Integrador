@@ -1,7 +1,7 @@
 .ayuda-section {
   display: flex;
   justify-content: center;
-  padding: 30px;
+  padding: 35px;
   background-color: #f3f0db;
   min-height: 100vh;
 }
@@ -11,21 +11,21 @@
   border: 2px solid #ccc;
   border-radius: 12px;
   padding: 30px 40px;
-  max-width: 900px;
+  max-width: 1150px;
   font-family: 'Segoe UI', sans-serif;
   color: #222;
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .ayuda-card h2 {
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   color: #333;
   margin-top: 20px;
 }
 
 .ayuda-card p {
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  line-height: 1.4;
   margin-bottom: 15px;
 }
 
@@ -36,8 +36,8 @@
 
 .ayuda-card ul li {
   margin-bottom: 18px;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  line-height: 1.4;
 }
 
 .ayuda-card ul li strong {
