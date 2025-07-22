@@ -57,17 +57,13 @@ function setupEventListeners() {
 // Cargar tabla de clientes desde la API
 async function cargarTablaClientesDesdeAPI() {
     try {
-        console.log('=== CARGANDO CLIENTES DESDE API ===');
         mostrarToast('Cargando clientes...', 'info');
         const clientesAPI = await getClientes();
         clientes = clientesAPI;
-        console.log('✓ Clientes cargados desde API:', clientes);
         
         // Esperar un poco para asegurar que la tabla esté actualizada
         setTimeout(() => {
-            console.log('=== RECONFIGURANDO SELECCIÓN DESPUÉS DE CARGAR ===');
             setupRowSelection(); // Reconfigurar selección después de cargar
-            mostrarToast('Clientes cargados exitosamente', 'success');
         }, 300); // Aumenté el tiempo de espera
         
     } catch (error) {
@@ -78,7 +74,6 @@ async function cargarTablaClientesDesdeAPI() {
 
 // Configurar selección de filas - MEJORADO
 function setupRowSelection() {
-    console.log('=== CONFIGURANDO SELECCIÓN DE FILAS ===');
     
     const tabla = document.querySelector('.clientes-table tbody');
     if (!tabla) {
@@ -87,7 +82,6 @@ function setupRowSelection() {
     }
 
     const filas = tabla.querySelectorAll('tr');
-    console.log(`Encontradas ${filas.length} filas en la tabla`);
 
     // Verificar que hay filas válidas
     const filasValidas = Array.from(filas).filter(fila => {
@@ -96,7 +90,6 @@ function setupRowSelection() {
         return contenido && contenido !== 'No hay clientes registrados' && !isNaN(parseInt(contenido));
     });
 
-    console.log(`Encontradas ${filasValidas.length} filas válidas`);
 
     if (filasValidas.length === 0) {
         console.warn('No hay filas válidas para configurar selección');
@@ -109,7 +102,6 @@ function setupRowSelection() {
 
     // Configurar cada fila individualmente
     const nuevasFilas = nuevaTabla.querySelectorAll('tr');
-    console.log(`Configurando ${nuevasFilas.length} filas nuevas`);
 
     nuevasFilas.forEach((fila, index) => {
         const primeraCelda = fila.children[0];
@@ -122,7 +114,6 @@ function setupRowSelection() {
             contenidoCelda !== 'No hay clientes registrados' && 
             !isNaN(parseInt(contenidoCelda))) {
             
-            console.log(`Configurando fila ${index} con ID: ${contenidoCelda}`);
             
             // Asegurar que los datos estén en la fila
             const clienteId = parseInt(contenidoCelda);
@@ -143,10 +134,6 @@ function setupRowSelection() {
             fila.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('=== CLICK EN FILA ===');
-                console.log('Fila clickeada:', this);
-                console.log('Cliente ID:', this.clienteId);
-                console.log('Data Cliente ID:', this.getAttribute('data-cliente-id'));
                 handleRowClick(this);
             });
 
@@ -165,12 +152,9 @@ function setupRowSelection() {
         }
     });
     
-    console.log('=== SELECCIÓN DE FILAS CONFIGURADA ===');
 }
 
 function handleRowClick(fila) {
-    console.log('=== MANEJANDO CLICK EN FILA ===');
-    console.log('Fila recibida:', fila);
     
     // Verificar que la fila tenga contenido válido
     const primeraCelda = fila.children[0];
@@ -180,7 +164,6 @@ function handleRowClick(fila) {
     }
 
     const contenidoCelda = primeraCelda.textContent.trim();
-    console.log('Contenido de la primera celda:', contenidoCelda);
     
     // Verificar que sea una fila válida con datos de cliente
     if (contenidoCelda && 
@@ -197,9 +180,7 @@ function handleRowClick(fila) {
 
 // Seleccionar fila - CORREGIDO para manejar IDs como enteros
 function seleccionarFila(fila) {
-    console.log('=== SELECCIONANDO FILA ===');
-    console.log('Fila a seleccionar:', fila);
-    
+
     // Asegurar que los estilos CSS para selección existan
     if (!document.getElementById('row-selection-styles')) {
         const style = document.createElement('style');
@@ -225,7 +206,6 @@ function seleccionarFila(fila) {
             }
         `;
         document.head.appendChild(style);
-        console.log('✓ Estilos de selección aplicados');
     }
     
     // Remover selección anterior
@@ -237,7 +217,6 @@ function seleccionarFila(fila) {
     fila.classList.add('selected');
     filaSeleccionada = fila;
     
-    console.log('✓ Fila seleccionada asignada:', filaSeleccionada);
     
     // Obtener datos del cliente seleccionado - MÉTODO MEJORADO
     let clienteId = null;
@@ -249,7 +228,6 @@ function seleccionarFila(fila) {
         clienteId = fila.clienteId;
         clienteNombre = fila.clienteNombre || '';
         clienteTelefono = fila.clienteTelefono || '';
-        console.log('✓ Datos obtenidos de propiedades directas');
     }
     // Método 2: Usar data attributes
     else if (fila.getAttribute('data-cliente-id')) {
@@ -265,7 +243,6 @@ function seleccionarFila(fila) {
             clienteId = parseInt(celdas[0].textContent.trim());
             clienteNombre = celdas[1].textContent.trim();
             clienteTelefono = celdas[2].textContent.trim();
-            console.log('✓ Datos obtenidos de las celdas directamente');
             
             // Guardar en propiedades para uso futuro
             fila.clienteId = clienteId;
@@ -302,6 +279,8 @@ function seleccionarFila(fila) {
 // Función para crear el modal de agregar cliente
 function crearModalCliente() {
     console.log('Creando modal de cliente...');
+    console.log('[CREAR] Modal de cliente abierto');
+    console.trace();
     
     // Verificar si ya existe un modal
     const modalExistente = document.getElementById('modal-add-cliente');
@@ -352,6 +331,8 @@ function crearModalCliente() {
 async function crearModalEditarCliente() {
     console.log('Creando modal de editar cliente...');
     console.log('Fila seleccionada:', filaSeleccionada);
+    console.log('[EDITAR] Modal de edición de cliente abierto');
+    console.trace();
     
     if (!filaSeleccionada) {
         mostrarToast('Por favor, selecciona un cliente para editar', 'warning');
@@ -401,7 +382,7 @@ async function crearModalEditarCliente() {
         if (modalExistente) {
             modalExistente.remove();
         }
-
+        
         const modal = document.createElement('div');
         modal.id = 'modal-edit-cliente';
         modal.className = 'modal-overlay';
@@ -539,6 +520,7 @@ function setupModalFormularioEventsClientes(modal) {
     const closeBtn = modal.querySelector(".modal-close");
     const cancelBtns = modal.querySelectorAll(".btn-cancel");
     const form = modal.querySelector("form");
+
     
     // Cerrar con X
     if (closeBtn) {
@@ -572,9 +554,11 @@ function setupModalFormularioEventsClientes(modal) {
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
+            console.log("🧪 Evento submit capturado para:", form.id);
+
             
             const formData = new FormData(form);
-            const isEdit = form.id === 'form-edit-cliente';
+            const isEdit = modal.id === 'modal-edit-cliente';
             
             if (isEdit) {
                 // Lógica para editar cliente usando API
