@@ -1,0 +1,46 @@
+.ayuda-section {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  background-color: #f3f0db;
+  min-height: 100vh;
+}
+
+.ayuda-card {
+  background-color: #fefbea;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  padding: 30px 40px;
+  max-width: 900px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ayuda-card h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-top: 20px;
+}
+
+.ayuda-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.ayuda-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.ayuda-card ul li {
+  margin-bottom: 18px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.ayuda-card ul li strong {
+  display: block;
+  color: #000;
+}
