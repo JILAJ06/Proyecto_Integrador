@@ -349,7 +349,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="modal-info-right">
                         <button class="modal-info-btn modal-info-btn-sms">Enviar por SMS</button>
-                        <button class="modal-info-btn modal-info-btn-exportar">Exportar</button>
                     </div>
                 </div>
             `;

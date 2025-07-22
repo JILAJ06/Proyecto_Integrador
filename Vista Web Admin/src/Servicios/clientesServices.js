@@ -353,174 +353,76 @@ export async function deleteCliente(clienteId) {
     }
 }
 
-// Update client - VERSIÓN CON LOGGING EXHAUSTIVO PARA DEBUGGING
+// Update client - CORREGIDO CON ACTUALIZACIÓN LOCAL
 export async function updateCliente(clienteId, datos) {
     try {
         const NEGOCIO_ID = getNegocioId();
         const url = `${BASE_URL}/negocio/${NEGOCIO_ID}/cliente/${clienteId}`;
+        console.log('Actualizando cliente:', clienteId, datos);
+        console.log('URL:', url);
         
-        console.log('=== DEBUGGING ACTUALIZACIÓN DE CLIENTE ===');
-        console.log('1. BASE_URL:', BASE_URL);
-        console.log('2. NEGOCIO_ID:', NEGOCIO_ID);
-        console.log('3. Cliente ID recibido:', clienteId, 'Tipo:', typeof clienteId);
-        console.log('4. URL completa construida:', url);
-        console.log('5. Datos a enviar:', datos);
-        
-        // Validar que el clienteId sea válido antes de enviar
-        if (!clienteId || isNaN(clienteId) || clienteId <= 0) {
-            throw new Error('ID de cliente inválido para actualización');
-        }
-        
-        const requestBody = JSON.stringify(datos);
-        console.log('6. Request body JSON:', requestBody);
-        
-        const requestOptions = {
+        const response = await fetch(url, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: requestBody
-        };
-        console.log('7. Request options:', requestOptions);
+            body: JSON.stringify(datos)
+        });
         
-        console.log('8. Enviando petición...');
-        const response = await fetch(url, requestOptions);
-        
-        console.log('9. Respuesta recibida:');
-        console.log('   - Status:', response.status);
-        console.log('   - Status Text:', response.statusText);
-        console.log('   - OK:', response.ok);
-        console.log('   - Headers:', Object.fromEntries(response.headers.entries()));
-        console.log('   - URL final:', response.url);
-        
-        // Verificar si la URL cambió (redirección)
-        if (response.url !== url) {
-            console.warn('¡ALERTA! La URL cambió durante la petición:');
-            console.warn('   - URL enviada:', url);
-            console.warn('   - URL final:', response.url);
-            console.warn('   - Esto podría indicar una redirección no deseada');
-        }
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
         
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('10. Error en respuesta:');
-            console.error('    - Status:', response.status);
-            console.error('    - Error text:', errorText);
+            console.error('Error response:', errorText);
             
             // Manejar diferentes tipos de errores
             if (response.status === 409 || errorText.includes('foreign key constraint') || errorText.includes('CONSTRAINT')) {
                 throw new Error('CONSTRAINT_ERROR: Error de integridad en la base de datos');
             } else if (response.status === 404) {
-                console.error('    - Cliente no encontrado con ID:', clienteId);
                 throw new Error('NOT_FOUND: Cliente no encontrado');
             } else if (response.status === 400) {
-                console.error('    - Datos inválidos enviados:', datos);
                 throw new Error('BAD_REQUEST: Datos del cliente inválidos');
-            } else if (response.status === 405) {
-                console.error('    - Método no permitido. ¿El endpoint acepta PUT?');
-                throw new Error('METHOD_NOT_ALLOWED: El endpoint no acepta PUT');
             } else if (response.status === 500) {
-                console.error('    - Error interno del servidor');
                 throw new Error('SERVER_ERROR: Error interno del servidor');
             } else {
                 throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
         }
         
-        // Manejar respuesta exitosa
-        console.log('11. Respuesta exitosa, procesando contenido...');
+        // Manejar respuesta que puede ser vacía o con contenido
         let clienteActualizado = null;
         const contentType = response.headers.get('content-type');
-        console.log('12. Content-Type:', contentType);
         
-        try {
-            if (contentType && contentType.includes('application/json')) {
-                const responseText = await response.text();
-                console.log('13. Response text raw:', responseText);
-                
-                if (responseText.trim()) {
-                    clienteActualizado = JSON.parse(responseText);
-                    console.log('14. Cliente actualizado (JSON parseado):', clienteActualizado);
-                } else {
-                    console.log('14. Respuesta JSON vacía, usando datos locales');
-                    clienteActualizado = {
-                        id: parseInt(clienteId),
-                        nombre: datos.nombre,
-                        telefono: datos.telefono
-                    };
-                }
-            } else {
-                const textResponse = await response.text();
-                console.log('14. Respuesta de texto (no JSON):', textResponse);
-                
-                // Si no hay JSON, crear el objeto con los datos enviados
-                clienteActualizado = {
-                    id: parseInt(clienteId),
-                    nombre: datos.nombre,
-                    telefono: datos.telefono
-                };
-            }
-        } catch (parseError) {
-            console.warn('15. Error al parsear respuesta:', parseError);
-            console.warn('    Usando datos locales como fallback');
+        if (contentType && contentType.includes('application/json')) {
+            clienteActualizado = await response.json();
+            console.log('Cliente actualizado (JSON):', clienteActualizado);
+            clienteActualizado = normalizarCliente(clienteActualizado);
+        } else {
+            console.log('Respuesta sin JSON, creando objeto cliente actualizado');
             clienteActualizado = {
-                id: parseInt(clienteId),
+                id: clienteId,
                 nombre: datos.nombre,
                 telefono: datos.telefono
             };
         }
         
-        // Normalizar el cliente
-        if (clienteActualizado) {
-            clienteActualizado = normalizarCliente(clienteActualizado);
-        }
+        console.log('Cliente actualizado final:', clienteActualizado);
         
-        console.log('16. Cliente actualizado final:', clienteActualizado);
-        console.log('17. Verificación crítica de ID:');
-        console.log('    - ID enviado:', clienteId, 'Tipo:', typeof clienteId);
-        console.log('    - ID recibido:', clienteActualizado.id, 'Tipo:', typeof clienteActualizado.id);
-        
-        // CRÍTICO: Verificar que el ID no haya cambiado
-        if (clienteActualizado.id !== parseInt(clienteId)) {
-            console.error('18. ¡PROBLEMA CRÍTICO DETECTADO!');
-            console.error('    - El ID del cliente cambió durante la actualización');
-            console.error('    - Esto indica que se creó un nuevo cliente en lugar de actualizar');
-            console.error('    - ID original:', clienteId);
-            console.error('    - ID nuevo:', clienteActualizado.id);
-            console.error('    - Diferencia:', clienteActualizado.id - parseInt(clienteId));
-            
-            // Esto es crítico: significa que el backend está creando un nuevo registro
-            console.error('🚨 EL BACKEND ESTÁ CREANDO UN NUEVO CLIENTE EN LUGAR DE ACTUALIZAR 🚨');
-            console.error('🔍 Posibles causas:');
-            console.error('   1. El endpoint PUT no existe y está cayendo en POST');
-            console.error('   2. El endpoint PUT está mal implementado');
-            console.error('   3. El ID no se está pasando correctamente al endpoint');
-            console.error('   4. Hay un problema en el mapeo de rutas del backend');
-            
-            // Forzar el ID correcto para mantener la consistencia en el frontend
-            clienteActualizado.id = parseInt(clienteId);
-            console.log('19. ID corregido forzadamente a:', clienteActualizado.id);
-        } else {
-            console.log('18. ✅ ID verificado correctamente - actualización exitosa');
-        }
-        
-        // Actualizar solo la fila específica
+        // CAMBIO: Actualizar solo la fila específica en lugar de recargar toda la tabla
         actualizarFilaEspecifica(clienteActualizado);
         
-        console.log('20. === ACTUALIZACIÓN DE CLIENTE COMPLETADA ===');
         return clienteActualizado;
         
     } catch (error) {
-        console.error('❌ Error en updateCliente:', error);
-        console.error('Stack trace:', error.stack);
+        console.error('Error updating cliente:', error);
         throw error;
     }
 }
 
-// Función para actualizar solo una fila específica - MEJORADA
+// Función para actualizar solo una fila específica
 function actualizarFilaEspecifica(clienteActualizado) {
-    console.log('=== ACTUALIZANDO FILA ESPECÍFICA ===');
-    console.log('Cliente a actualizar:', clienteActualizado);
+    console.log('Actualizando fila específica para cliente:', clienteActualizado);
     
     const tbody = document.querySelector('.clientes-table tbody');
     if (!tbody) {
@@ -532,26 +434,16 @@ function actualizarFilaEspecifica(clienteActualizado) {
     const filas = tbody.querySelectorAll('tr');
     let filaEncontrada = null;
     
-    console.log(`Buscando fila con ID ${clienteActualizado.id} entre ${filas.length} filas`);
-    
     for (const fila of filas) {
         const clienteId = fila.clienteId || parseInt(fila.getAttribute('data-cliente-id'));
-        const primeraCeldaId = fila.children[0] ? parseInt(fila.children[0].textContent.trim()) : null;
-        
-        console.log(`Fila: clienteId=${clienteId}, dataId=${fila.getAttribute('data-cliente-id')}, celdaId=${primeraCeldaId}`);
-        
-        if (clienteId === clienteActualizado.id || primeraCeldaId === clienteActualizado.id) {
+        if (clienteId === clienteActualizado.id) {
             filaEncontrada = fila;
-            console.log('✓ Fila encontrada para actualizar');
             break;
         }
     }
     
     if (filaEncontrada) {
-        console.log('Actualizando contenido de la fila...');
-        
-        // Preservar el estado de selección antes de actualizar
-        const estabaSeleccionada = filaEncontrada.classList.contains('selected');
+        console.log('Fila encontrada, actualizando contenido...');
         
         // Actualizar el contenido de la fila
         filaEncontrada.innerHTML = `
@@ -569,11 +461,9 @@ function actualizarFilaEspecifica(clienteActualizado) {
         filaEncontrada.setAttribute('data-cliente-nombre', clienteActualizado.nombre || '');
         filaEncontrada.setAttribute('data-cliente-telefono', clienteActualizado.telefono || '');
         
-        // Restaurar el estado de selección y estilos
-        if (estabaSeleccionada) {
-            filaEncontrada.classList.add('selected');
-            console.log('Selección restaurada en fila actualizada');
-            
+        // Mantener la selección si esta fila estaba seleccionada
+        if (filaEncontrada.classList.contains('selected')) {
+            console.log('Manteniendo selección en fila actualizada');
             // Actualizar también la variable global si existe
             if (window.clienteSeleccionado) {
                 window.clienteSeleccionado = {
@@ -582,42 +472,20 @@ function actualizarFilaEspecifica(clienteActualizado) {
                     telefono: clienteActualizado.telefono
                 };
             }
-            
-            // Actualizar filaSeleccionada global
-            if (window.filaSeleccionada) {
-                window.filaSeleccionada = filaEncontrada;
-            }
         }
         
-        // Restaurar el cursor pointer
-        filaEncontrada.style.cursor = 'pointer';
-        
-        console.log('✓ Fila actualizada exitosamente con ID:', clienteActualizado.id);
-        
-        // Reconfigurar events listeners para la fila actualizada
-        setTimeout(() => {
-            if (window.setupRowSelection) {
-                console.log('Reconfigurando eventos de selección...');
-                window.setupRowSelection();
-            }
-        }, 100);
-        
+        console.log('✓ Fila actualizada exitosamente');
     } else {
-        console.warn('⚠️ No se encontró la fila para actualizar con ID:', clienteActualizado.id);
-        console.log('Recargando tabla completa como fallback...');
-        
+        console.warn('No se encontró la fila para actualizar, recargando tabla completa...');
         // Fallback: recargar toda la tabla si no se encuentra la fila
         setTimeout(async () => {
             try {
                 await getClientes();
-                console.log('✓ Tabla recargada completamente');
             } catch (error) {
                 console.error('Error al recargar tabla:', error);
             }
         }, 500);
     }
-    
-    console.log('=== ACTUALIZACIÓN DE FILA COMPLETADA ===');
 }
 
 // Create new client - CORREGIDO
@@ -756,74 +624,3 @@ export async function updateClienteInVenta(datos) {
         throw error;
     }
 }
-
-// Función de diagnóstico para probar endpoints
-export async function diagnosticarEndpointCliente(clienteId) {
-    const NEGOCIO_ID = getNegocioId();
-    const baseUrl = `${BASE_URL}/negocio/${NEGOCIO_ID}/cliente/${clienteId}`;
-    
-    console.log('=== DIAGNÓSTICO DE ENDPOINT ===');
-    console.log('URL base:', baseUrl);
-    
-    // Probar GET
-    try {
-        console.log('1. Probando GET...');
-        const getResponse = await fetch(baseUrl);
-        console.log('GET Status:', getResponse.status);
-        console.log('GET OK:', getResponse.ok);
-        if (getResponse.ok) {
-            const getData = await getResponse.json();
-            console.log('GET Data:', getData);
-        }
-    } catch (error) {
-        console.error('GET Error:', error);
-    }
-    
-    // Probar OPTIONS (para verificar métodos permitidos)
-    try {
-        console.log('2. Probando OPTIONS...');
-        const optionsResponse = await fetch(baseUrl, { method: 'OPTIONS' });
-        console.log('OPTIONS Status:', optionsResponse.status);
-        console.log('OPTIONS Headers:', Object.fromEntries(optionsResponse.headers.entries()));
-        const allowHeader = optionsResponse.headers.get('Allow');
-        if (allowHeader) {
-            console.log('Métodos permitidos:', allowHeader);
-        }
-    } catch (error) {
-        console.error('OPTIONS Error:', error);
-    }
-    
-    // Probar PUT con datos de prueba
-    try {
-        console.log('3. Probando PUT...');
-        const putData = { nombre: 'Test', telefono: '123-456-7890' };
-        const putResponse = await fetch(baseUrl, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(putData)
-        });
-        console.log('PUT Status:', putResponse.status);
-        console.log('PUT OK:', putResponse.ok);
-        console.log('PUT URL final:', putResponse.url);
-        
-        if (putResponse.ok) {
-            try {
-                const putResponseData = await putResponse.json();
-                console.log('PUT Response Data:', putResponseData);
-            } catch (e) {
-                const putText = await putResponse.text();
-                console.log('PUT Response Text:', putText);
-            }
-        } else {
-            const errorText = await putResponse.text();
-            console.log('PUT Error:', errorText);
-        }
-    } catch (error) {
-        console.error('PUT Error:', error);
-    }
-    
-    console.log('=== FIN DEL DIAGNÓSTICO ===');
-}
-
-// Hacer disponible globalmente para debugging
-window.diagnosticarEndpointCliente = diagnosticarEndpointCliente;
