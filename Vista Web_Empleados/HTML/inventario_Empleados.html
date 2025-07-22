@@ -8,6 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <script src="/Vista Web_Empleados/src/script_Empleados.js"></script>
+    <!-- En cada archivo HTML de empleados, después de los CSS y antes de los otros scripts -->
+<script src="/Vista Web_Empleados/src/empleadosConfig.js"></script>
     <title>Clink - Inventario</title>
 </head>
 <body>
@@ -119,5 +121,9 @@
                     </tbody>
                 </table>
         </div>
+    <!-- Al final del archivo, antes de </body> -->
+<script type="module" src="/Vista Web Admin/src/Servicios/inventarioServices.js"></script>
+<script type="module" src="/Vista Web Admin/src/Forms/formsInventario.js"></script>
+<script src="/Vista Web_Empleados/src/script_Empleados.js"></script>
 </body>
 </html>

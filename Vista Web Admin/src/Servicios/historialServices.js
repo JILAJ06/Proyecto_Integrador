@@ -1,23 +1,26 @@
-document.addEventListener('DOMContentLoaded', () =>{
-    getHistorial();
-});
+const BASE_URL = "http://localhost:8080"; // Ajusta el puerto o dominio si es necesario
 
-export async function getHistorial() {
-    const url_endpoint = 'https://jsonplaceholder.typicode.com/users'; // Replace with your actual API endpoint
-
+// Obtener historial de ventas para un negocio específico
+export async function obtenerHistorialVentas(idNegocio) {
     try {
-        const response = await fetch(url_endpoint);
-        const empleados = await response.json();
-
-        let tbody = document.querySelector('.historial-table tbody');
-        empleados.forEach(h => {
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-            <td>${h.fecha}</td><td>${h.id_venta}</td><td>${h.producto}</td><td>${h.categoria}</td><td>${h.cantidad}</td><td>${h.total}</td>`
-            tbody.appendChild(fila);
-        });
+        const response = await fetch(`${BASE_URL}/negocio/${idNegocio}/historial`);
+        console.log(response);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
     } catch (error) {
-        console.error('Error fetching historial:', error);
+        console.error("Error al obtener historial de ventas:", error);
+        return null;
     }
 }
 
+// Obtener resumen mensual de ventas
+export async function obtenerResumenMensual(idNegocio) {
+    try {
+        const response = await fetch(`${BASE_URL}/negocio/${idNegocio}/historial/mensual`);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error("Error al obtener resumen mensual:", error);
+        return null;
+    }
+}

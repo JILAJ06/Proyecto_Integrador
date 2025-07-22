@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/Vista Web_Empleados/CSS/base_Empleado.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
+    <!-- En cada archivo HTML de empleados, después de los CSS y antes de los otros scripts -->
+<script src="/Vista Web_Empleados/src/empleadosConfig.js"></script>
 </head>
 <body>
     <div class="container">
@@ -130,11 +132,12 @@
     </div>
 
        <!-- Scripts para el sistema de ventas -->
-    <script src="/Vista Web Admin/src/test-javalin-endpoints.js"></script>
-    <script src="/Vista Web Admin/src/Servicios/ventasServices.js"></script>
-    <script src="/Vista Web Admin/src/Forms/formsVentas.js"></script>
-    
-    <script src="/Vista Web Admin/src/Forms/pagoModal.js"></script>
-    <script src="/Vista Web Admin/script.js"></script>
+    <!-- Al final del archivo, antes de </body> -->
+<script src="/Vista Web Admin/src/test-javalin-endpoints.js"></script>
+<script type="module" src="/Vista Web Admin/src/Servicios/ventasServices.js"></script>
+<script type="module" src="/Vista Web Admin/src/Forms/formsVentas.js"></script>
+<script src="/Vista Web Admin/src/Forms/pagoModal.js"></script>
+<script src="/Vista Web_Empleados/src/script_Empleados.js"></script>
+
 </body>
 </html>
