@@ -346,333 +346,596 @@ document.addEventListener("DOMContentLoaded", () => {
     return modal;
   }
 
-  // Alertas para el sistema de productos
-  class ProductosAlertas {
+  // Crear modal para eliminar producto
+  function crearModalEliminar() {
+    // Verificar si ya existe un modal
+    const modalExistente = document.getElementById('modal-advertencia');
+    if (modalExistente) {
+      modalExistente.remove();
+    }
+
+    // Crear el modal usando el mismo diseño que modalAdvertencia.js
+    const modal = document.createElement('div');
+    modal.id = 'modal-advertencia';
+    modal.innerHTML = `
+      <div class="modal-advertencia-overlay"></div>
+      <div class="modal-advertencia-content">
+        <div class="modal-advertencia-icon">&#9888;</div>
+        <div class="modal-advertencia-title">Advertencia</div>
+        <div class="modal-advertencia-text">Esta a punto de eliminar un producto<br>de esta sección,<br>¿está seguro de querer realizar esta acción?</div>
+        <div class="modal-advertencia-actions">
+          <button class="modal-advertencia-btn-aceptar">Aceptar</button>
+          <button class="modal-advertencia-btn-cancelar">Cancelar</button>
+        </div>
+      </div>
+    `;
     
-    // Producto agregado exitosamente
-    static productoAgregado(nombreProducto) {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Producto agregado!',
-            text: `${nombreProducto} ha sido agregado exitosamente`,
-            timer: 2500,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-        });
-    }
-
-    // Producto editado exitosamente
-    static productoEditado(nombreProducto) {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Producto actualizado!',
-            text: `${nombreProducto} ha sido actualizado exitosamente`,
-            timer: 2500,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-        });
-    }
-
-    // Confirmación antes de eliminar producto
-    static confirmarEliminarProducto(nombreProducto) {
-        return Swal.fire({
-            title: '¿Eliminar producto?',
-            html: `
-                <p>¿Estás seguro de que deseas eliminar:</p>
-                <strong>${nombreProducto}</strong>
-                <p class="text-danger mt-2">Esta acción no se puede deshacer</p>
-            `,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        });
-    }
-
-    // Producto eliminado exitosamente
-    static productoEliminado(nombreProducto) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Producto eliminado',
-            text: `${nombreProducto} ha sido eliminado del inventario`,
-            timer: 2500,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-        });
-    }
-
-    // Ningún producto seleccionado para editar/eliminar
-    static ningunProductoSeleccionado(accion) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Selecciona un producto',
-            text: `Debes seleccionar un producto de la tabla para ${accion}`,
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Campos requeridos vacíos
-    static camposRequeridos(campos) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Campos requeridos',
-            html: `
-                <p>Los siguientes campos son obligatorios:</p>
-                <ul style="text-align: left; margin: 10px 0;">
-                    ${campos.map(campo => `<li>${campo}</li>`).join('')}
-                </ul>
-            `,
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Código de producto duplicado
-    static codigoDuplicado(codigo) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Código duplicado',
-            text: `El código "${codigo}" ya existe. Usa un código diferente.`,
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Precio inválido
-    static precioInvalido() {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Precio inválido',
-            text: 'El precio debe ser un número mayor a 0',
-            confirmButtonText: 'Corregir'
-        });
-    }
-
-    // Error al cargar productos
-    static errorCargarProductos() {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error al cargar productos',
-            text: 'No se pudieron cargar los productos. Verifica tu conexión.',
-            showCancelButton: true,
-            confirmButtonText: 'Reintentar',
-            cancelButtonText: 'Cancelar'
-        });
-    }
-
-    // Error al guardar producto
-    static errorGuardarProducto(mensaje) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error al guardar',
-            text: mensaje || 'Ocurrió un error al guardar el producto',
-            confirmButtonText: 'Intentar nuevamente'
-        });
-    }
-
-    // Confirmación antes de salir sin guardar
-    static confirmarSalirSinGuardar() {
-        return Swal.fire({
-            title: '¿Salir sin guardar?',
-            text: 'Tienes cambios sin guardar que se perderán',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Salir sin guardar',
-            cancelButtonText: 'Continuar editando'
-        });
-    }
-
-    // Contenido neto inválido
-    static contenidoNetoInvalido() {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Contenido neto inválido',
-            text: 'El contenido neto debe ser un número mayor a 0',
-            confirmButtonText: 'Corregir'
-        });
-    }
-
-    // Categoría no válida
-    static categoriaInvalida() {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Categoría requerida',
-            text: 'Debes seleccionar una categoría válida',
-            confirmButtonText: 'Seleccionar'
-        });
-    }
-
-    // Producto no encontrado
-    static productoNoEncontrado() {
-        Swal.fire({
-            icon: 'error',
-            title: 'Producto no encontrado',
-            text: 'El producto seleccionado no existe o fue eliminado',
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Múltiples productos seleccionados para editar
-    static multiplesProductosSeleccionados() {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Selección múltiple',
-            text: 'Solo puedes editar un producto a la vez. Selecciona solo uno.',
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Filtros aplicados
-    static filtrosAplicados(tipoFiltro, valor) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Filtro aplicado',
-            text: `Mostrando productos: ${tipoFiltro} - ${valor}`,
-            timer: 2000,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-        });
-    }
-
-    // Sin resultados en búsqueda
-    static sinResultadosBusqueda(termino) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Sin resultados',
-            text: `No se encontraron productos que coincidan con: "${termino}"`,
-            confirmButtonText: 'Entendido'
-        });
-    }
-
-    // Importación de productos exitosa
-    static importacionExitosa(cantidad) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Importación exitosa',
-            text: `Se importaron ${cantidad} productos correctamente`,
-            confirmButtonText: 'Continuar'
-        });
-    }
-
-    // Error en importación
-    static errorImportacion(errores) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error en importación',
-            html: `
-                <p>Se encontraron los siguientes errores:</p>
-                <ul style="text-align: left; max-height: 200px; overflow-y: auto;">
-                    ${errores.map(error => `<li>${error}</li>`).join('')}
-                </ul>
-            `,
-            confirmButtonText: 'Revisar errores'
-        });
-    }
-}
-
-// Event listeners para los botones de productos
-document.addEventListener('DOMContentLoaded', function() {
+    document.body.appendChild(modal);
     
-    // Botón agregar producto
-    const btnAgregar = document.querySelector('.btn-add');
-    if (btnAgregar) {
-        btnAgregar.addEventListener('click', function() {
-            // Aquí iría la lógica para mostrar modal de agregar producto
-            // Ejemplo de validación:
-            // ProductosAlertas.productoAgregado('Nuevo Producto');
-        });
+    // Aplicar estilos del modal de advertencia
+    aplicarEstilosModalAdvertencia();
+    
+    // Configurar eventos del modal de eliminar
+    setupModalAdvertenciaEvents(modal);
+    
+    // Mostrar modal con animación
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('mostrar'), 10);
+    
+    return modal;
+  }
+
+  // Función para aplicar estilos específicos del modal de advertencia
+  function aplicarEstilosModalAdvertencia() {
+    // Verificar si ya existen los estilos
+    if (document.getElementById('modal-advertencia-styles')) {
+      return;
     }
 
-    // Botón editar producto
-    const btnEditar = document.querySelector('.btn-edit');
-    if (btnEditar) {
-        btnEditar.addEventListener('click', function() {
-            // Verificar si hay un producto seleccionado
-            const filaSeleccionada = document.querySelector('.productos-table tbody tr.selected');
-            
-            if (!filaSeleccionada) {
-                ProductosAlertas.ningunProductoSeleccionado('editar');
-                return;
-            }
+    const style = document.createElement('style');
+    style.id = 'modal-advertencia-styles';
+    style.textContent = `
+      #modal-advertencia {
+        display: none;
+        position: fixed;
+        z-index: 3000;
+        left: 0; 
+        top: 0; 
+        width: 100vw; 
+        height: 100vh;
+        align-items: center; 
+        justify-content: center;
+      }
 
-            // Verificar si hay múltiples selecciones
-            const filasSeleccionadas = document.querySelectorAll('.productos-table tbody tr.selected');
-            if (filasSeleccionadas.length > 1) {
-                ProductosAlertas.multiplesProductosSeleccionados();
-                return;
-            }
+      #modal-advertencia .modal-advertencia-overlay {
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100vw; 
+        height: 100vh;
+        background: rgba(0,0,0,0.4);
+      }
 
-            // Proceder con la edición
-            // ProductosAlertas.productoEditado('Producto editado');
-        });
-    }
+      #modal-advertencia .modal-advertencia-content {
+        position: relative;
+        background: #e6e7c7;
+        border-radius: 32px;
+        padding: 38px 38px 32px 38px;
+        min-width: 420px;
+        min-height: 220px;
+        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        opacity: 0;
+        transform: scale(0.85);
+        transition: opacity 0.28s cubic-bezier(.4,1.3,.6,1), transform 0.28s cubic-bezier(.4,1.3,.6,1);
+      }
 
-    // Botón eliminar producto
-    const btnEliminar = document.querySelector('.btn-category'); // Cambiar clase si es necesario
-    if (btnEliminar) {
-        btnEliminar.addEventListener('click', function() {
-            const filaSeleccionada = document.querySelector('.productos-table tbody tr.selected');
-            
-            if (!filaSeleccionada) {
-                ProductosAlertas.ningunProductoSeleccionado('eliminar');
-                return;
-            }
+      #modal-advertencia.mostrar .modal-advertencia-content {
+        opacity: 1;
+        transform: scale(1);
+      }
 
-            const nombreProducto = filaSeleccionada.querySelector('td:nth-child(4)')?.textContent || 'Producto seleccionado';
-            
-            ProductosAlertas.confirmarEliminarProducto(nombreProducto).then((result) => {
-                if (result.isConfirmed) {
-                    // Aquí iría la lógica para eliminar el producto
-                    ProductosAlertas.productoEliminado(nombreProducto);
-                }
-            });
-        });
-    }
+      #modal-advertencia .modal-advertencia-icon {
+        font-size: 3.5rem;
+        color: #222;
+        margin-bottom: 8px;
+      }
 
-    // Función para validar formulario de producto
-    function validarFormularioProducto(formulario) {
-        const camposRequeridos = [];
+      #modal-advertencia .modal-advertencia-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #222;
+      }
+
+      #modal-advertencia .modal-advertencia-text {
+        font-size: 1.2rem;
+        color: #222;
+        text-align: center;
+        margin-bottom: 24px;
+        line-height: 1.4;
+      }
+
+      #modal-advertencia .modal-advertencia-actions {
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        width: 100%;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-aceptar, 
+      #modal-advertencia .modal-advertencia-btn-cancelar {
+        flex: 1;
+        padding: 14px 0;
+        border: none;
+        border-radius: 20px;
+        background: #fff;
+        font-weight: bold;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin: 0 8px;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-aceptar:hover {
+        background: #b8e6b8;
+      }
+
+      #modal-advertencia .modal-advertencia-btn-cancelar:hover {
+        background: #f2bcbc;
+      }
+
+      /* Responsive para pantallas pequeñas */
+      @media (max-width: 480px) {
+        #modal-advertencia .modal-advertencia-content {
+          min-width: 320px;
+          padding: 30px 25px 25px 25px;
+          margin: 20px;
+        }
         
-        // Validar campos obligatorios
-        if (!formulario.codigo.value.trim()) camposRequeridos.push('Código');
-        if (!formulario.producto.value.trim()) camposRequeridos.push('Nombre del producto');
-        if (!formulario.categoria.value.trim()) camposRequeridos.push('Categoría');
-        if (!formulario.precio.value.trim()) camposRequeridos.push('Precio');
+        #modal-advertencia .modal-advertencia-icon {
+          font-size: 2.8rem;
+        }
         
-        if (camposRequeridos.length > 0) {
-            ProductosAlertas.camposRequeridos(camposRequeridos);
-            return false;
+        #modal-advertencia .modal-advertencia-title {
+          font-size: 1.6rem;
         }
-
-        // Validar precio
-        const precio = parseFloat(formulario.precio.value);
-        if (isNaN(precio) || precio <= 0) {
-            ProductosAlertas.precioInvalido();
-            return false;
+        
+        #modal-advertencia .modal-advertencia-text {
+          font-size: 1rem;
         }
-
-        // Validar contenido neto si está presente
-        if (formulario.contenidoNeto.value.trim()) {
-            const contenido = parseFloat(formulario.contenidoNeto.value);
-            if (isNaN(contenido) || contenido <= 0) {
-                ProductosAlertas.contenidoNetoInvalido();
-                return false;
-            }
+        
+        #modal-advertencia .modal-advertencia-actions {
+          gap: 20px;
         }
+        
+        #modal-advertencia .modal-advertencia-btn-aceptar, 
+        #modal-advertencia .modal-advertencia-btn-cancelar {
+          font-size: 1.1rem;
+          padding: 12px 0;
+        }
+      }
+    `;
 
-        return true;
+    document.head.appendChild(style);
+  }
+
+  // Función para configurar eventos del modal de advertencia
+  function setupModalAdvertenciaEvents(modal) {
+    const btnAceptar = modal.querySelector('.modal-advertencia-btn-aceptar');
+    const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
+    const overlay = modal.querySelector('.modal-advertencia-overlay');
+
+    // Función para cerrar modal with animación
+    function cerrarModal() {
+      modal.classList.remove('mostrar');
+      setTimeout(() => { 
+        if (modal.parentNode) {
+          modal.remove(); 
+        }
+      }, 280);
     }
 
-    // Hacer la función disponible globalmente
-    window.validarFormularioProducto = validarFormularioProducto;
-    window.ProductosAlertas = ProductosAlertas;
-});
+    // Evento para cerrar modal con Escape
+    function handleEscape(e) {
+      if (e.key === 'Escape') {
+        cerrarModal();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape);
+
+    // Limpiar listeners previos
+    btnAceptar.onclick = null;
+    btnCancelar.onclick = null;
+    overlay.onclick = null;
+
+    // Evento del botón aceptar (confirmar eliminación)
+    btnAceptar.onclick = function() {
+      confirmarEliminar();
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+
+    // Evento del botón cancelar
+    btnCancelar.onclick = function() {
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+
+    // Evento para cerrar modal al hacer clic en overlay
+    overlay.onclick = function() {
+      cerrarModal();
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }
+
+  // Confirmar eliminación
+  async function confirmarEliminar() {
+    if (!filaSeleccionada) return;
+
+    const celdas = filaSeleccionada.querySelectorAll("td");
+    const codigo = celdas[0].textContent.trim();
+
+    try {
+      // Usar el servicio real del backend
+      if (typeof window.deleteProducto === 'function') {
+        await window.deleteProducto(codigo);
+        filaSeleccionada = null;
+        mostrarAlertaVisual("Producto eliminado exitosamente.");
+      } else {
+        throw new Error('Servicio no disponible');
+      }
+      
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      mostrarAlertaVisual('Error al eliminar el producto: ' + error.message);
+    }
+  }
+
+  // Función para mostrar alerta visual
+  function mostrarAlertaVisual(mensaje) {
+    // Crear elemento de alerta si no existe
+    let alerta = document.getElementById('alerta-visual');
+    if (!alerta) {
+      alerta = document.createElement('div');
+      alerta.id = 'alerta-visual';
+      alerta.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 10001;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      `;
+      document.body.appendChild(alerta);
+    }
+    
+    alerta.textContent = mensaje;
+    alerta.style.opacity = '1';
+    
+    setTimeout(() => {
+      alerta.style.opacity = '0';
+    }, 3000);
+  }
+
+  // Función para capitalizar texto - CORREGIDA
+  function capitalizarTexto(texto) {
+    // Validar que el texto sea válido y convertirlo a string
+    if (!texto || texto === null || texto === undefined) return '';
+    
+    // Convertir a string si no lo es
+    const textoStr = String(texto);
+    
+    // Verificar que no esté vacío después de la conversión
+    if (textoStr.length === 0) return '';
+    
+    return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
+  }
+
+  // Función para abrir modal de agregar producto con comboboxes
+  async function abrirModalProducto() {
+    console.log("Abriendo modal de producto...");
+    
+    // Crear modal
+    const modal = crearModalProducto();
+    
+    // Mostrar modal primero
+    mostrarModal(modal);
+    
+    // Esperar un poco para que el modal se renderice completamente
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Cargar datos y crear comboboxes después de mostrar el modal
+    try {
+      console.log("Cargando datos para comboboxes...");
+      
+      // Verificar que las funciones estén disponibles
+      if (!window.getCategorias || !window.getMarcas || !window.getEnvases) {
+        console.error('Funciones de servicio no disponibles');
+        throw new Error('Servicios no disponibles');
+      }
+      
+      // Obtener datos de la base de datos
+      const [categorias, marcas, envases] = await Promise.all([
+        window.getCategorias(),
+        window.getMarcas(),
+        window.getEnvases()
+      ]);
+
+      console.log('Datos obtenidos:', { categorias, marcas, envases });
+
+      // Procesar datos para extraer solo los nombres
+      const categoriasArray = procesarDatosCombobox(categorias);
+      const marcasArray = procesarDatosCombobox(marcas);
+      const envasesArray = procesarDatosCombobox(envases);
+
+      console.log('Datos procesados:', { categoriasArray, marcasArray, envasesArray });
+
+      // Verificar que los contenedores existan
+      const categoriaContainer = document.getElementById('categoria-container');
+      const marcaContainer = document.getElementById('marca-container');
+      const envaseContainer = document.getElementById('envase-container');
+
+      if (!categoriaContainer || !marcaContainer || !envaseContainer) {
+        console.error('Contenedores no encontrados');
+        throw new Error('Contenedores de combobox no encontrados');
+      }
+
+      // Crear comboboxes con autocompletado
+      crearComboboxAutocompletado('categoria-producto', 'categoria-container', categoriasArray, 'Buscar o crear categoría...');
+      crearComboboxAutocompletado('marca-producto', 'marca-container', marcasArray, 'Buscar o crear marca...');
+      crearComboboxAutocompletado('envase-producto', 'envase-container', envasesArray, 'Buscar o crear envase...');
+
+      console.log('Comboboxes creados exitosamente');
+
+    } catch (error) {
+      console.error('Error cargando datos para comboboxes:', error);
+      
+      // Crear comboboxes vacíos en caso de error pero que permitan escribir
+      setTimeout(() => {
+        crearComboboxAutocompletado('categoria-producto', 'categoria-container', [], 'Escribir categoría...');
+        crearComboboxAutocompletado('marca-producto', 'marca-container', [], 'Escribir marca...');
+        crearComboboxAutocompletado('envase-producto', 'envase-container', [], 'Escribir envase...');
+      }, 50);
+    }
+    
+    // Configurar eventos del modal
+    configurarEventosModal(modal, async (e) => {
+      e.preventDefault();
+      
+      // Obtener valores de los comboboxes
+      const codigo = document.getElementById('codigo-producto')?.value?.trim() || '';
+      const contenido = document.getElementById('contenido')?.value?.trim() || '';
+      const nombre = document.getElementById('nombre-producto')?.value?.trim() || '';
+      const categoria = document.getElementById('categoria-producto')?.value?.trim() || '';
+      const marca = document.getElementById('marca-producto')?.value?.trim() || '';
+      const envase = document.getElementById('envase-producto')?.value?.trim() || '';
+      const variedad = document.getElementById('variedad')?.value?.trim() || '';
+      const medida = document.getElementById('medida')?.value?.trim() || 'pz';
+      const precio = parseFloat(document.getElementById('precio')?.value) || 0;
+      
+      const datosProducto = {
+        codigo,
+        nombre,
+        marca,
+        variedad,
+        contenido,
+        categoria,
+        envase,
+        medida,
+        precio
+      };
+
+      console.log("Datos a enviar:", datosProducto);
+
+      // Validar datos antes de enviar
+      if (!datosProducto.codigo) {
+        mostrarAlertaVisual('Error: El código es requerido');
+        return;
+      }
+      if (!datosProducto.nombre) {
+        mostrarAlertaVisual('Error: El nombre es requerido');
+        return;
+      }
+      if (!datosProducto.marca) {
+        mostrarAlertaVisual('Error: La marca es requerida');
+        return;
+      }
+      if (!datosProducto.categoria) {
+        mostrarAlertaVisual('Error: La categoría es requerida');
+        return;
+      }
+      if (!datosProducto.envase) {
+        mostrarAlertaVisual('Error: El envase es requerido');
+        return;
+      }
+
+      try {
+        // Usar el servicio real del backend
+        if (typeof window.postProducto === 'function') {
+          await window.postProducto(datosProducto);
+          cerrarModal(modal);
+          mostrarAlertaVisual("Producto agregado exitosamente");
+        } else {
+          throw new Error('Servicio no disponible');
+        }
+        
+      } catch (error) {
+        console.error('Error al agregar producto:', error);
+        mostrarAlertaVisual('Error al agregar el producto: ' + error.message);
+      }
+    });
+  }
+
+  // Función para abrir modal de editar producto con comboboxes
+  async function abrirModalEditar() {
+    if (!filaSeleccionada) {
+      mostrarAlertaVisual('Por favor selecciona un producto para editar');
+      return;
+    }
+
+    console.log("Abriendo modal de editar...");
+    
+    // Obtener datos de la fila seleccionada
+    const celdas = filaSeleccionada.querySelectorAll('td');
+    const datosActuales = {
+      codigo: celdas[0]?.textContent?.trim() || '',
+      categoria: celdas[1]?.textContent?.trim() || '',
+      marca: celdas[2]?.textContent?.trim() || '',
+      nombre: celdas[3]?.textContent?.trim() || '',
+      envase: celdas[4]?.textContent?.trim() || '',
+      variedad: celdas[5]?.textContent?.trim() || '',
+      contenido: celdas[6]?.textContent?.trim() || '',
+      medida: celdas[7]?.textContent?.trim() || '',
+      precio: celdas[8]?.textContent?.replace('$', '').trim() || ''
+    };
+
+    console.log('Datos actuales extraídos:', datosActuales);
+
+    const modal = crearModalEditar();
+    document.body.appendChild(modal);
+
+    // Mostrar modal
+    mostrarModal(modal);
+
+    // Esperar un poco para que el modal se renderice
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    try {
+      // Obtener datos de la base de datos
+      const [categorias, marcas, envases] = await Promise.all([
+        window.getCategorias ? window.getCategorias() : [],
+        window.getMarcas ? window.getMarcas() : [],
+        window.getEnvases ? window.getEnvases() : []
+      ]);
+
+      // Procesar datos para extraer solo los nombres
+      const categoriasArray = procesarDatosCombobox(categorias);
+      const marcasArray = procesarDatosCombobox(marcas);
+      const envasesArray = procesarDatosCombobox(envases);
+
+      // Crear comboboxes con autocompletado
+      const categoriaCombo = crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', categoriasArray, 'Buscar o crear categoría...');
+      const marcaCombo = crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', marcasArray, 'Buscar o crear marca...');
+      const envaseCombo = crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', envasesArray, 'Buscar o crear envase...');
+
+      // Prellenar campos después de crear los comboboxes
+      setTimeout(() => {
+        // Campos normales
+        const codigoInput = modal.querySelector('#edit-codigo-producto');
+        const nombreInput = modal.querySelector('#edit-nombre-producto');
+        const variedadInput = modal.querySelector('#edit-variedad');
+        const contenidoInput = modal.querySelector('#edit-contenido');
+        const medidaSelect = modal.querySelector('#edit-medida');
+        const precioInput = modal.querySelector('#edit-precio');
+
+        if (codigoInput) codigoInput.value = datosActuales.codigo;
+        if (nombreInput) nombreInput.value = datosActuales.nombre;
+        if (variedadInput) variedadInput.value = datosActuales.variedad;
+        if (contenidoInput) contenidoInput.value = datosActuales.contenido;
+        if (precioInput) precioInput.value = datosActuales.precio;
+
+        // Prellenar comboboxes
+        if (categoriaCombo && categoriaCombo.input) {
+          categoriaCombo.input.value = datosActuales.categoria;
+        }
+        if (marcaCombo && marcaCombo.input) {
+          marcaCombo.input.value = datosActuales.marca;
+        }
+        if (envaseCombo && envaseCombo.input) {
+          envaseCombo.input.value = datosActuales.envase;
+        }
+
+        // Medida
+        if (medidaSelect && datosActuales.medida) {
+          const opcionMedida = Array.from(medidaSelect.options).find(option => 
+            option.value.toLowerCase() === datosActuales.medida.toLowerCase()
+          );
+          if (opcionMedida) {
+            medidaSelect.value = opcionMedida.value;
+          }
+        }
+
+        console.log('Campos prellenados correctamente');
+      }, 100);
+
+    } catch (error) {
+      console.error('Error cargando datos para comboboxes:', error);
+      // Crear comboboxes vacíos en caso de error
+      crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', [], 'Escribir categoría...');
+      crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', [], 'Escribir marca...');
+      crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', [], 'Escribir envase...');
+    }
+
+    // Configurar eventos del modal
+    configurarEventosModal(modal, async (e) => {
+      e.preventDefault();
+      
+      // Obtener valores de los comboboxes y campos
+      const codigo = document.getElementById('edit-codigo-producto')?.value?.trim() || '';
+      const contenido = document.getElementById('edit-contenido')?.value?.trim() || '';
+      const nombre = document.getElementById('edit-nombre-producto')?.value?.trim() || '';
+      const categoria = document.getElementById('edit-categoria-producto')?.value?.trim() || '';
+      const marca = document.getElementById('edit-marca-producto')?.value?.trim() || '';
+      const envase = document.getElementById('edit-envase-producto')?.value?.trim() || '';
+      const variedad = document.getElementById('edit-variedad')?.value?.trim() || '';
+      const medida = document.getElementById('edit-medida')?.value?.trim() || 'pz';
+      const precio = parseFloat(document.getElementById('edit-precio')?.value) || 0;
+      
+      const datosProducto = {
+        codigo,
+        nombre,
+        marca,
+        variedad,
+        contenido,
+        categoria,
+        envase,
+        medida,
+        precio
+      };
+      
+      console.log('Datos del formulario para editar:', datosProducto);
+      
+      // VALIDACIÓN antes de enviar
+      if (!datosProducto.categoria || datosProducto.categoria.trim() === '') {
+        mostrarAlertaVisual('Por favor ingresa una categoría');
+        return;
+      }
+      
+      if (!datosProducto.marca || datosProducto.marca.trim() === '') {
+        mostrarAlertaVisual('Por favor ingresa una marca');
+        return;
+      }
+      
+      if (!datosProducto.envase || datosProducto.envase.trim() === '') {
+        mostrarAlertaVisual('Por favor ingresa un envase');
+        return;
+      }
+      
+      try {
+        // Usar putProducto del servicio
+        if (typeof window.putProducto === 'function') {
+          await window.putProducto(datosActuales.codigo, datosProducto);
+          cerrarModal(modal);
+          mostrarAlertaVisual('Producto editado exitosamente');
+        } else {
+          throw new Error('Función putProducto no disponible');
+        }
+      } catch (error) {
+        console.error('Error al editar producto:', error);
+        mostrarAlertaVisual('Error al editar el producto: ' + error.message);
+      }
+    });
+  }
 
   // Crear modal para eliminar producto
   function crearModalEliminar() {
@@ -1375,30 +1638,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // NUEVO: Exponer función de selección globalmente
   window.seleccionarFilaProducto = seleccionarFila;
-
-  // Funcionalidad para seleccionar filas de la tabla
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabla = document.querySelector('.productos-table tbody');
-    
-    if (tabla) {
-        tabla.addEventListener('click', function(e) {
-            const fila = e.target.closest('tr');
-            if (fila) {
-                // Si la fila ya está seleccionada, deseleccionarla
-                if (fila.classList.contains('selected')) {
-                    fila.classList.remove('selected');
-                } else {
-                    // Deseleccionar todas las otras filas (para selección única)
-                    tabla.querySelectorAll('tr.selected').forEach(tr => {
-                        tr.classList.remove('selected');
-                    });
-                    // Seleccionar la fila actual
-                    fila.classList.add('selected');
-                }
-            }
-        });
-    }
-});
 
   // Función para cargar productos en la tabla - MODIFICADA para NO duplicar eventos
   function cargarProductos() {

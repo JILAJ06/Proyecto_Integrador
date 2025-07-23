@@ -419,55 +419,34 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // Eliminar funciones duplicadas de alertas
-  // function mostrarAlertaVisual() { ... } // ELIMINAR
-  // function aplicarEstilosModalAdvertencia() { ... } // ELIMINAR
-  // function crearModalEliminar() { ... } // ELIMINAR
-
-  // Actualizar función de eliminar para usar sistema unificado
-  async function abrirModalEliminar() {
-    if (!filaSeleccionada) {
-        window.Alertas.error("Selecciona una fila para eliminar.");
-        return;
-    }
-
-    const confirmado = await window.Modales.mostrarConfirmacion({
-        titulo: 'Eliminar Lote',
-        texto: '¿Estás seguro de que deseas eliminar<br>este lote?<br>Esta acción no se puede deshacer.',
-        icono: '&#9888;'
-    });
-
-    if (confirmado) {
-        await confirmarEliminar();
-    }
-  }
-
+  // Función para confirmar la eliminación del lote
   async function confirmarEliminar() {
     if (!filaSeleccionada) {
-        window.Alertas.error("No hay lote seleccionado para eliminar");
-        return;
+      mostrarAlertaVisual("No hay lote seleccionado para eliminar", "error");
+      return;
     }
 
     try {
-        const registroId = filaSeleccionada.dataset.registroId || filaSeleccionada.children[0]?.textContent;
-        
-        if (!registroId) {
-            window.Alertas.error("No se pudo obtener el ID del registro");
-            return;
-        }
+      const registroId = filaSeleccionada.dataset.registroId || filaSeleccionada.children[0]?.textContent;
+      
+      if (!registroId) {
+        mostrarAlertaVisual("No se pudo obtener el ID del registro", "error");
+        return;
+      }
 
-        window.Alertas.info("Eliminando lote...");
+      mostrarAlertaVisual("Eliminando lote...", "warning");
 
-        await InventarioServices.eliminarLote(registroId);
-        
-        await cargarInventario();
-        filaSeleccionada = null;
-        
-        window.Alertas.success("Lote eliminado exitosamente");
-        
+      await InventarioServices.eliminarLote(registroId);
+      
+      // Recargar inventario después de eliminar
+      await cargarInventario();
+      filaSeleccionada = null;
+      
+      mostrarAlertaVisual("Lote eliminado exitosamente", "success");
+      
     } catch (error) {
-        console.error('Error al eliminar lote:', error);
-        window.Alertas.error(error.message);
+      console.error('Error al eliminar lote:', error);
+      mostrarAlertaVisual(error.message, "error");
     }
   }
 
@@ -865,6 +844,53 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error('Error al editar lote:', error);
         mostrarAlertaVisual(error.message, "error");
     }
+  }
+
+  function mostrarAlertaVisual(mensaje, tipo = "error") {
+      const alerta = document.createElement('div');
+      
+      const colores = {
+          success: { bg: '#d4edda', color: '#155724', border: '#c3e6cb' },
+          error: { bg: '#f8d7da', color: '#721c24', border: '#f5c6cb' },
+          warning: { bg: '#fff3cd', color: '#856404', border: '#ffeaa7' }
+      };
+      
+      const colorConfig = colores[tipo] || colores.error;
+      
+      alerta.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${colorConfig.bg};
+          color: ${colorConfig.color};
+          padding: 15px 20px;
+          border: 1px solid ${colorConfig.border};
+          border-radius: 4px;
+          z-index: 9999;
+          font-size: 14px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          opacity: 0;
+          transform: translateX(100%);
+          transition: all 0.3s ease;
+      `;
+      alerta.textContent = mensaje;
+      
+      document.body.appendChild(alerta);
+      
+      setTimeout(() => {
+          alerta.style.opacity = '1';
+          alerta.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(() => {
+          alerta.style.opacity = '0';
+          alerta.style.transform = 'translateX(100%)';
+          setTimeout(() => {
+              if (alerta.parentNode) {
+                  alerta.remove();
+              }
+          }, 300);
+      }, 3000);
   }
 
   function capitalizarTexto(texto) {
