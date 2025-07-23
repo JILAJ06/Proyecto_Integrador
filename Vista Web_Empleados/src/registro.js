@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('Registrando...', 'info');
             
             // Realizar el POST al endpoint
-            const response = await fetch('http://54.198.31.200:8080/negocio', {
+            const response = await fetch('http://localhost:8080/negocio', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

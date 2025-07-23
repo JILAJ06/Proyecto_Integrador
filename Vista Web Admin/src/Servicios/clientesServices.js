@@ -1,5 +1,5 @@
 // Base URL for the API
-const BASE_URL = 'http://54.198.31.200:8080';
+const BASE_URL = 'http://localhost:8080';
 
 // Función para obtener el ID del negocio desde sessionStorage
 function getNegocioId() {

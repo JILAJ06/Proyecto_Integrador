@@ -27,7 +27,7 @@ function getNegocioId() {
 export const GraficasServices = {
     async obtenerVentasPorSemana(idNegocio, año) {
         idNegocio = getNegocioId();
-        const url = `http://54.198.31.200:8080/negocio/${idNegocio}/graficasventa/${año}`;
+        const url = `http://localhost:8080/negocio/${idNegocio}/graficasventa/${año}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Error al obtener ventas por semana");
         return await res.json();
@@ -35,7 +35,7 @@ export const GraficasServices = {
 
     async obtenerProductosPorSemana(idNegocio, año) {
         idNegocio = getNegocioId();
-        const url = `http://54.198.31.200:8080/negocio/${idNegocio}/graficasproducto`;
+        const url = `http://localhost:8080/negocio/${idNegocio}/graficasproducto`;
         const res = await fetch(url);
         if (!res.ok) {
             const text = await res.text();

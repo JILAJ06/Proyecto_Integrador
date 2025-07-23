@@ -1,6 +1,6 @@
 // Configuración de la API
 const API_CONFIG = {
-    baseURL: 'http://54.198.31.200:8080', // Cambia por tu URL base
+    baseURL: 'http://localhost:8080', // Cambia por tu URL base
     headers: {
         'Content-Type': 'application/json',
         // Agrega aquí headers de autenticación si los necesitas
