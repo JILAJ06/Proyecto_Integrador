@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
+    <link rel="stylesheet" href="/Vista Web Admin/css/corte-caja.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
+    <script src="/Vista Web Admin/script.js"></script>
+    <script src="/Vista Web Admin/src/Servicios/corteServices.js"></script>
+    <title>Clink - Corte de Caja</title>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>CLINK</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section-main">
+                    <a href="Ventas_Empleados.html" class="nav-item" data-tooltip="Venta">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Venta</span>
+                    </a>
+
+                    <div class="nav-divider"></div>
+
+                    <a href="inventario_Empleados.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
+                    </a>
+                    <a href="clientes_Empleados.html" class="nav-item" data-tooltip="Clientes">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="historial_Empleados.html" class="nav-item" data-tooltip="Historial de ventas">
+                        <i class="fas fa-history"></i>
+                        <span>Historial</span>
+                    </a>
+                     <a href="corte-caja_Empleados.html" class="nav-item" data-tooltip="Corte de caja">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Corte de caja</span>
+                    </a>
+                    <a href="/Vista Web Admin/html/ayuda.html" class="nav-item" data-tooltip="Ayuda">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                </div>
+
+
+                <div class="nav-section-bottom">
+                    <button class="logout-btn" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+         <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <i class="fas fa-box"></i>
+                    <span>Corte de caja</span>
+                </div>
+                <div class="header-right">
+                    <span class="session-info">Cargando...<br>Administrador</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+        <section class="corte-caja-section">
+            <div class="corte-caja-card">
+                <table class="corte-caja-table" id="corteCajaTable">
+                    <tr>
+                        <td class="label">Fecha:</td>
+                        <td class="value" id="fecha">DD/MM/AAAA</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Empleado:</td>
+                        <td class="value" id="empleado">------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Cantidad Inicial:</td>
+                        <td class="value" id="cantidadInicial">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Ingresos:</td>
+                        <td class="value" id="ingresos">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Ganancias:</td>
+                        <td class="value" id="ganancias">$------</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total a Entregar:</td>
+                        <td class="value" id="totalEntregar">$------</td>
+                    </tr>
+                </table>
+                <div class="corte-caja-actions">
+                    <button class="corte-caja-btn" id="cargarCajaBtn">Cargar caja</button>
+                    <button class="corte-caja-btn" id="toggleCajaBtn">Cerrar caja</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Modal para abrir caja -->
+    <div id="modalAbrirCaja" class="modal-abrir-caja" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Abrir Caja</span>
+                <span class="modal-close" id="cerrarModalAbrirCaja">&times;</span>
+            </div>
+            <form id="formAbrirCaja" autocomplete="off">
+                <div class="modal-body">
+                    <label for="cantidadInicialInput">¿Con cuánto se empieza?</label>
+                    <input type="number" min="0" step="0.01" id="cantidadInicialInput" name="cantidadInicialInput" placeholder="$0.00" required style="width:100%;font-size:1.2rem;padding:8px 12px;border-radius:8px;border:1.5px solid #bdbdbd;margin-top:8px;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn-cancelar" id="cancelarAbrirCaja">Cancelar</button>
+                    <button type="submit" class="modal-btn-aceptar">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- estilos movidos a corte-caja.css -->
+    <script type="module">
+        import { inicializarCorteCaja } from '/Vista Web Admin/src/Servicios/corteServices.js';
+        inicializarCorteCaja && inicializarCorteCaja();
+    </script>
+</body>
+</html>
