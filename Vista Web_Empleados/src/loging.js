@@ -44,11 +44,11 @@ function verificarSesionExistente() {
 
 // Función principal de autenticación
 async function autenticarUsuario(idNegocio, nombreUsuario, contrasena) {
-    const API_BASE_URL = `https://clinkapp.zapto.org:8080/negocio/${idNegocio}`;
+    const API_BASE_URL = `/api/negocio/${idNegocio}`;
     
     try {
         // 1. Verificar que el negocio existe
-        const responseNegocio = await fetch(`https://clinkapp.zapto.org:8080/negocio/${idNegocio}`);
+        const responseNegocio = await fetch(`/api/negocio/${idNegocio}`);
         if (!responseNegocio.ok) {
             throw new Error('ID de negocio no válido');
         }
@@ -142,7 +142,7 @@ function obtenerDatosSesion() {
 
 // Función para obtener la URL base de la API
 function obtenerAPIBaseURL() {
-    return sessionStorage.getItem('clink_api_base_url') || 'https://clinkapp.zapto.org:8080/negocio/1';
+    return sessionStorage.getItem('clink_api_base_url') || '/api/negocio/1';
 }
 
 // Función para verificar si el usuario está autenticado

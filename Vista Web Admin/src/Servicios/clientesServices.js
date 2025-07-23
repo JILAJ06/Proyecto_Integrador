@@ -1,5 +1,5 @@
 // Base URL for the API
-const BASE_URL = 'https://clinkapp.zapto.org:8080';
+const BASE_URL = '/api';
 
 // Función para obtener el ID del negocio desde sessionStorage
 function getNegocioId() {

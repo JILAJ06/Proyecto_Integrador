@@ -21,9 +21,9 @@ function obtenerDatosSesion() {
 function obtenerAPIBaseURL() {
     const sesion = obtenerDatosSesion();
     if (sesion && sesion.idNegocio) {
-        return `https://clinkapp.zapto.org:8080/negocio/${sesion.idNegocio}`;
+        return `/api/negocio/${sesion.idNegocio}`;
     }
-    return 'https://clinkapp.zapto.org:8080/negocio/1'; // Fallback
+    return '/api/negocio/1'; // Fallback
 }
 
 const API_BASE_URL = obtenerAPIBaseURL();

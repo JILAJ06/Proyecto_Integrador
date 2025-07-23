@@ -1,6 +1,6 @@
 // Configuración de la API
 const API_CONFIG = {
-    baseURL: 'https://clinkapp.zapto.org:8080', // Cambia por tu URL base
+    baseURL: '/api', // Cambia por tu URL base
     headers: {
         'Content-Type': 'application/json',
         // Agrega aquí headers de autenticación si los necesitas

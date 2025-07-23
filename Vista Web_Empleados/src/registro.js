@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('Registrando...', 'info');
             
             // Realizar el POST al endpoint
-            const response = await fetch('https://clinkapp.zapto.org:8080/negocio', {
+            const response = await fetch('/api/negocio', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
