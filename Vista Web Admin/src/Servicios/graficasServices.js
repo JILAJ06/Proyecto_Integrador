@@ -4,7 +4,7 @@
 
 export const GraficasServices = {
     async obtenerVentasPorSemana(idNegocio, año) {
-        const url = `http://localhost:8080/negocio/${idNegocio}/graficasventa/2025`;
+        const url = `http://localhost:8080/negocio/${idNegocio}/graficasventa/${año}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Error al obtener ventas por semana");
         return await res.json();
