@@ -1,7 +1,7 @@
 .ayuda-section {
   display: flex;
   justify-content: center;
-  padding: 30px;
+  padding: 35px;
   background-color: #f3f0db;
   min-height: 100vh;
 }

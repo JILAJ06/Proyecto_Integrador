@@ -119,5 +119,12 @@ export const VentasServices = {
 
     generarNumeroTicket() {
         return "T-" + Math.floor(Math.random() * 100000);
+    },
+
+    // Agregar esta función para obtener el ID de la venta actual
+    getVentaActualId() {
+        // Esto depende de cómo manejes las ventas en tu aplicación
+        // Puede ser que tengas que almacenar el ID cuando inicias una venta
+        return ventaActualId || null; // Necesitarás implementar esto según tu lógica
     }
 };
