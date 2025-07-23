@@ -1,3 +1,24 @@
+// Desactivar todas las alertas globalmente
+window.alert = function() {};
+window.confirm = function() { return true; };
+window.prompt = function(message, defaultValue) { return defaultValue || ''; };
+
+// Desactivar console errors y warnings si es necesario
+// window.console.error = function() {};
+// window.console.warn = function() {};
+
+// Si existe SweetAlert2, desactivarlo
+if (typeof Swal !== 'undefined') {
+    window.Swal = {
+        fire: function() { return Promise.resolve({ isConfirmed: true, value: '' }); },
+        close: function() {},
+        isVisible: function() { return false; },
+        mixin: function() { return this; },
+        showLoading: function() {},
+        hideLoading: function() {}
+    };
+}
+
 // Alerta visual global reutilizable (estilo historial)
 function mostrarAlertaVisual(mensaje) {
     if (document.getElementById('alerta-descarga')) return;
@@ -38,6 +59,18 @@ function mostrarAlertaVisual(mensaje) {
         setTimeout(() => alerta.remove(), 400);
     }, 2600);
 }
+
+// Importar sistemas unificados
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar sistemas de alertas y modales
+    const alertasScript = document.createElement('script');
+    alertasScript.src = '/Vista Web Admin/src/Servicios/alertasGlobales.js';
+    document.head.appendChild(alertasScript);
+
+    const modalesScript = document.createElement('script');
+    modalesScript.src = '/Vista Web Admin/src/Servicios/modalesGlobales.js';
+    document.head.appendChild(modalesScript);
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar autenticación al cargar la página

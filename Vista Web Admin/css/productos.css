@@ -49,14 +49,23 @@
     border: 1px solid black;
 }
 
+/* Filas seleccionables de la tabla */
 .productos-table tbody tr {
+    cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .productos-table tbody tr:hover {
-    background: #f8f9ff;
-    transform: none;
-    box-shadow: none;
+    background-color: #f8f9fa;
+}
+
+.productos-table tbody tr.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.productos-table tbody tr.selected:hover {
+    background-color: #bbdefb;
 }
 
 .productos-table tbody tr:nth-child(even) {

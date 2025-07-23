@@ -336,6 +336,8 @@ body.sidebar-expanded .sidebar {
     display: none;
 }
 
+/* ...existing code... */
+
 /* Main Content */
 .main-content {
     flex: 1;
