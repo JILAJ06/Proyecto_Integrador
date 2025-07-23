@@ -167,6 +167,7 @@ export const InventarioServices = {
         } catch (error) {
             console.error('❌ Error al obtener lotes:', error);
             throw new Error(`Error al obtener lotes: ${error.message}`);
+            window.mostrarAlertaGlobal('Error al obtener lotes: ' + error.message, 'error');
         }
     },
 
@@ -185,6 +186,7 @@ export const InventarioServices = {
             // Validar datos requeridos
             if (!loteData.codigoProducto || !nombreUsuario) {
                 throw new Error('Faltan campos obligatorios: codigoProducto, nombreUsuario');
+                window.mostrarAlertaGlobal('Faltan campos obligatorios: codigoProducto, nombreUsuario', 'error');
             }
             
             // Transformar datos al formato EXACTO que espera el backend
@@ -222,6 +224,7 @@ export const InventarioServices = {
             if (!response.ok) {
                 console.error('❌ Error del servidor:', responseText);
                 throw new Error(`Error HTTP: ${response.status} - ${responseText}`);
+                window.mostrarAlertaGlobal('Error al crear lote: ' + responseText, 'error');
             }
             
             let data;
@@ -234,10 +237,12 @@ export const InventarioServices = {
             
             console.log('✅ Lote creado exitosamente:', data);
             return data;
+            window.mostrarAlertaGlobal('Lote creado exitosamente', 'success');
             
         } catch (error) {
             console.error('❌ Error completo al crear lote:', error);
             throw new Error(`Error al crear lote: ${error.message}`);
+            window.mostrarAlertaGlobal('Error al crear lote: ' + error.message, 'error');
         }
     },
 
@@ -261,10 +266,12 @@ export const InventarioServices = {
         if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Error al actualizar lote:", errorText);
+        window.mostrarAlertaGlobal('Error al actualizar lote: ' + errorText, 'error');
         throw new Error(`Error HTTP ${response.status}`);
         }
 
         console.log("✅ Lote actualizado exitosamente");
+        window.mostrarAlertaGlobal('Lote actualizado exitosamente', 'success');
         const contentType = response.headers.get("content-type");
 
         if (response.status === 204 || !contentType?.includes("application/json")) {
@@ -302,17 +309,20 @@ export const InventarioServices = {
             console.log('📡 Response status:', response.status);
             
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Error del servidor:', errorText);
-                throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
+            const errorText = await response.text();
+            console.error('❌ Error del servidor:', errorText);
+            window.mostrarAlertaGlobal('Error al eliminar lote: ' + errorText, 'error');
+            throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
             }
             
             console.log('✅ Lote eliminado exitosamente');
+            window.mostrarAlertaGlobal('Lote eliminado exitosamente', 'success');
             return true;
             
         } catch (error) {
             console.error('❌ Error al eliminar lote:', error);
             throw new Error(`Error al eliminar lote: ${error.message}`);
+            window.mostrarAlertaGlobal('Error al eliminar lote: ' + error.message, 'error');
         }
     },
 

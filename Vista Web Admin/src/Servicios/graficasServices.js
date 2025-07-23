@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } catch (error) {
         console.error("❌ Error al cargar gráficas:", error.message);
+        window.mostrarAlertaGlobal('Error al cargar gráficas: ' + error.message, 'error');
     }
 });
 

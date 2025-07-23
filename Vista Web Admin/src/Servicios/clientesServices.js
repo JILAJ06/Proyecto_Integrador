@@ -48,7 +48,7 @@ export async function getClientes() {
         
     } catch (error) {
         console.error('Error fetching clientes:', error);
-        
+        window.mostrarAlertaGlobal('Error al obtener clientes: ' + error.message, 'error');
         // Si hay error de conexión, mostrar datos de prueba
         console.warn('Usando datos de prueba debido a error de conexión');
         const clientesPrueba = [
@@ -56,7 +56,6 @@ export async function getClientes() {
             { id: 2, nombre: "María González", telefono: "961-987-6543" },
             { id: 3, nombre: "Carlos López", telefono: "961-555-0123" }
         ];
-        
         actualizarTablaClientes(clientesPrueba);
         return clientesPrueba;
     }
@@ -293,6 +292,7 @@ export async function getClienteById(clienteId) {
         
     } catch (error) {
         console.error('Error fetching cliente:', error);
+        window.mostrarAlertaGlobal('Error al obtener cliente: ' + error.message, 'error');
         throw error;
     }
 }
@@ -344,6 +344,7 @@ export async function deleteCliente(clienteId) {
         
     } catch (error) {
         console.error('Error deleting cliente:', error);
+        window.mostrarAlertaGlobal('Error al eliminar cliente: ' + error.message, 'error');
         throw error;
     }
 }
@@ -413,6 +414,7 @@ export async function updateCliente(clienteId, datos) {
         
     } catch (error) {
         console.error('Error updating cliente:', error);
+        window.mostrarAlertaGlobal('Error al actualizar cliente: ' + error.message, 'error');
         throw error;
     }
 }
@@ -543,6 +545,7 @@ export async function createCliente(datos) {
         
     } catch (error) {
         console.error('Error creating cliente:', error);
+        window.mostrarAlertaGlobal('Error al crear cliente: ' + error.message, 'error');
         throw error;
     }
 }
@@ -618,6 +621,7 @@ export async function updateClienteInVenta(datos) {
         
     } catch (error) {
         console.error('Error updating cliente in venta:', error);
+        window.mostrarAlertaGlobal('Error al actualizar cliente en venta: ' + error.message, 'error');
         throw error;
     }
 }

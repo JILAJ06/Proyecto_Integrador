@@ -13,77 +13,102 @@ export const VentasServices = {
     },
 
     async iniciarVenta() {
-    if (!this.idNegocio || !this.nombreUsuario) {
-        throw new Error("No hay sesión activa para iniciar venta");
+    try {
+        if (!this.idNegocio || !this.nombreUsuario) {
+            throw new Error("No hay sesión activa para iniciar venta");
+        }
+
+        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/${this.nombreUsuario}`;
+        const res = await fetch(url, { method: "POST" });
+
+        if (!res.ok) {
+            throw new Error("No se pudo iniciar venta");
+        }
+
+        const text = await res.text();
+        if (!text) return {};
+        return JSON.parse(text);
+    } catch (error) {
+        window.mostrarAlertaGlobal('Error al iniciar venta: ' + error.message, 'error');
+        throw error;
     }
-
-    const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/${this.nombreUsuario}`;
-    const res = await fetch(url, { method: "POST" });
-
-    if (!res.ok) {
-        throw new Error("No se pudo iniciar venta");
-    }
-
-    const text = await res.text();
-    if (!text) return {};
-    return JSON.parse(text);
     },
 
 
     async consultarProductoPorCodigo(codigoProducto) {
-        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
-        const res = await fetch(url);
-        console.log(res);
+        try {
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
+            const res = await fetch(url);
+            console.log(res);
 
-        if (!res.ok) {
-            throw new Error("Producto no encontrado");
+            if (!res.ok) {
+                throw new Error("Producto no encontrado");
+            }
+
+            return await res.json();
+        } catch (error) {
+            window.mostrarAlertaGlobal('Error al consultar producto: ' + error.message, 'error');
+            throw error;
         }
-
-        return await res.json();
     },
 
     async guardarDetallesVenta(listaDetalles) {
-        const url = `http://localhost:8080/negocio/venta/detalles`;
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(listaDetalles)
-        });
-
-        if (!res.ok) {
-            throw new Error("Error al guardar detalles de venta");
-        }
-
-        const text = await res.text();
-
         try {
-            return JSON.parse(text);
-        } catch (e) {
-            return { mensaje: text }; // lo que haya devuelto el servidor
+            const url = `http://localhost:8080/negocio/venta/detalles`;
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(listaDetalles)
+            });
+
+            if (!res.ok) {
+                throw new Error("Error al guardar detalles de venta");
+            }
+
+            const text = await res.text();
+
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                return { mensaje: text }; // lo que haya devuelto el servidor
+            }
+        } catch (error) {
+            window.mostrarAlertaGlobal('Error al guardar detalles de venta: ' + error.message, 'error');
+            throw error;
         }
 
     },
 
     async cancelarVenta() {
-        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta`;
-        const res = await fetch(url, { method: "DELETE" });
+        try {
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta`;
+            const res = await fetch(url, { method: "DELETE" });
 
-        if (!res.ok) {
-            throw new Error("Error al cancelar venta");
+            if (!res.ok) {
+                throw new Error("Error al cancelar venta");
+            }
+
+            return await res.json();
+        } catch (error) {
+            window.mostrarAlertaGlobal('Error al cancelar venta: ' + error.message, 'error');
+            throw error;
         }
-
-        return await res.json();
     },
 
     async obtenerTotalVenta() {
-        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/total`;
-        const res = await fetch(url);
+        try {
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/total`;
+            const res = await fetch(url);
 
-        if (!res.ok) {
-            throw new Error("No se pudo obtener total de la venta");
+            if (!res.ok) {
+                throw new Error("No se pudo obtener total de la venta");
+            }
+
+            return await res.json();
+        } catch (error) {
+            window.mostrarAlertaGlobal('Error al obtener total de la venta: ' + error.message, 'error');
+            throw error;
         }
-
-        return await res.json();
     },
 
     mapearProductoADetalleVenta(producto, cantidad) {

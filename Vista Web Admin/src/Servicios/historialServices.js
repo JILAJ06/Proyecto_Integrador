@@ -33,6 +33,7 @@ export async function obtenerHistorialVentas() {
         return await response.json();
     } catch (error) {
         console.error("Error al obtener historial de ventas:", error);
+        window.mostrarAlertaGlobal('Error al obtener historial de ventas: ' + error.message, 'error');
         return null;
     }
 }
@@ -46,6 +47,7 @@ export async function obtenerResumenMensual() {
         return await response.json();
     } catch (error) {
         console.error("Error al obtener resumen mensual:", error);
+        window.mostrarAlertaGlobal('Error al obtener resumen mensual: ' + error.message, 'error');
         return null;
     }
 }

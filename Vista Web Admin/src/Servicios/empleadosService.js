@@ -46,7 +46,7 @@ export async function getEmpleados() {
         }
     } catch (error) {
         console.error('Error fetching empleados:', error);
-        mostrarError('Error al cargar los empleados');
+        window.mostrarAlertaGlobal('Error al cargar los empleados', 'error');
     }
 }
 
@@ -125,12 +125,12 @@ export async function postEmpleado(datos) {
         
         console.log('Empleado creado:', resultado);
         await getEmpleados();
-        mostrarExito('Empleado creado exitosamente');
+        window.mostrarAlertaGlobal('Empleado creado exitosamente', 'success');
         return resultado;
         
     } catch (error) {
         console.error('Error posting empleado:', error);
-        mostrarError('Error al crear el empleado: ' + error.message);
+        window.mostrarAlertaGlobal('Error al crear el empleado: ' + error.message, 'error');
         throw error;
     }
 }
@@ -183,12 +183,12 @@ export async function putEmpleado(nombre, datos) {
         
         console.log('Empleado actualizado:', resultado);
         await getEmpleados();
-        mostrarExito('Empleado actualizado exitosamente');
+        window.mostrarAlertaGlobal('Empleado actualizado exitosamente', 'success');
         
         return resultado;
     } catch (error) {
         console.error('Error updating empleado:', error);
-        mostrarError('Error al actualizar el empleado: ' + error.message);
+        window.mostrarAlertaGlobal('Error al actualizar el empleado: ' + error.message, 'error');
         throw error;
     }
 }
@@ -213,132 +213,10 @@ export async function deleteEmpleado(nombre) {
         return { message: 'Empleado eliminado exitosamente' };
     } catch (error) {
         console.error('Error deleting empleado:', error);
-        mostrarError('Error al eliminar el empleado');
+        window.mostrarAlertaGlobal('Error al eliminar el empleado', 'error');
         throw error;
     }
 }
 
-// Función para mostrar mensajes de éxito
-function mostrarExito(mensaje) {
-    let snackbar = document.getElementById('snackbar-empleados');
-    if (!snackbar) {
-        snackbar = document.createElement('div');
-        snackbar.id = 'snackbar-empleados';
-        snackbar.className = 'snackbar-empleados';
-        snackbar.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 16px;
-            border-radius: 4px;
-            z-index: 9999;
-            max-width: 300px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: none;
-        `;
-        document.body.appendChild(snackbar);
-    }
-    
-    snackbar.style.background = '#4caf50';
-    snackbar.textContent = mensaje;
-    snackbar.style.display = 'block';
-    
-    setTimeout(() => {
-        snackbar.style.display = 'none';
-    }, 4000);
-}
 
 // Función auxiliar para mostrar errores (actualizada)
-function mostrarError(mensaje) {
-    let snackbar = document.getElementById('snackbar-empleados');
-    if (!snackbar) {
-        snackbar = document.createElement('div');
-        snackbar.id = 'snackbar-empleados';
-        snackbar.className = 'snackbar-empleados';
-        snackbar.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #f44336;
-            color: white;
-            padding: 16px;
-            border-radius: 4px;
-            z-index: 9999;
-            max-width: 300px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: none;
-        `;
-        document.body.appendChild(snackbar);
-    }
-    
-    snackbar.style.background = '#f44336';
-    snackbar.textContent = mensaje;
-    snackbar.style.display = 'block';
-    
-    setTimeout(() => {
-        snackbar.style.display = 'none';
-    }, 4000);
-}
-
-// Servicio para manejo de empleados sin alertas
-class EmpleadosService {
-    constructor() {
-        this.empleados = [];
-    }
-
-    async obtenerEmpleados() {
-        try {
-            // Simulación de petición API
-            return this.empleados;
-        } catch (error) {
-            console.log('Error al obtener empleados:', error);
-            return [];
-        }
-    }
-
-    async agregarEmpleado(empleado) {
-        try {
-            this.empleados.push({
-                id: Date.now(),
-                ...empleado
-            });
-            return true;
-        } catch (error) {
-            console.log('Error al agregar empleado:', error);
-            return false;
-        }
-    }
-
-    async editarEmpleado(id, datosActualizados) {
-        try {
-            const index = this.empleados.findIndex(emp => emp.id === id);
-            if (index !== -1) {
-                this.empleados[index] = { ...this.empleados[index], ...datosActualizados };
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.log('Error al editar empleado:', error);
-            return false;
-        }
-    }
-
-    async eliminarEmpleado(id) {
-        try {
-            const index = this.empleados.findIndex(emp => emp.id === id);
-            if (index !== -1) {
-                this.empleados.splice(index, 1);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.log('Error al eliminar empleado:', error);
-            return false;
-        }
-    }
-}
-
-// Exportar instancia del servicio
-export const empleadosService = new EmpleadosService();

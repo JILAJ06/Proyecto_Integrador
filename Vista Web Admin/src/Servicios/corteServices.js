@@ -19,7 +19,7 @@ export function inicializarCorteCaja() {
             cajaAbierta = false;
             toggleCajaBtn.textContent = 'Abrir caja';
             toggleCajaBtn.classList.add('cerrada');
-            mostrarAlerta('Caja cerrada');
+            window.mostrarAlertaGlobal('Caja cerrada', 'info');
             limpiarVistaCaja();
             idCorteCajaActual = null; // Reiniciar el ID del corte actual
         } else {
@@ -65,13 +65,13 @@ export function inicializarCorteCaja() {
 
             const datosPost = await resPost.json();
             idCorteCajaActual = datosPost.idCorteCaja; // Guardar el ID del nuevo corte
-            mostrarAlerta("Caja abierta con éxito");
+            window.mostrarAlertaGlobal('Caja abierta con éxito', 'success');
 
             // Obtener datos del corte de caja activo
             obtenerDatosCorteCajaActivo();
         } catch (err) {
             console.error("❌ Error:", err.message);
-            mostrarAlerta("Error: " + err.message);
+            window.mostrarAlertaGlobal('Error al abrir caja: ' + err.message, 'error');
         }
 
         cerrarModalAbrirCaja();
@@ -93,6 +93,7 @@ async function obtenerDatosCorteCajaActivo() {
         cargarDatosCaja(datosGet);
     } catch (err) {
         console.error("❌ Error al obtener datos del corte de caja:", err.message);
+        window.mostrarAlertaGlobal('Error al obtener datos del corte de caja: ' + err.message, 'error');
         limpiarVistaCaja();
     }
 }
@@ -117,6 +118,7 @@ async function cargarDatosCaja(datos) {
         document.getElementById('totalEntregar').textContent = `$${totalEntregar.toFixed(2)}`;
     } catch (err) {
         console.warn("⚠️ Error al cargar datos del corte de caja:", err.message);
+        window.mostrarAlertaGlobal('Error al cargar datos del corte de caja: ' + err.message, 'error');
         limpiarVistaCaja();
     }
 }
@@ -131,11 +133,4 @@ function limpiarVistaCaja() {
     document.getElementById('totalEntregar').textContent = '$0.00';
 }
 
-// === Alerta visual ===
-function mostrarAlerta(mensaje) {
-    const alerta = document.createElement('div');
-    alerta.className = 'custom-alert';
-    alerta.textContent = mensaje;
-    document.body.appendChild(alerta);
-    setTimeout(() => alerta.remove(), 2500);
-}
+// El sistema de alertas ahora usa window.mostrarAlertaGlobal para todos los mensajes visuales.

@@ -146,9 +146,10 @@ class AlertasGlobales {
 // Instancia global
 window.Alertas = new AlertasGlobales();
 
-// Funciones de compatibilidad para el código existente
-window.mostrarAlertaVisual = (mensaje, tipo = 'info') => window.Alertas.mostrar(mensaje, tipo);
-window.mostrarToast = (mensaje, tipo = 'info') => window.Alertas.mostrar(mensaje, tipo);
-window.mostrarNotificacion = (mensaje, tipo = 'info') => window.Alertas.mostrar(mensaje, tipo);
-window.mostrarSnackbar = (mensaje, esError = false) => window.Alertas.mostrar(mensaje, esError ? 'error' : 'success');
-window.mostrarAlerta = (mensaje) => window.Alertas.info(mensaje);
+// Funciones de compatibilidad para el código existente, todas usan el mismo diseño y posición
+window.mostrarAlertaGlobal = (mensaje, tipo = 'info', duracion = 3000) => window.Alertas.mostrar(mensaje, tipo, duracion);
+window.mostrarAlertaVisual = (mensaje, tipo = 'info', duracion = 3000) => window.Alertas.mostrar(mensaje, tipo, duracion);
+window.mostrarToast = (mensaje, tipo = 'info', duracion = 3000) => window.Alertas.mostrar(mensaje, tipo, duracion);
+window.mostrarNotificacion = (mensaje, tipo = 'info', duracion = 3000) => window.Alertas.mostrar(mensaje, tipo, duracion);
+window.mostrarSnackbar = (mensaje, esError = false, duracion = 3000) => window.Alertas.mostrar(mensaje, esError ? 'error' : 'success', duracion);
+window.mostrarAlerta = (mensaje, duracion = 3000) => window.Alertas.info(mensaje, duracion);

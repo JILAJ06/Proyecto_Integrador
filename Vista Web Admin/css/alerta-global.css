@@ -1,0 +1,23 @@
+/* Alerta global estilo uniforme, esquina inferior derecha */
+.global-alert {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  min-width: 280px;
+  max-width: 350px;
+  background: #fff;
+  color: #222;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: 18px 28px;
+  font-size: 1.1rem;
+  text-align: center;
+  z-index: 9999;
+  border: 1px solid #e0e0e0;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 1;
+}
+.global-alert.hide {
+  opacity: 0;
+  transform: translateY(20px);
+}

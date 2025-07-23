@@ -39,6 +39,7 @@ async function cargarDatosIniciales() {
         console.log('Datos iniciales cargados correctamente');
     } catch (error) {
         console.error('Error cargando datos iniciales:', error);
+        window.mostrarAlertaGlobal('Error cargando datos iniciales: ' + error.message, 'error');
     }
 }
 
@@ -74,6 +75,7 @@ async function getCategorias() {
         
     } catch (error) {
         console.error('Error extrayendo categorías:', error);
+        window.mostrarAlertaGlobal('Error extrayendo categorías: ' + error.message, 'error');
         return [];
     }
 }
@@ -108,6 +110,7 @@ async function getMarcas() {
         
     } catch (error) {
         console.error('Error extrayendo marcas:', error);
+        window.mostrarAlertaGlobal('Error extrayendo marcas: ' + error.message, 'error');
         return [];
     }
 }
@@ -142,6 +145,7 @@ async function getEnvases() {
         
     } catch (error) {
         console.error('Error extrayendo envases:', error);
+        window.mostrarAlertaGlobal('Error extrayendo envases: ' + error.message, 'error');
         return [];
     }
 }
@@ -212,6 +216,7 @@ async function getProductos() {
         
     } catch (error) {
         console.error('Error fetching productos:', error);
+        window.mostrarAlertaGlobal('Error al obtener productos: ' + error.message, 'error');
         mostrarError('Error al cargar los productos desde el servidor');
         // Limpiar la tabla en caso de error
         const tbody = document.querySelector('.productos-table tbody');
@@ -416,7 +421,7 @@ async function postProducto(datosProducto) {
         }
         
         console.log('Producto creado:', resultado);
-        mostrarExito('Producto creado exitosamente');
+        window.mostrarAlertaGlobal('Producto creado exitosamente', 'success');
         
         // Recargar productos después de crear
         setTimeout(() => {
@@ -427,7 +432,7 @@ async function postProducto(datosProducto) {
         
     } catch (error) {
         console.error('Error posting producto:', error);
-        mostrarError('Error al crear el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al crear el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -515,7 +520,7 @@ async function putProducto(codigo, datosProducto) {
         }
         
         console.log('Producto editado:', resultado);
-        mostrarExito('Producto editado exitosamente');
+        window.mostrarAlertaGlobal('Producto editado exitosamente', 'success');
         
         // Recargar productos después de editar
         setTimeout(() => {
@@ -526,7 +531,7 @@ async function putProducto(codigo, datosProducto) {
         
     } catch (error) {
         console.error('Error editing producto:', error);
-        mostrarError('Error al editar el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al editar el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -560,7 +565,7 @@ async function deleteProducto(codigo) {
         }
 
         console.log('Producto eliminado exitosamente');
-        mostrarExito('Producto eliminado exitosamente');
+        window.mostrarAlertaGlobal('Producto eliminado exitosamente', 'success');
         
         // Recargar productos después de eliminar
         await getProductos();
@@ -569,7 +574,7 @@ async function deleteProducto(codigo) {
         
     } catch (error) {
         console.error('Error deleting producto:', error);
-        mostrarError('Error al eliminar el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al eliminar el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -717,55 +722,6 @@ function capitalizarTexto(texto) {
     return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
 }
 
-// Función para mostrar mensajes de éxito
-function mostrarExito(mensaje) {
-    if (typeof mostrarAlertaVisual === 'function') {
-        mostrarAlertaVisual(mensaje);
-    } else {
-        console.log(mensaje);
-        // Crear alerta simple si no existe la función
-        const alerta = document.createElement('div');
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            z-index: 10001;
-            font-size: 14px;
-        `;
-        alerta.textContent = mensaje;
-        document.body.appendChild(alerta);
-        setTimeout(() => alerta.remove(), 3000);
-    }
-}
-
-// Función auxiliar para mostrar errores
-function mostrarError(mensaje) {
-    if (typeof mostrarAlertaVisual === 'function') {
-        mostrarAlertaVisual(mensaje);
-    } else {
-        console.error(mensaje);
-        // Crear alerta simple si no existe la función
-        const alerta = document.createElement('div');
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #f44336;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            z-index: 10001;
-            font-size: 14px;
-        `;
-        alerta.textContent = mensaje;
-        document.body.appendChild(alerta);
-        setTimeout(() => alerta.remove(), 3000);
-    }
-}
 
 // Al final del archivo, agrega estas líneas para exponer las funciones globalmente:
 window.getCategorias = getCategorias;
