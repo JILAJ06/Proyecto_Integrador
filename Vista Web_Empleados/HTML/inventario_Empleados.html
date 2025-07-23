@@ -63,14 +63,15 @@
                 </div>
             </nav>
         </aside>
-         <main class="main-content">
+        
+        <main class="main-content">
             <header class="header">
                 <div class="header-left">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Inventario</span>
                 </div>
                 <div class="header-right">
-                    <span class="session-info">Cargando...<br>Empleado</span>
+                    <span class="session-info">Cargando...<br>Administrador</span>
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
@@ -78,7 +79,7 @@
             </header>
 
             <div class="inventario-container">
-                                <div class="action-buttons">
+                <div class="action-buttons">
                     <button class="btn-action btn-add">
                         <i class="fas fa-plus"></i>
                         Agregar lote
@@ -87,11 +88,13 @@
                         <i class="fas fa-edit"></i>
                         Modificar lote
                     </button>
-                    <button class="btn-action btn-category">
-                        <i class="fas fa-filter"></i>
-                        Categoria
+
+                    <button class="btn-action btn-delete">
+                        <i class="fas fa-times-circle"></i>
+                        Eliminar lote
                     </button>
                 </div>
+                
                 <table class="products-table">
                     <thead>
                         <tr>
@@ -105,25 +108,21 @@
                             <th class="column-fechasal">Fecha de Salida</th>
                             <th class="column-stockalm">Stock en Almacen</th>
                             <th class="column-stockex">Stock en Exhibicion</th>
-                            <th class="column-precio">Precio unitario</th>
+                            <th class="column-precio">Precio de Compra</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <!-- Las filas se llenarán dinámicamente -->
                     </tbody>
                 </table>
-        </div>
-    <!-- Al final del archivo, antes de </body> -->
-<script type="module" src="/Vista Web Admin/src/Servicios/inventarioServices.js"></script>
-<script type="module" src="/Vista Web Admin/src/Forms/formsInventario.js"></script>
-<script src="/Vista Web_Empleados/src/script_Empleados.js"></script>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts al final del body -->
+    <script src="/Vista Web Admin/sidebar.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Servicios/inventarioServices.js"></script>
+    <script type="module" src="/Vista Web Admin/script.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Forms/formsInventario.js"></script>
 </body>
 </html>

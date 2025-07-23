@@ -67,7 +67,7 @@
                     <span>Historial</span>
                 </div>
                 <div class="header-right">
-                    <span class="session-info">Cargando...<br>Empleado</span>
+                    <span class="session-info">Cargando...<br>Administrador</span>
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
@@ -76,95 +76,94 @@
 
             <div class="historial-container">
                 <div class="action-buttons">
-                    <!-- Dropdown Venta -->
-                    <div class="dropdown">
-                        <button class="btn-action btn-dropdown" onclick="toggleDropdown('ventaDropdown')">
-                            <i class="fas fa-cash-register"></i>
-                            Venta
+                    <!-- Dropdown Día personalizado -->
+                    <div class="dropdown" id="dia-combobox">
+                        <button class="btn-action btn-dropdown" id="dia-combobox-btn" type="button">
+                            <i class="fas fa-calendar-day"></i>
+                            <span id="dia-combobox-label">Día</span>
                             <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </button>
-                        <div class="dropdown-content" id="ventaDropdown">
-                            <a href="#" onclick="filterByVenta('todas')">
-                                <i class="fas fa-list"></i> Todas las ventas
-                            </a>
-                            <a href="#" onclick="filterByVenta('matutina')">
-                                <i class="fas fa-sun"></i> Venta matutina
-                            </a>
-                            <a href="#" onclick="filterByVenta('vespertina')">
-                                <i class="fas fa-moon"></i> Venta vespertina
-                            </a>
-                            <a href="#" onclick="filterByVenta('nocturna')">
-                                <i class="fas fa-star"></i> Venta nocturna
-                            </a>
-                            <a href="#" onclick="filterByVenta('hoy')">
-                                <i class="fas fa-calendar-day"></i> Ventas de hoy
-                            </a>
-                            <a href="#" onclick="filterByVenta('ayer')">
-                                <i class="fas fa-calendar-minus"></i> Ventas de ayer
-                            </a>
+                        <div class="dropdown-content" id="dia-combobox-list">
+                            <a href="#" data-dia="hoy"><i class="fas fa-calendar-day"></i> Hoy</a>
+                            <a href="#" data-dia="ayer"><i class="fas fa-calendar-minus"></i> Ayer</a>
+                            <a href="#" data-dia="semana"><i class="fas fa-calendar-week"></i> Esta semana</a>
+                            <a href="#" data-dia="personalizado"><i class="fas fa-calendar"></i> Personalizado</a>
                         </div>
                     </div>
 
                     <!-- Dropdown Meses -->
-                    <div class="dropdown">
-                        <button class="btn-action btn-dropdown" onclick="toggleDropdown('mesesDropdown')">
+                    <div class="dropdown" id="meses-combobox">
+                        <button class="btn-action btn-dropdown" id="meses-combobox-btn" type="button">
                             <i class="fas fa-calendar"></i>
-                            Meses
+                            <span id="meses-combobox-label">Meses</span>
                             <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </button>
-                        <div class="dropdown-content" id="mesesDropdown">
-                            <a href="#" onclick="filterByMonth('enero')">
-                                <i class="fas fa-calendar-alt"></i> Enero
-                            </a>
-                            <a href="#" onclick="filterByMonth('febrero')">
-                                <i class="fas fa-calendar-alt"></i> Febrero
-                            </a>
-                            <a href="#" onclick="filterByMonth('marzo')">
-                                <i class="fas fa-calendar-alt"></i> Marzo
-                            </a>
-                            <a href="#" onclick="filterByMonth('abril')">
-                                <i class="fas fa-calendar-alt"></i> Abril
-                            </a>
-                            <a href="#" onclick="filterByMonth('mayo')">
-                                <i class="fas fa-calendar-alt"></i> Mayo
-                            </a>
-                            <a href="#" onclick="filterByMonth('junio')">
-                                <i class="fas fa-calendar-alt"></i> Junio
-                            </a>
-                            <a href="#" onclick="filterByMonth('todos')">
-                                <i class="fas fa-list"></i> Todos los meses
-                            </a>
+                        <div class="dropdown-content" id="meses-combobox-list">
+                            <a href="#" data-mes="enero"><i class="fas fa-calendar-alt"></i> Enero</a>
+                            <a href="#" data-mes="febrero"><i class="fas fa-calendar-alt"></i> Febrero</a>
+                            <a href="#" data-mes="marzo"><i class="fas fa-calendar-alt"></i> Marzo</a>
+                            <a href="#" data-mes="abril"><i class="fas fa-calendar-alt"></i> Abril</a>
+                            <a href="#" data-mes="mayo"><i class="fas fa-calendar-alt"></i> Mayo</a>
+                            <a href="#" data-mes="junio"><i class="fas fa-calendar-alt"></i> Junio</a>
+                            <a href="#" data-mes="julio"><i class="fas fa-calendar-alt"></i> Julio</a>
+                            <a href="#" data-mes="agosto"><i class="fas fa-calendar-alt"></i> Agosto</a>
+                            <a href="#" data-mes="septiembre"><i class="fas fa-calendar-alt"></i> Septiembre</a>
+                            <a href="#" data-mes="octubre"><i class="fas fa-calendar-alt"></i> Octubre</a>
+                            <a href="#" data-mes="noviembre"><i class="fas fa-calendar-alt"></i> Noviembre</a>
+                            <a href="#" data-mes="diciembre"><i class="fas fa-calendar-alt"></i> Diciembre</a>
+                            <a href="#" data-mes="todos"><i class="fas fa-list"></i> Todos los meses</a>
                         </div>
                     </div>
                 </div>
 
-                <table class="products-table">
+                <table id="tablaHistorial"  class="products-table">
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>ID de venta</th>
+                            <th>ID de Venta</th>
                             <th>Producto</th>
-                            <th>Categoria</th>
+                            <th>Categoría</th>
                             <th>Cantidad</th>
                             <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tbody id="bodyHistorial">
+
                     </tbody>
                 </table>
             </div>
         </main>
-
-        <script src="dropdown.js"></script>
+        <script type="module" src="/Vista Web Admin/src/Forms/formsHistorial.js"></script>
+        <script>
+        // Dropdown funcionalidad para Día
+        (function() {
+            const btn = document.getElementById('dia-combobox-btn');
+            const list = document.getElementById('dia-combobox-list');
+            const label = document.getElementById('dia-combobox-label');
+            if (!btn || !list) return;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                list.style.display = (list.style.display === 'block') ? 'none' : 'block';
+            });
+            // Selección de día
+            list.querySelectorAll('a').forEach(function(a) {
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dia = a.getAttribute('data-dia');
+                    label.textContent = a.textContent.trim();
+                    list.style.display = 'none';
+                    // Aquí puedes llamar a tu función de filtro, por ejemplo:
+                    if (typeof window.filterByDia === 'function') window.filterByDia(dia);
+                });
+            });
+            // Cerrar al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!btn.contains(e.target) && !list.contains(e.target)) {
+                    list.style.display = 'none';
+                }
+            });
+        })();
+        </script>
     </div>
 </body>
 </html>

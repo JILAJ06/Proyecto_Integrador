@@ -28,27 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { value: "higiene", text: "Higiene Personal" }
   ];
 
-  // Crear dropdown dinámicamente
-  function crearDropdown() {
-    dropdownMenu = document.createElement("div");
-    dropdownMenu.className = "dropdown-menu";
 
-    categorias.forEach(categoria => {
-      const item = document.createElement("div");
-      item.className = "dropdown-item";
-      item.setAttribute("data-category", categoria.value);
-      item.textContent = categoria.text;
-      
-      if (categoria.value === "all") {
-        item.classList.add("selected");
-      }
-      
-      dropdownMenu.appendChild(item);
-    });
-
-    dropdownContainer.appendChild(dropdownMenu);
-    dropdownItems = dropdownMenu.querySelectorAll(".dropdown-item");
-  }
 
   // Crear modal para agregar producto
   function crearModalAgregar() {
@@ -530,7 +510,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Crear elementos dinámicos
-      crearDropdown();
+    
       const modalAdd = crearModalAgregar();
       const modalEdit = crearModalEditar();
       
@@ -549,17 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btnAdd.addEventListener("click", () => abrirModalAgregar(modalAdd));
     btnEdit.addEventListener("click", () => abrirModalEditar(modalEdit));
     btnDelete.addEventListener("click", abrirModalEliminar);
-    
-    btnCategory.addEventListener("click", toggleDropdown);
-    dropdownItems.forEach(item => {
-      item.addEventListener("click", filtrarPorCategoriaHandler);
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!dropdownContainer.contains(e.target)) {
-        cerrarDropdown();
-      }
-    });
 
     setupModalEvents(modalAdd, modalEdit);
 
