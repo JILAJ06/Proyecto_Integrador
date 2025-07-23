@@ -12,9 +12,9 @@ function obtenerDatosSesion() {
 function obtenerAPIBaseURL() {
     const sesion = obtenerDatosSesion();
     if (sesion && sesion.idNegocio) {
-        return `http://localhost:8080/negocio/${sesion.idNegocio}`;
+        return `http://54.198.31.200:8080/negocio/${sesion.idNegocio}`;
     }
-    return sessionStorage.getItem('clink_api_base_url') || 'http://localhost:8080/negocio/1';
+    return sessionStorage.getItem('clink_api_base_url') || 'http://54.198.31.200:8080/negocio/1';
 }
 
 // URL base dinámica

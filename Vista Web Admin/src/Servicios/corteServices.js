@@ -53,7 +53,7 @@ export function inicializarCorteCaja() {
 
         try {
             // POST para abrir caja
-            const resPost = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja/${nombreUsuario}`, {
+            const resPost = await fetch(`http://54.198.31.200:8080/negocio/${idNegocio}/corteCaja/${nombreUsuario}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -83,7 +83,7 @@ async function obtenerDatosCorteCajaActivo() {
     const idNegocio = sessionStorage.getItem("negocioId");
 
     try {
-        const resGet = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja`);
+        const resGet = await fetch(`http://54.198.31.200:8080/negocio/${idNegocio}/corteCaja`);
         if (!resGet.ok) throw new Error("No hay caja activa");
 
         const datosGet = await resGet.json();

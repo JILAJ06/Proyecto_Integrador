@@ -21,9 +21,9 @@ function obtenerDatosSesion() {
 function obtenerAPIBaseURL() {
     const sesion = obtenerDatosSesion();
     if (sesion && sesion.idNegocio) {
-        return `http://localhost:8080/negocio/${sesion.idNegocio}`;
+        return `http://54.198.31.200:8080/negocio/${sesion.idNegocio}`;
     }
-    return 'http://localhost:8080/negocio/1'; // Fallback
+    return 'http://54.198.31.200:8080/negocio/1'; // Fallback
 }
 
 const API_BASE_URL = obtenerAPIBaseURL();
