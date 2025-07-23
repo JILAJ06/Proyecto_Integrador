@@ -1279,7 +1279,15 @@ function mostrarVentaExitosa() {
             closeTicket();
             console.log('❌ Ticket no generado - finalizando venta');
             // Aquí termina la venta sin generar ticket
-        };
+            mostrarToast('Venta finalizada sin ticket', 'info');
+        setTimeout(() => {
+            console.log('🔄 Refrescando página para nueva venta...');
+            mostrarToast('Preparando nueva venta...', 'info');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }, 1500);
+    };
 
         // También cerrar al hacer click fuera
         modalTicket.querySelector('.modal-ticket-overlay').onclick = closeTicket;
@@ -1763,6 +1771,14 @@ function mostrarVentaExitosa() {
             mostrarToast('Ticket enviado exitosamente por SMS', 'success');
             console.log('✅ Proceso completado - Ticket enviado por SMS al cliente:', clienteId);
 
+             setTimeout(() => {
+            console.log('🔄 Refrescando página para nueva venta...');
+            mostrarToast('Preparando nueva venta...', 'info');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }, 2000); // Esperar 2 segundos para que el usuario vea el mensaje de éxito
+
         } catch (error) {
             console.error('Error en el proceso de envío de ticket:', error);
             
@@ -1774,8 +1790,16 @@ function mostrarVentaExitosa() {
             
             // Mostrar mensaje de error
             mostrarToast('Error al enviar ticket: ' + error.message, 'error');
-        }
+            // ✅ OPCIONAL: También refrescar después de un error (para no dejar el sistema colgado)
+        setTimeout(() => {
+            console.log('🔄 Refrescando página después del error...');
+            mostrarToast('Reiniciando sistema...', 'warning');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }, 3000); // Esperar 3 segundos para que el usuario vea el error
     }
+}
 
     // Función auxiliar para mostrar toast (si no existe)
     function mostrarToast(mensaje, tipo = 'info') {
