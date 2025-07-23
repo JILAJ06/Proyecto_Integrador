@@ -1186,14 +1186,15 @@ function mostrarVentaExitosa() {
             modalTicket.innerHTML = `
                 <div class="modal-ticket-overlay"></div>
                 <div class="modal-ticket-content">
-                    <div class="modal-ticket-question">¿<b>Hacer ticket</b>?</div>
+                    <div class="modal-ticket-question">¿Desea generar un ticket?</div>
                     <div class="modal-ticket-actions">
                         <button class="modal-ticket-btn-si">Sí</button>
-                        <button class="modal-ticket-btn-no">NO</button>
+                        <button class="modal-ticket-btn-no">No</button>
                     </div>
                 </div>
             `;
             document.body.appendChild(modalTicket);
+
             // Estilos solo una vez
             if (!document.getElementById('modal-ticket-style')) {
                 const style = document.createElement('style');
@@ -1262,522 +1263,571 @@ function mostrarVentaExitosa() {
             }
         }
         modalTicket.style.display = 'flex';
+
         // Acciones de los botones
         const btnSi = modalTicket.querySelector('.modal-ticket-btn-si');
         const btnNo = modalTicket.querySelector('.modal-ticket-btn-no');
         const closeTicket = () => { modalTicket.style.display = 'none'; };
+
         btnSi.onclick = function() {
             closeTicket();
-            mostrarModalInfoTicket();
+            console.log('✅ Ticket solicitado - mostrando selección de cliente');
+            mostrarModalSeleccionCliente();
         };
-        btnNo.onclick = closeTicket;
+
+        btnNo.onclick = function() {
+            closeTicket();
+            console.log('❌ Ticket no generado - finalizando venta');
+            // Aquí termina la venta sin generar ticket
+        };
+
         // También cerrar al hacer click fuera
         modalTicket.querySelector('.modal-ticket-overlay').onclick = closeTicket;
     }
 
-    // Modal de información del ticket
-    function mostrarModalInfoTicket() {
-        let modalInfo = document.getElementById('modal-info-ticket');
-        if (!modalInfo) {
-            modalInfo = document.createElement('div');
-            modalInfo.id = 'modal-info-ticket';
-            modalInfo.innerHTML = `
-                <div class="modal-info-overlay"></div>
-                <div class="modal-info-content">
-                    <div class="modal-info-left">
-                        <div class="modal-info-ticket-text">Información del<br>ticket</div>
+    // Modal para seleccionar o registrar cliente
+    function mostrarModalSeleccionCliente() {
+        let modalCliente = document.getElementById('modal-cliente');
+        if (!modalCliente) {
+            modalCliente = document.createElement('div');
+            modalCliente.id = 'modal-cliente';
+            modalCliente.innerHTML = `
+                <div class="modal-cliente-overlay"></div>
+                <div class="modal-cliente-content">
+                    <h3>Seleccionar o Registrar Cliente</h3>
+                    <div class="modal-cliente-body">
+                        <label for="cliente-combobox">Buscar Cliente:</label>
+                        <select id="cliente-combobox" class="cliente-combobox">
+                            <option value="">Seleccione un cliente...</option>
+                        </select>
+                        <button id="btn-registrar-cliente" class="btn-registrar-cliente">Registrar Nuevo Cliente</button>
                     </div>
-                    <div class="modal-info-right">
-                        <button class="modal-info-btn modal-info-btn-sms">Enviar por SMS</button>
+                    <div class="modal-cliente-actions">
+                        <button id="btn-cancelar-cliente" class="btn-cancelar-cliente">Cancelar</button>
+                        <button id="btn-continuar-cliente" class="btn-continuar-cliente">Enviar Ticket</button>
                     </div>
                 </div>
             `;
-            document.body.appendChild(modalInfo);
-            // Estilos solo una vez
-            if (!document.getElementById('modal-info-ticket-style')) {
+            document.body.appendChild(modalCliente);
+
+            // Estilos del modal de cliente
+            if (!document.getElementById('modal-cliente-style')) {
                 const style = document.createElement('style');
-                style.id = 'modal-info-ticket-style';
+                style.id = 'modal-cliente-style';
                 style.textContent = `
-                    #modal-info-ticket {
+                    #modal-cliente {
                         display: flex;
                         position: fixed;
                         z-index: 2200;
                         left: 0; top: 0; width: 100vw; height: 100vh;
                         align-items: center; justify-content: center;
                     }
-                    #modal-info-ticket .modal-info-overlay {
+                    #modal-cliente .modal-cliente-overlay {
                         position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.4);
+                        background: rgba(0,0,0,0.5);
                     }
-                    #modal-info-ticket .modal-info-content {
+                    #modal-cliente .modal-cliente-content {
                         position: relative;
-                        background: #e6e7c7;
-                        border-radius: 36px;
-                        padding: 40px 40px 40px 40px;
-                        min-width: 700px;
-                        min-height: 400px;
-                        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-                        display: flex;
-                        flex-direction: row;
-                        gap: 48px;
+                        background: #fff;
+                        border-radius: 12px;
+                        padding: 24px;
+                        min-width: 400px;
+                        max-width: 500px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
                         z-index: 2;
-                        align-items: center;
-                        justify-content: center;
                     }
-                    #modal-info-ticket .modal-info-left {
-                        background: #fff;
-                        border-radius: 24px;
-                        min-width: 320px;
-                        min-height: 320px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    #modal-info-ticket .modal-info-ticket-text {
-                        color: #222;
-                        font-size: 2rem;
-                        font-weight: bold;
+                    #modal-cliente h3 {
+                        margin: 0 0 20px 0;
+                        color: #333;
                         text-align: center;
-                        line-height: 1.2;
                     }
-                    #modal-info-ticket .modal-info-right {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 40px;
-                        align-items: center;
-                        justify-content: center;
-                        min-width: 260px;
+                    #modal-cliente .modal-cliente-body {
+                        margin-bottom: 20px;
                     }
-                    #modal-info-ticket .modal-info-btn {
-                        background: #fff;
+                    #modal-cliente label {
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: bold;
+                        color: #555;
+                    }
+                    #modal-cliente .cliente-combobox {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        margin-bottom: 15px;
+                        font-size: 14px;
+                    }
+                    #modal-cliente .btn-registrar-cliente {
+                        width: 100%;
+                        padding: 10px;
+                        background: #007bff;
+                        color: #fff;
                         border: none;
-                        border-radius: 20px;
-                        font-size: 1.6rem;
-                        font-weight: bold;
-                        padding: 22px 36px;
-                        margin: 0 auto;
+                        border-radius: 6px;
                         cursor: pointer;
-                        transition: background 0.2s;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                        font-size: 14px;
+                        margin-bottom: 10px;
                     }
-                    #modal-info-ticket .modal-info-btn:hover {
-                        background: #b8e6b8;
+                    #modal-cliente .btn-registrar-cliente:hover {
+                        background: #0056b3;
                     }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        modalInfo.style.display = 'flex';
-        // Cerrar al hacer click fuera
-        modalInfo.querySelector('.modal-info-overlay').onclick = function() {
-            modalInfo.style.display = 'none';
-        };
-        // Funcionalidad para 'Enviar por SMS'
-        const btnSms = modalInfo.querySelector('.modal-info-btn-sms');
-        btnSms.onclick = function() {
-            modalInfo.style.display = 'none';
-            mostrarModalClienteRegistrado();
-        };
-        // Puedes agregar funcionalidad a 'Exportar' aquí si lo deseas
-        // modalInfo.querySelector('.modal-info-btn-exportar').onclick = ...
-    }
-
-    // Modal de '¿Cliente ya registrado?'
-    function mostrarModalClienteRegistrado() {
-        let modalCliente = document.getElementById('modal-cliente-registrado');
-        if (!modalCliente) {
-            modalCliente = document.createElement('div');
-            modalCliente.id = 'modal-cliente-registrado';
-            modalCliente.innerHTML = `
-                <div class="modal-cliente-overlay"></div>
-                <div class="modal-cliente-content">
-                    <div class="modal-cliente-question">¿<b>Cliente ya registrado</b>?</div>
-                    <div class="modal-cliente-actions">
-                        <button class="modal-cliente-btn-si">Sí</button>
-                        <button class="modal-cliente-btn-no">NO</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modalCliente);
-            // Estilos solo una vez
-            if (!document.getElementById('modal-cliente-registrado-style')) {
-                const style = document.createElement('style');
-                style.id = 'modal-cliente-registrado-style';
-                style.textContent = `
-                    #modal-cliente-registrado {
-                        display: flex;
-                        position: fixed;
-                        z-index: 2300;
-                        left: 0; top: 0; width: 100vw; height: 100vh;
-                        align-items: center; justify-content: center;
-                    }
-                    #modal-cliente-registrado .modal-cliente-overlay {
-                        position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.4);
-                    }
-                    #modal-cliente-registrado .modal-cliente-content {
-                        position: relative;
-                        background: #e6e7c7;
-                        border-radius: 24px;
-                        padding: 32px 32px 24px 32px;
-                        min-width: 380px;
-                        min-height: 160px;
-                        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-                        display: flex;
-                        flex-direction: column;
-                        gap: 24px;
-                        z-index: 2;
-                        align-items: center;
-                    }
-                    #modal-cliente-registrado .modal-cliente-question {
-                        background: #fff;
-                        border-radius: 16px;
-                        font-size: 2rem;
-                        font-weight: bold;
-                        color: #222;
-                        padding: 12px 18px;
-                        text-align: center;
-                        margin-bottom: 12px;
-                    }
-                    #modal-cliente-registrado .modal-cliente-actions {
+                    #modal-cliente .modal-cliente-actions {
                         display: flex;
                         justify-content: space-between;
                         width: 100%;
-                        gap: 48px;
+                        gap: 32px;
                     }
-                    #modal-cliente-registrado .modal-cliente-btn-si, #modal-cliente-registrado .modal-cliente-btn-no {
-                        flex: 1;
-                        padding: 18px 0;
+                    #modal-cliente .btn-cancelar-cliente {
+                        padding: 10px 20px;
+                        background: #6c757d;
+                        color: #fff;
                         border: none;
-                        border-radius: 16px;
-                        background: #fff;
-                        font-weight: bold;
-                        font-size: 2rem;
+                        border-radius: 6px;
                         cursor: pointer;
-                        transition: background 0.2s;
                     }
-                    #modal-cliente-registrado .modal-cliente-btn-si:hover {
-                        background: #b8e6b8;
+                    #modal-cliente .btn-cancelar-cliente:hover {
+                        background: #545b62;
                     }
-                    #modal-cliente-registrado .modal-cliente-btn-no:hover {
-                        background: #f2bcbc;
+                    #modal-cliente .btn-continuar-cliente {
+                        padding: 10px 20px;
+                        background: #28a745;
+                        color: #fff;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                    }
+                    #modal-cliente .btn-continuar-cliente:hover {
+                        background: #1e7e34;
                     }
                 `;
                 document.head.appendChild(style);
             }
         }
         modalCliente.style.display = 'flex';
-        // Acciones de los botones
-        const btnSi = modalCliente.querySelector('.modal-cliente-btn-si');
-        const btnNo = modalCliente.querySelector('.modal-cliente-btn-no');
-        const closeCliente = () => { modalCliente.style.display = 'none'; };
-        btnSi.onclick = function() {
-            closeCliente();
-            mostrarModalTelefonoRegistrado();
-        };
-        btnNo.onclick = function() {
-            closeCliente();
-            mostrarModalTelefonoNoRegistrado();
-        };
-        // También cerrar al hacer click fuera
-        modalCliente.querySelector('.modal-cliente-overlay').onclick = closeCliente;
-    }
 
-    // Modal para escribir teléfono (cliente registrado)
-    function mostrarModalTelefonoRegistrado() {
-        let modalTel = document.getElementById('modal-tel-registrado');
-        if (!modalTel) {
-            modalTel = document.createElement('div');
-            modalTel.id = 'modal-tel-registrado';
-            modalTel.innerHTML = `
-                <div class="modal-tel-overlay"></div>
-                <div class="modal-tel-content">
-                    <div class="modal-tel-title">Escriba el telefono</div>
-                    <div class="modal-tel-ejemplo">Ejem. 25/05/2025</div>
-                    <input class="modal-tel-input" type="text" placeholder="__________________________">
-                    <div class="modal-tel-actions">
-                        <button class="modal-tel-btn-cancelar">Cancelar</button>
-                        <button class="modal-tel-btn-aceptar">Aceptar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modalTel);
-            if (!document.getElementById('modal-tel-registrado-style')) {
-                const style = document.createElement('style');
-                style.id = 'modal-tel-registrado-style';
-                style.textContent = `
-                    #modal-tel-registrado {
-                        display: flex;
-                        position: fixed;
-                        z-index: 2400;
-                        left: 0; top: 0; width: 100vw; height: 100vh;
-                        align-items: center; justify-content: center;
-                    }
-                    #modal-tel-registrado .modal-tel-overlay {
-                        position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.4);
-                    }
-                    #modal-tel-registrado .modal-tel-content {
-                        position: relative;
-                        background: #e6e7c7;
-                        border-radius: 24px;
-                        padding: 32px 32px 24px 32px;
-                        min-width: 340px;
-                        min-height: 180px;
-                        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        gap: 8px;
-                        z-index: 2;
-                    }
-                    #modal-tel-registrado .modal-tel-title {
-                        font-size: 1.5rem;
-                        font-weight: bold;
-                        margin-bottom: 2px;
-                        margin-top: 8px;
-                        text-align: center;
-                    }
-                    #modal-tel-registrado .modal-tel-ejemplo {
-                        font-size: 1.1rem;
-                        color: #444;
-                        margin-bottom: 8px;
-                        text-align: center;
-                    }
-                    #modal-tel-registrado .modal-tel-input {
-                        width: 90%;
-                        font-size: 1.2rem;
-                        border: none;
-                        border-bottom: 2px solid #222;
-                        background: transparent;
-                        margin-bottom: 18px;
-                        outline: none;
-                        text-align: center;
-                        padding: 6px 0;
-                    }
-                    #modal-tel-registrado .modal-tel-actions {
-                        display: flex;
-                        justify-content: space-between;
-                        width: 100%;
-                        gap: 48px;
-                        margin-top: 8px;
-                    }
-                    #modal-tel-registrado .modal-tel-btn-cancelar, #modal-tel-registrado .modal-tel-btn-aceptar {
-                        flex: 1;
-                        padding: 12px 0;
-                        border: none;
-                        border-radius: 16px;
-                        background: #fff;
-                        font-weight: bold;
-                        font-size: 1.3rem;
-                        cursor: pointer;
-                        transition: background 0.2s;
-                        margin: 0 8px;
-                    }
-                    #modal-tel-registrado .modal-tel-btn-cancelar:hover {
-                        background: #f2bcbc;
-                    }
-                    #modal-tel-registrado .modal-tel-btn-aceptar:hover {
-                        background: #b8e6b8;
-                    }
-                `;
-                document.head.appendChild(style);
+        // Acciones de los botones
+        const btnRegistrarCliente = modalCliente.querySelector('#btn-registrar-cliente');
+        const btnCancelarCliente = modalCliente.querySelector('#btn-cancelar-cliente');
+        const btnContinuarCliente = modalCliente.querySelector('#btn-continuar-cliente');
+        const clienteCombobox = modalCliente.querySelector('#cliente-combobox');
+
+        // Cargar clientes en el combobox
+        cargarClientesEnCombobox(clienteCombobox);
+
+        btnRegistrarCliente.onclick = function () {
+            modalCliente.style.display = 'none';
+            mostrarModalRegistrarCliente();
+        };
+
+        btnCancelarCliente.onclick = function () {
+            modalCliente.style.display = 'none';
+        };
+
+        // Corregir el manejo del botón "Enviar Ticket" en el modal de selección de cliente
+        btnContinuarCliente.onclick = async function () {
+            const clienteId = clienteCombobox.value;
+            
+            // Validar que se haya seleccionado un cliente
+            if (!clienteId || clienteId === "") {
+                alert('Por favor, seleccione un cliente de la lista.');
+                return;
             }
-        }
-        modalTel.style.display = 'flex';
-        // Acciones de los botones
-        const btnCancelar = modalTel.querySelector('.modal-tel-btn-cancelar');
-        const btnAceptar = modalTel.querySelector('.modal-tel-btn-aceptar');
-        const closeTel = () => { modalTel.style.display = 'none'; };
-        btnCancelar.onclick = closeTel;
-        btnAceptar.onclick = function() {
-            closeTel();
-            mostrarVentaExitosaSMS();
+            
+            console.log('Cliente seleccionado ID:', clienteId); // Para debug
+            
+            modalCliente.style.display = 'none';
+            await enviarTicketPorSms(clienteId);
         };
-        modalTel.querySelector('.modal-tel-overlay').onclick = closeTel;
+
+        modalCliente.querySelector('.modal-cliente-overlay').onclick = function () {
+            modalCliente.style.display = 'none';
+        };
     }
 
-    // Modal para escribir teléfono y nombre (cliente NO registrado)
-    function mostrarModalTelefonoNoRegistrado() {
-        let modalTelNom = document.getElementById('modal-tel-nombre');
-        if (!modalTelNom) {
-            modalTelNom = document.createElement('div');
-            modalTelNom.id = 'modal-tel-nombre';
-            modalTelNom.innerHTML = `
-                <div class="modal-tel-overlay"></div>
-                <div class="modal-tel-content">
-                    <div class="modal-tel-title">Escriba el telefono</div>
-                    <div class="modal-tel-ejemplo">Ejem. 961XXXXXXXX</div>
-                    <input class="modal-tel-input" type="text" placeholder="__________________________">
-                    <div class="modal-tel-title" style="margin-top:18px;">Escriba el nombre</div>
-                    <input class="modal-tel-input" type="text" placeholder="__________________________">
-                    <div class="modal-tel-actions">
-                        <button class="modal-tel-btn-cancelar">Cancelar</button>
-                        <button class="modal-tel-btn-aceptar">Aceptar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modalTelNom);
-            if (!document.getElementById('modal-tel-nombre-style')) {
-                const style = document.createElement('style');
-                style.id = 'modal-tel-nombre-style';
-                style.textContent = `
-                    #modal-tel-nombre {
-                        display: flex;
-                        position: fixed;
-                        z-index: 2400;
-                        left: 0; top: 0; width: 100vw; height: 100vh;
-                        align-items: center; justify-content: center;
-                    }
-                    #modal-tel-nombre .modal-tel-overlay {
-                        position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.4);
-                    }
-                    #modal-tel-nombre .modal-tel-content {
-                        position: relative;
-                        background: #e6e7c7;
-                        border-radius: 24px;
-                        padding: 32px 32px 24px 32px;
-                        min-width: 340px;
-                        min-height: 220px;
-                        box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        gap: 8px;
-                        z-index: 2;
-                    }
-                    #modal-tel-nombre .modal-tel-title {
-                        font-size: 1.5rem;
-                        font-weight: bold;
-                        margin-bottom: 2px;
-                        margin-top: 8px;
-                        text-align: center;
-                    }
-                    #modal-tel-nombre .modal-tel-ejemplo {
-                        font-size: 1.1rem;
-                        color: #444;
-                        margin-bottom: 8px;
-                        text-align: center;
-                    }
-                    #modal-tel-nombre .modal-tel-input {
-                        width: 90%;
-                        font-size: 1.2rem;
-                        border: none;
-                        border-bottom: 2px solid #222;
-                        background: transparent;
-                        margin-bottom: 8px;
-                        outline: none;
-                        text-align: center;
-                        padding: 6px 0;
-                    }
-                    #modal-tel-nombre .modal-tel-actions {
-                        display: flex;
-                        justify-content: space-between;
-                        width: 100%;
-                        gap: 48px;
-                        margin-top: 8px;
-                    }
-                    #modal-tel-nombre .modal-tel-btn-cancelar, #modal-tel-nombre .modal-tel-btn-aceptar {
-                        flex: 1;
-                        padding: 12px 0;
-                        border: none;
-                        border-radius: 16px;
-                        background: #fff;
-                        font-weight: bold;
-                        font-size: 1.3rem;
-                        cursor: pointer;
-                        transition: background 0.2s;
-                        margin: 0 8px;
-                    }
-                    #modal-tel-nombre .modal-tel-btn-cancelar:hover {
-                        background: #f2bcbc;
-                    }
-                    #modal-tel-nombre .modal-tel-btn-aceptar:hover {
-                        background: #b8e6b8;
-                    }
-                `;
-                document.head.appendChild(style);
+    // Cargar clientes en el combobox usando el endpoint
+// ...existing code...
+
+    // Función mejorada para cargar clientes con más debugging
+    // ...existing code...
+    
+    // Función corregida para cargar clientes - primero verificar estructura
+    async function cargarClientesEnCombobox(combobox) {
+        try {
+            console.log('🔄 Iniciando carga de clientes...');
+            
+            const negocioId = VentasServices.idNegocio;
+            console.log('🏢 ID del negocio:', negocioId);
+            
+            if (!negocioId) {
+                throw new Error('ID del negocio no está definido');
             }
+            
+            const url = `http://localhost:8080/negocio/${negocioId}/clientes`;
+            console.log('📡 Haciendo petición a:', url);
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+            }
+            
+            const clientes = await response.json();
+            console.log('📋 RESPUESTA COMPLETA del servidor:', clientes);
+            
+            // Verificar la estructura de cada cliente
+            if (clientes && clientes.length > 0) {
+                console.log('🔍 ESTRUCTURA del primer cliente:');
+                console.log('   - Objeto completo:', clientes[0]);
+                console.log('   - Propiedades disponibles:', Object.keys(clientes[0]));
+                console.log('   - ¿Tiene ID?:', clientes[0].id);
+                console.log('   - ¿Tiene idCliente?:', clientes[0].idCliente);
+                console.log('   - ¿Tiene clienteId?:', clientes[0].clienteId);
+                console.log('   - ¿Tiene nombre?:', clientes[0].nombre);
+                console.log('   - ¿Tiene telefono?:', clientes[0].telefono);
+            }
+            
+            // Limpiar opciones anteriores
+            combobox.innerHTML = '<option value="">Seleccione un cliente...</option>';
+            
+            // Verificar si hay clientes
+            if (!clientes || clientes.length === 0) {
+                console.log('⚠️ No hay clientes registrados');
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No hay clientes registrados";
+                option.disabled = true;
+                combobox.appendChild(option);
+                return;
+            }
+            
+            // Agregar clientes al combobox - detectar la propiedad correcta para el ID
+            clientes.forEach((cliente, index) => {
+                console.log(`👤 Cliente ${index + 1} - Objeto completo:`, cliente);
+                
+                const option = document.createElement('option');
+                
+                // Probar diferentes propiedades para el ID
+                let clienteId = cliente.id || cliente.idCliente || cliente.clienteId;
+                
+                console.log(`   🔍 ID detectado: ${clienteId}`);
+                
+                option.value = clienteId;
+                option.textContent = `${cliente.nombre || 'Sin nombre'} - ${cliente.telefono || 'Sin teléfono'}`;
+                
+                console.log(`   ➡️ Option - value: "${option.value}", text: "${option.textContent}"`);
+                combobox.appendChild(option);
+            });
+            
+            console.log(`✅ Cargados ${clientes.length} clientes en el combobox`);
+            
+        } catch (error) {
+            console.error('❌ Error al cargar clientes:', error);
+            combobox.innerHTML = '<option value="">Error al cargar clientes</option>';
+            alert('Error al cargar la lista de clientes: ' + error.message);
         }
-        modalTelNom.style.display = 'flex';
-        // Acciones de los botones
-        const btnCancelar = modalTelNom.querySelector('.modal-tel-btn-cancelar');
-        const btnAceptar = modalTelNom.querySelector('.modal-tel-btn-aceptar');
-        const closeTelNom = () => { modalTelNom.style.display = 'none'; };
-        btnCancelar.onclick = closeTelNom;
-        btnAceptar.onclick = function() {
-            closeTelNom();
-            mostrarVentaExitosaSMS();
-        };
-        modalTelNom.querySelector('.modal-tel-overlay').onclick = closeTelNom;
-
     }
+    
+    // ...existing code...
+    // Función mejorada para el botón continuar con más debugging
+    btnContinuarCliente.onclick = async function () {
+        console.log('🔍 Verificando selección de cliente...');
+        console.log('📋 Combobox element:', clienteCombobox);
+        console.log('📋 Todas las opciones:', clienteCombobox.options);
+        console.log('📋 Índice seleccionado:', clienteCombobox.selectedIndex);
+        console.log('📋 Opción seleccionada:', clienteCombobox.options[clienteCombobox.selectedIndex]);
+        
+        const clienteId = clienteCombobox.value;
+        console.log('🆔 Cliente ID capturado:', clienteId);
+        console.log('🔢 Tipo de clienteId:', typeof clienteId);
+        
+        // Validar que se haya seleccionado un cliente
+        if (!clienteId || clienteId === "" || clienteId === "undefined") {
+            console.log('❌ No se seleccionó un cliente válido');
+            alert('Por favor, seleccione un cliente de la lista.');
+            return;
+        }
+        
+        console.log('✅ Cliente válido seleccionado, ID:', clienteId);
+        
+        modalCliente.style.display = 'none';
+        await enviarTicketPorSms(clienteId);
+    };
 
-    // Modal de éxito para SMS enviado (igual a venta exitosa)
-    function mostrarVentaExitosaSMS() {
-        let modalSuccess = document.getElementById('modal-sms-exitoso');
-        if (!modalSuccess) {
-            modalSuccess = document.createElement('div');
-            modalSuccess.id = 'modal-sms-exitoso';
-            modalSuccess.innerHTML = `
-                <div class="modal-success-overlay"></div>
-                <div class="modal-success-content">
-                    <div class="modal-success-icon">✔</div>
-                    <div class="modal-success-text">SMS ENVIADO</div>
+    // ...existing code...
+    // Modal para registrar nuevo cliente
+    function mostrarModalRegistrarCliente() {
+        let modalRegistrar = document.getElementById('modal-registrar-cliente');
+        if (!modalRegistrar) {
+            modalRegistrar = document.createElement('div');
+            modalRegistrar.id = 'modal-registrar-cliente';
+            modalRegistrar.innerHTML = `
+                <div class="modal-registrar-overlay"></div>
+                <div class="modal-registrar-content">
+                    <h3>Registrar Nuevo Cliente</h3>
+                    <form id="form-registrar-cliente">
+                        <div class="form-group">
+                            <label for="nombre-cliente">Nombre *</label>
+                            <input type="text" id="nombre-cliente" name="nombre" required placeholder="Nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono-cliente">Teléfono *</label>
+                            <input type="tel" id="telefono-cliente" name="telefono" required placeholder="961-123-4567">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" id="btn-cancelar-registrar" class="btn-cancel">Cancelar</button>
+                            <button type="submit" class="btn-accept">Registrar y Enviar Ticket</button>
+                        </div>
+                    </form>
                 </div>
             `;
-            document.body.appendChild(modalSuccess);
-            if (!document.getElementById('modal-sms-success-style')) {
+            document.body.appendChild(modalRegistrar);
+
+            // Estilos del modal de registro
+            if (!document.getElementById('modal-registrar-style')) {
                 const style = document.createElement('style');
-                style.id = 'modal-sms-success-style';
+                style.id = 'modal-registrar-style';
                 style.textContent = `
-                    #modal-sms-exitoso {
+                    #modal-registrar-cliente {
                         display: flex;
                         position: fixed;
-                        z-index: 2500;
+                        z-index: 2300;
                         left: 0; top: 0; width: 100vw; height: 100vh;
                         align-items: center; justify-content: center;
                     }
-                    #modal-sms-exitoso .modal-success-overlay {
+                    #modal-registrar-cliente .modal-registrar-overlay {
                         position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.4);
+                        background: rgba(0,0,0,0.5);
                     }
-                    #modal-sms-exitoso .modal-success-content {
+                    #modal-registrar-cliente .modal-registrar-content {
                         position: relative;
-                        background: transparent;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
+                        background: #fff;
+                        border-radius: 12px;
+                        padding: 24px;
+                        min-width: 400px;
+                        max-width: 500px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
                         z-index: 2;
                     }
-                    #modal-sms-exitoso .modal-success-icon {
-                        font-size: 5rem;
-                        color: #111;
-                        background: #fff;
-                        border-radius: 50%;
-                        width: 100px; height: 100px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin-bottom: 24px;
-                        box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+                    #modal-registrar-cliente h3 {
+                        margin: 0 0 20px 0;
+                        color: #333;
+                        text-align: center;
                     }
-                    #modal-sms-exitoso .modal-success-text {
+                    #modal-registrar-cliente .form-group {
+                        margin-bottom: 15px;
+                    }
+                    #modal-registrar-cliente label {
+                        display: block;
+                        margin-bottom: 5px;
+                        font-weight: bold;
+                        color: #555;
+                    }
+                    #modal-registrar-cliente input {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        box-sizing: border-box;
+                    }
+                    #modal-registrar-cliente .modal-actions {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: flex-end;
+                        margin-top: 20px;
+                    }
+                    #modal-registrar-cliente .btn-cancel {
+                        padding: 10px 20px;
+                        background: #6c757d;
                         color: #fff;
-                        font-size: 2.8rem;
-                        font-weight: bold;
-                        text-align: center;
-                        text-shadow: 0 2px 8px rgba(0,0,0,0.18);
-                        letter-spacing: 2px;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                    }
+                    #modal-registrar-cliente .btn-accept {
+                        padding: 10px 20px;
+                        background: #28a745;
+                        color: #fff;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                    }
+                    #modal-registrar-cliente .btn-cancel:hover {
+                        background: #545b62;
+                    }
+                    #modal-registrar-cliente .btn-accept:hover {
+                        background: #1e7e34;
                     }
                 `;
                 document.head.appendChild(style);
             }
         }
-        modalSuccess.style.display = 'flex';
+        modalRegistrar.style.display = 'flex';
+
+        const formRegistrar = modalRegistrar.querySelector('#form-registrar-cliente');
+        const btnCancelarRegistrar = modalRegistrar.querySelector('#btn-cancelar-registrar');
+
+        btnCancelarRegistrar.onclick = function () {
+            modalRegistrar.style.display = 'none';
+            mostrarModalSeleccionCliente(); // Volver al modal anterior
+        };
+
+        formRegistrar.onsubmit = async function (e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre-cliente').value.trim();
+            const telefono = document.getElementById('telefono-cliente').value.trim();
+
+            if (!nombre || !telefono) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            try {
+                // Registrar nuevo cliente
+                const nuevoCliente = await window.createCliente({ nombre, telefono });
+                console.log('Cliente registrado:', nuevoCliente);
+                
+                modalRegistrar.style.display = 'none';
+                
+                // Enviar ticket al cliente recién registrado
+                await enviarTicketPorSms(nuevoCliente.id);
+                
+            } catch (error) {
+                console.error('Error al registrar cliente:', error);
+                alert('Error al registrar cliente. Por favor, inténtelo de nuevo.');
+            }
+        };
+
+        modalRegistrar.querySelector('.modal-registrar-overlay').onclick = function () {
+            modalRegistrar.style.display = 'none';
+            mostrarModalSeleccionCliente(); // Volver al modal anterior
+        };
+
+        // Enfocar el primer input
         setTimeout(() => {
-            modalSuccess.style.display = 'none';
-        }, 1800);
+            document.getElementById('nombre-cliente').focus();
+        }, 100);
+    }
+
+    // Función simplificada para enviar ticket por SMS
+    async function enviarTicketPorSms(clienteId) {
+        // Validar que clienteId no sea undefined
+        if (!clienteId || clienteId === undefined || clienteId === "undefined") {
+            console.error('❌ Error: clienteId es undefined o inválido:', clienteId);
+            mostrarToast('Error: No se seleccionó un cliente válido', 'error');
+            return;
+        }
+        
+        try {
+            console.log('Iniciando proceso de envío de ticket por SMS al cliente ID:', clienteId);
+            
+            // Mostrar mensaje de carga
+            const loadingToast = mostrarToast('Generando y enviando ticket por SMS...', 'info');
+            
+            // Obtener ID del negocio
+            const negocioId = VentasServices.idNegocio;
+            
+            // PASO 1: Generar el ticket usando POST
+            console.log('Paso 1: Generando ticket...');
+            const generarResponse = await fetch(`http://localhost:8080/negocio/${negocioId}/ticket`, {
+                method: 'POST'
+            });
+
+            if (!generarResponse.ok) {
+                throw new Error(`Error al generar ticket: ${generarResponse.status} - ${generarResponse.statusText}`);
+            }
+
+            const generarResult = await generarResponse.text();
+            console.log('✅ Ticket generado:', generarResult);
+
+            // PASO 2: Enviar el ticket por SMS usando GET
+            console.log('Paso 2: Enviando ticket por SMS al cliente ID:', clienteId);
+            const enviarResponse = await fetch(`http://localhost:8080/negocio/${negocioId}/ticket/send/${clienteId}`, {
+                method: 'GET'
+            });
+
+            // Cerrar toast de carga
+            if (loadingToast && loadingToast.parentNode) {
+                loadingToast.remove();
+            }
+
+            if (!enviarResponse.ok) {
+                throw new Error(`Error al enviar SMS: ${enviarResponse.status} - ${enviarResponse.statusText}`);
+            }
+
+            const enviarResult = await enviarResponse.text();
+            console.log('✅ SMS enviado:', enviarResult);
+
+            // Mostrar mensaje de éxito
+            mostrarToast('Ticket enviado exitosamente por SMS', 'success');
+            console.log('✅ Proceso completado - Ticket enviado por SMS al cliente:', clienteId);
+
+        } catch (error) {
+            console.error('Error en el proceso de envío de ticket:', error);
+            
+            // Cerrar toast de carga si aún existe
+            const loadingToast = document.querySelector('.toast');
+            if (loadingToast && loadingToast.parentNode) {
+                loadingToast.remove();
+            }
+            
+            // Mostrar mensaje de error
+            mostrarToast('Error al enviar ticket: ' + error.message, 'error');
+        }
+    }
+
+    // Función auxiliar para mostrar toast (si no existe)
+    function mostrarToast(mensaje, tipo = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${tipo}`;
+        toast.textContent = mensaje;
+        
+        // Estilos básicos para el toast
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            z-index: 3000;
+            max-width: 300px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        
+        // Colores según el tipo
+        switch (tipo) {
+            case 'success':
+                toast.style.background = '#28a745';
+                break;
+            case 'error':
+                toast.style.background = '#dc3545';
+                break;
+            case 'warning':
+                toast.style.background = '#ffc107';
+                toast.style.color = '#000';
+                break;
+            default:
+                toast.style.background = '#17a2b8';
+        }
+        
+        document.body.appendChild(toast);
+        
+        // Mostrar con animación
+        setTimeout(() => toast.style.opacity = '1', 10);
+        
+        // Auto-cerrar después de 3 segundos
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 300);
+        }, 3000);
+        
+        return toast;
     }

@@ -1,14 +1,15 @@
 // === Corte de Caja ===
 
+let idCorteCajaActual = null; // Variable global para almacenar el ID del corte de caja actual
+
 export function inicializarCorteCaja() {
     const cargarBtn = document.getElementById('cargarCajaBtn');
     const toggleCajaBtn = document.getElementById('toggleCajaBtn');
     let cajaAbierta = false;
-    let idCorteCajaActual = null;
 
     // Cargar datos al iniciar o al hacer clic
     if (cargarBtn) {
-        cargarBtn.addEventListener('click', () => cargarDatosCaja());
+        cargarBtn.addEventListener('click', () => obtenerDatosCorteCajaActivo());
     }
 
     // Abrir o cerrar caja
@@ -51,7 +52,8 @@ export function inicializarCorteCaja() {
         const nombreUsuario = sessionStorage.getItem("nombreUsuario");
 
         try {
-            const res = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja/${nombreUsuario}`, {
+            // POST para abrir caja
+            const resPost = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja/${nombreUsuario}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -59,50 +61,50 @@ export function inicializarCorteCaja() {
                 })
             });
 
-            if (!res.ok) throw new Error("No se pudo abrir la caja");
+            if (!resPost.ok) throw new Error("No se pudo abrir la caja");
 
-            const datos = await res.json(); // Aquí se parseará correctamente el JSON
-            idCorteCajaActual = datos.idCorteCaja; // Guardar el ID del nuevo corte
+            const datosPost = await resPost.json();
+            idCorteCajaActual = datosPost.idCorteCaja; // Guardar el ID del nuevo corte
             mostrarAlerta("Caja abierta con éxito");
-            cargarDatosCaja();
+
+            // Obtener datos del corte de caja activo
+            obtenerDatosCorteCajaActivo();
         } catch (err) {
-            console.error("❌ Error al abrir caja:", err.message);
-            mostrarAlerta("Error al abrir caja: " + err.message);
+            console.error("❌ Error:", err.message);
+            mostrarAlerta("Error: " + err.message);
         }
 
         cerrarModalAbrirCaja();
     };
 }
 
-// === GET Corte de Caja Activa ===
-
-async function cargarDatosCaja() {
+// === GET para cargar datos del corte de caja activo ===
+async function obtenerDatosCorteCajaActivo() {
     const idNegocio = sessionStorage.getItem("negocioId");
-    if (!idNegocio) {
-        console.warn("ID de negocio no encontrado en sesión");
-        return;
-    }
 
     try {
-        const res = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja/${idCorteCajaActual}`);
-        if (!res.ok) throw new Error("No hay caja activa");
+        const resGet = await fetch(`http://localhost:8080/negocio/${idNegocio}/corteCaja`);
+        if (!resGet.ok) throw new Error("No hay caja activa");
 
-        const datos = await res.json();
-        console.log("Datos de corte de caja:", datos);
+        const datosGet = await resGet.json();
+        console.log("Datos de corte de caja activo:", datosGet);
 
-        // Extraer datos del JSON
+        // Actualizar la vista con los datos obtenidos
+        cargarDatosCaja(datosGet);
+    } catch (err) {
+        console.error("❌ Error al obtener datos del corte de caja:", err.message);
+        limpiarVistaCaja();
+    }
+}
+
+// === Actualizar la vista con los datos del corte de caja ===
+async function cargarDatosCaja(datos) {
+    try {
         const cantidadInicial = parseFloat(datos.cantidadInicial || 0);
         const totalVentas = parseFloat(datos.totalVentas || 0);
+        const margenGanancias = parseFloat(datos.ganancias || 0);
 
-        // Calcular margen de ganancia si no está en el JSON
-        let margenGanancias = parseFloat(datos.ganancias || 0);
-        if (datos.ventas && datos.ventas.length > 0) {
-            margenGanancias = datos.ventas.reduce((total, venta) => {
-                const margen = venta.precioVenta - venta.costo; // Asegúrate de que el backend envíe estos campos
-                return total + margen;
-            }, 0);
-        }
-
+        // Si no hay ventas, los valores deben ser 0
         const totalEntregar = cantidadInicial + totalVentas;
 
         // Actualizar la vista
@@ -114,7 +116,7 @@ async function cargarDatosCaja() {
         document.getElementById('ganancias').textContent = `$${margenGanancias.toFixed(2)}`;
         document.getElementById('totalEntregar').textContent = `$${totalEntregar.toFixed(2)}`;
     } catch (err) {
-        console.warn("⚠️ No hay caja activa:", err.message);
+        console.warn("⚠️ Error al cargar datos del corte de caja:", err.message);
         limpiarVistaCaja();
     }
 }
