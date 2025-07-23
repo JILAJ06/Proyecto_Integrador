@@ -1302,13 +1302,13 @@ function mostrarVentaExitosa() {
             modalCliente.innerHTML = `
                 <div class="modal-cliente-overlay"></div>
                 <div class="modal-cliente-content">
-                    <h3>Seleccionar o Registrar Cliente</h3>
+                    <h3>Seleccionar Cliente</h3>
                     <div class="modal-cliente-body">
                         <label for="cliente-combobox">Buscar Cliente:</label>
                         <select id="cliente-combobox" class="cliente-combobox">
                             <option value="">Seleccione un cliente...</option>
                         </select>
-                        <button id="btn-registrar-cliente" class="btn-registrar-cliente">Registrar Nuevo Cliente</button>
+                        <button hidden id="btn-registrar-cliente" class="btn-registrar-cliente">Registrar Nuevo Cliente</button>
                     </div>
                     <div class="modal-cliente-actions">
                         <button id="btn-cancelar-cliente" class="btn-cancelar-cliente">Cancelar</button>
