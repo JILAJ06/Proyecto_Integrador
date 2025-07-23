@@ -44,11 +44,11 @@ function verificarSesionExistente() {
 
 // Función principal de autenticación
 async function autenticarUsuario(idNegocio, nombreUsuario, contrasena) {
-    const API_BASE_URL = `http://localhost:8080/negocio/${idNegocio}`;
+    const API_BASE_URL = `http://54.198.31.200:8080/negocio/${idNegocio}`;
     
     try {
         // 1. Verificar que el negocio existe
-        const responseNegocio = await fetch(`http://localhost:8080/negocio/${idNegocio}`);
+        const responseNegocio = await fetch(`http://54.198.31.200:8080/negocio/${idNegocio}`);
         if (!responseNegocio.ok) {
             throw new Error('ID de negocio no válido');
         }
@@ -142,7 +142,7 @@ function obtenerDatosSesion() {
 
 // Función para obtener la URL base de la API
 function obtenerAPIBaseURL() {
-    return sessionStorage.getItem('clink_api_base_url') || 'http://localhost:8080/negocio/1';
+    return sessionStorage.getItem('clink_api_base_url') || 'http://54.198.31.200:8080/negocio/1';
 }
 
 // Función para verificar si el usuario está autenticado
