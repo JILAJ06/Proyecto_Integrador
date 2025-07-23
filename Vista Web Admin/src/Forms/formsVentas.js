@@ -1831,3 +1831,216 @@ function mostrarVentaExitosa() {
         
         return toast;
     }
+
+    // Alertas para el sistema de ventas
+class VentasAlertas {
+    
+    // Alerta para producto agregado exitosamente
+    static productoAgregado(nombreProducto) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Producto agregado!',
+            text: `${nombreProducto} ha sido agregado al carrito`,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Alerta para producto eliminado
+    static productoEliminado(nombreProducto) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Producto eliminado',
+            text: `${nombreProducto} ha sido eliminado del carrito`,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Confirmación antes de eliminar producto
+    static confirmarEliminarProducto() {
+        return Swal.fire({
+            title: '¿Eliminar producto?',
+            text: 'Esta acción eliminará el producto del carrito',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+    }
+
+    // Alerta de carrito vacío
+    static carritoVacio() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Carrito vacío',
+            text: 'Debes agregar al menos un producto antes de proceder al pago',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Confirmación de pago
+    static confirmarPago(total) {
+        return Swal.fire({
+            title: 'Confirmar pago',
+            text: `¿Proceder con el pago de $${total}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Confirmar pago',
+            cancelButtonText: 'Cancelar'
+        });
+    }
+
+    // Pago exitoso
+    static pagoExitoso(idVenta, total) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Pago realizado!',
+            html: `
+                <p>Venta #${idVenta} procesada exitosamente</p>
+                <p><strong>Total: $${total}</strong></p>
+            `,
+            confirmButtonText: 'Nueva venta',
+            confirmButtonColor: '#28a745'
+        });
+    }
+
+    // Error en el pago
+    static errorPago(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en el pago',
+            text: mensaje || 'Ocurrió un error al procesar el pago',
+            confirmButtonText: 'Intentar nuevamente'
+        });
+    }
+
+    // Producto no encontrado
+    static productoNoEncontrado() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Producto no encontrado',
+            text: 'El código del producto no existe en el inventario',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+
+    // Stock insuficiente
+    static stockInsuficiente(nombreProducto, stockDisponible) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Stock insuficiente',
+            text: `${nombreProducto} solo tiene ${stockDisponible} unidades disponibles`,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Cantidad inválida
+    static cantidadInvalida() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cantidad inválida',
+            text: 'La cantidad debe ser mayor a 0',
+            timer: 2500,
+            showConfirmButton: false
+        });
+    }
+
+    // Error de conexión
+    static errorConexion() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo conectar con el servidor. Verifica tu conexión a internet.',
+            confirmButtonText: 'Reintentar'
+        });
+    }
+
+    // Confirmación para limpiar carrito
+    static confirmarLimpiarCarrito() {
+        return Swal.fire({
+            title: '¿Limpiar carrito?',
+            text: 'Esta acción eliminará todos los productos del carrito',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, limpiar',
+            cancelButtonText: 'Cancelar'
+        });
+    }
+
+    // Carrito limpiado
+    static carritoLimpiado() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Carrito limpiado',
+            text: 'Todos los productos han sido eliminados',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+}
+
+// Funciones de ejemplo de uso en el sistema de ventas
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Botón agregar producto
+    const btnAgregar = document.querySelector('.btn-add');
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', function() {
+            // Aquí iría la lógica para agregar producto
+            // Ejemplo de uso:
+            const nombreProducto = 'Producto ejemplo';
+            VentasAlertas.productoAgregado(nombreProducto);
+        });
+    }
+
+    // Botón eliminar producto
+    const btnEliminar = document.querySelector('.btn-remove');
+    if (btnEliminar) {
+        btnEliminar.addEventListener('click', function() {
+            VentasAlertas.confirmarEliminarProducto().then((result) => {
+                if (result.isConfirmed) {
+                    // Lógica para eliminar producto
+                    VentasAlertas.productoEliminado('Producto ejemplo');
+                }
+            });
+        });
+    }
+
+    // Botón pagar
+    const btnPagar = document.querySelector('.btn-pay');
+    if (btnPagar) {
+        btnPagar.addEventListener('click', function() {
+            const total = document.querySelector('.total-amount').textContent;
+            
+            // Verificar si hay productos en el carrito
+            const tbody = document.querySelector('.products-table tbody');
+            if (!tbody || tbody.children.length === 0) {
+                VentasAlertas.carritoVacio();
+                return;
+            }
+
+            VentasAlertas.confirmarPago(total).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí iría la lógica del pago
+                    // Simular pago exitoso
+                    const idVenta = Math.floor(Math.random() * 10000);
+                    VentasAlertas.pagoExitoso(idVenta, total);
+                }
+            });
+        });
+    }
+});
