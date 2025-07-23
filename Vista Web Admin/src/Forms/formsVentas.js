@@ -1471,7 +1471,7 @@ function mostrarVentaExitosa() {
                 throw new Error('ID del negocio no está definido');
             }
             
-            const url = `http://54.198.31.200:8080/negocio/${negocioId}/clientes`;
+            const url = `https://clinkapp.zapto.org:8080/negocio/${negocioId}/clientes`;
             console.log('📡 Haciendo petición a:', url);
             
             const response = await fetch(url);
@@ -1738,7 +1738,7 @@ function mostrarVentaExitosa() {
             
             // PASO 1: Generar el ticket usando POST
             console.log('Paso 1: Generando ticket...');
-            const generarResponse = await fetch(`http://54.198.31.200:8080/negocio/${negocioId}/ticket`, {
+            const generarResponse = await fetch(`https://clinkapp.zapto.org:8080/negocio/${negocioId}/ticket`, {
                 method: 'POST'
             });
 
@@ -1751,7 +1751,7 @@ function mostrarVentaExitosa() {
 
             // PASO 2: Enviar el ticket por SMS usando GET
             console.log('Paso 2: Enviando ticket por SMS al cliente ID:', clienteId);
-            const enviarResponse = await fetch(`http://54.198.31.200:8080/negocio/${negocioId}/ticket/send/${clienteId}`, {
+            const enviarResponse = await fetch(`https://clinkapp.zapto.org:8080/negocio/${negocioId}/ticket/send/${clienteId}`, {
                 method: 'GET'
             });
 
