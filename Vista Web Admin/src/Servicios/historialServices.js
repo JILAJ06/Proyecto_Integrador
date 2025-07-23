@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080"; // Ajusta el puerto o dominio si es necesario
+const BASE_URL = "http://54.198.31.200:8080"; // Ajusta el puerto o dominio si es necesario
 
 function getNegocioId() {
     // Intentar usar la función global primero

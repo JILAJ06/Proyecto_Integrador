@@ -18,7 +18,7 @@ export const VentasServices = {
             throw new Error("No hay sesión activa para iniciar venta");
         }
 
-        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/${this.nombreUsuario}`;
+        const url = `http://54.198.31.200:8080/negocio/${this.idNegocio}/venta/${this.nombreUsuario}`;
         const res = await fetch(url, { method: "POST" });
 
         if (!res.ok) {
@@ -37,7 +37,7 @@ export const VentasServices = {
 
     async consultarProductoPorCodigo(codigoProducto) {
         try {
-            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
+            const url = `http://54.198.31.200:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
             const res = await fetch(url);
             console.log(res);
 
@@ -54,7 +54,7 @@ export const VentasServices = {
 
     async guardarDetallesVenta(listaDetalles) {
         try {
-            const url = `http://localhost:8080/negocio/venta/detalles`;
+            const url = `http://54.198.31.200:8080/negocio/venta/detalles`;
             const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -81,7 +81,7 @@ export const VentasServices = {
 
     async cancelarVenta() {
         try {
-            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta`;
+            const url = `http://54.198.31.200:8080/negocio/${this.idNegocio}/venta`;
             const res = await fetch(url, { method: "DELETE" });
 
             if (!res.ok) {
@@ -97,7 +97,7 @@ export const VentasServices = {
 
     async obtenerTotalVenta() {
         try {
-            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/total`;
+            const url = `http://54.198.31.200:8080/negocio/${this.idNegocio}/venta/total`;
             const res = await fetch(url);
 
             if (!res.ok) {
