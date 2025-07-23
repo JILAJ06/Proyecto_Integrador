@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             
             <div class="form-group">
-              <label>Escriba el envase</label>
+              <label>Escriba la presentación del producto</label>
               <div class="combobox-container" id="envase-container"></div>
             </div>
           </div>
@@ -187,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="form-group">
               <label>Medida</label>
               <div class="medida-container">
-                <input type="text" value="Medida" readonly class="medida-label">
                 <div class="dropdown-field">
                   <select id="medida" name="medida" required>
                     <option value="ml">ml</option>
@@ -297,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             
             <div class="form-group">
-              <label>Envase</label>
+              <label>Escriba la presentación del producto</label>
               <div class="combobox-container" id="edit-envase-container"></div>
             </div>
           </div>
@@ -311,7 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="form-group">
               <label>Medida</label>
               <div class="medida-container">
-                <input type="text" value="Medida" readonly class="medida-label">
                 <div class="dropdown-field">
                   <select id="edit-medida" name="medida" required>
                     <option value="ml">ml</option>
