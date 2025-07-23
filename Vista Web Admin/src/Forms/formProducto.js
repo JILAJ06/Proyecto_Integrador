@@ -24,7 +24,369 @@ document.addEventListener("DOMContentLoaded", () => {
     return resultado;
   }
 
-  // Crear combobox con autocompletado
+  // NUEVAS OPCIONES PREDETERMINADAS
+  const CATEGORIAS_PREDETERMINADAS = [
+    'Frutas y Verduras',
+    'Embutidos',
+    'Carnes rojas',
+    'Carnes blancas',
+    'Pescadería',
+    'Lácteos',
+    'Panadería',
+    'Repostería',
+    'Alimentos Congelados',
+    'Legumbres',
+    'Harinas y levaduras',
+    'Despensa Básica',
+    'Conservas y Enlatados',
+    'Frituras',
+    'Bebidas',
+    'Higiene',
+    'Hogar',
+    'Bebés',
+    'Limpieza',
+    'Cuidado Femenino y Adultos Mayores',
+    'Electrónica',
+    'Farmacia y Salud'
+  ];
+
+  const ENVASES_PREDETERMINADOS = [
+    'Bolsa (plástico, papel, aluminio)',
+    'Caja',
+    'Lata',
+    'Frasco de vidrio',
+    'Botella de plástico',
+    'Tetra Pak',
+    'Bolsa sellada al vacío',
+    'Botella de vidrio',
+    'Lata de aluminio'
+  ];
+
+  // Función para combinar opciones predeterminadas con datos del servidor
+  function combinarOpciones(opcionesPredeterminadas, datosServidor) {
+    console.log('Combinando opciones:', { opcionesPredeterminadas, datosServidor });
+    
+    // Crear un Set para evitar duplicados (ignorando mayúsculas/minúsculas)
+    const opcionesUnicas = new Set();
+    const resultado = [];
+    
+    // Agregar opciones predeterminadas primero
+    opcionesPredeterminadas.forEach(opcion => {
+      const opcionLower = opcion.toLowerCase().trim();
+      if (!opcionesUnicas.has(opcionLower)) {
+        opcionesUnicas.add(opcionLower);
+        resultado.push(opcion);
+      }
+    });
+    
+    // Agregar opciones del servidor que no estén duplicadas
+    if (Array.isArray(datosServidor)) {
+      datosServidor.forEach(opcion => {
+        if (opcion && typeof opcion === 'string') {
+          const opcionLower = opcion.toLowerCase().trim();
+          if (!opcionesUnicas.has(opcionLower) && opcion.trim() !== '') {
+            opcionesUnicas.add(opcionLower);
+            resultado.push(opcion.trim());
+          }
+        }
+      });
+    }
+    
+    console.log('Opciones combinadas:', resultado);
+    return resultado;
+  }
+
+  // Agregar estilos CSS mejorados para los comboboxes
+  if (!document.getElementById('combobox-styles')) {
+    const comboboxStyle = document.createElement('style');
+    comboboxStyle.id = 'combobox-styles';
+    comboboxStyle.textContent = `
+      /* Contenedor principal del combobox */
+      .combobox-container {
+        position: relative;
+        width: 100%;
+      }
+
+      /* Input del combobox */
+      .combobox-input {
+        width: 100%;
+        padding: 12px 40px 12px 15px;
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        color: #333;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        cursor: text;
+        position: relative;
+        z-index: 1;
+      }
+
+      .combobox-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        background: #fafafa;
+      }
+
+      .combobox-input::placeholder {
+        color: #999;
+        font-style: italic;
+      }
+
+      /* Icono de dropdown */
+      .combobox-container::after {
+        content: '▼';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 2;
+        transition: transform 0.3s ease;
+      }
+
+      .combobox-container.active::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+
+      /* Dropdown del combobox */
+      .combobox-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #007bff;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-height: 200px;
+        overflow: hidden;
+        animation: slideDown 0.2s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Contenedor de opciones con scroll */
+      .combobox-options {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      /* Estilos del scrollbar */
+      .combobox-options::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .combobox-options::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .combobox-options::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      .combobox-options::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+
+      /* Opciones individuales */
+      .combobox-option {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+      }
+
+      .combobox-option:last-child {
+        border-bottom: none;
+      }
+
+      .combobox-option:hover {
+        background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+        color: #1976d2;
+        transform: translateX(2px);
+      }
+
+      .combobox-option:active {
+        background: linear-gradient(135deg, #bbdefb, #e3f2fd);
+        transform: translateX(0px);
+      }
+
+      /* Opción para crear nueva */
+      .combobox-option.nueva-opcion {
+        background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+        border-left: 4px solid #4caf50;
+        color: #2e7d32;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .combobox-option.nueva-opcion:hover {
+        background: linear-gradient(135deg, #c8e6c9, #dcedc8);
+        color: #1b5e20;
+        transform: translateX(4px);
+      }
+
+      .combobox-option.nueva-opcion i {
+        color: #4caf50;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      /* Estados especiales */
+      .combobox-option.destacado {
+        background: linear-gradient(135deg, #fff3e0, #ffecd1);
+        border-left: 3px solid #ff9800;
+        font-weight: 500;
+      }
+
+      .combobox-option.destacado:hover {
+        background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+      }
+
+      /* Mensaje cuando no hay opciones */
+      .combobox-no-options {
+        padding: 20px 15px;
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        background: #fafafa;
+      }
+
+      /* Separadores de categorías */
+      .combobox-separator {
+        padding: 6px 15px;
+        background: #f8f9fa;
+        color: #6c757d;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #dee2e6;
+        cursor: default;
+      }
+
+      /* Animación de carga */
+      .combobox-loading {
+        padding: 15px;
+        text-align: center;
+        color: #007bff;
+        font-style: italic;
+      }
+
+      .combobox-loading::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #007bff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Resaltado de texto buscado */
+      .combobox-option .highlight {
+        background: #ffeb3b;
+        font-weight: bold;
+        padding: 1px 2px;
+        border-radius: 2px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .combobox-dropdown {
+          max-height: 150px;
+        }
+        
+        .combobox-option {
+          padding: 14px 15px;
+          font-size: 16px; /* Mejor para móviles */
+        }
+        
+        .combobox-input {
+          padding: 14px 40px 14px 15px;
+          font-size: 16px; /* Evita zoom en iOS */
+        }
+      }
+
+      /* Modo oscuro (opcional) */
+      @media (prefers-color-scheme: dark) {
+        .combobox-input {
+          background: #2d2d2d;
+          color: #ffffff;
+          border-color: #555;
+        }
+        
+        .combobox-dropdown {
+          background: #2d2d2d;
+          border-color: #555;
+        }
+        
+        .combobox-option {
+          background: #2d2d2d;
+          color: #ffffff;
+          border-bottom-color: #555;
+        }
+        
+        .combobox-option:hover {
+          background: #3d3d3d;
+        }
+      }
+
+      /* Estados de validación */
+      .combobox-container.error .combobox-input {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+      }
+
+      .combobox-container.success .combobox-input {
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+      }
+
+      /* Transiciones suaves para todos los elementos */
+      .combobox-container * {
+        transition: all 0.2s ease;
+      }
+    `;
+    document.head.appendChild(comboboxStyle);
+  }
+
+  // Función para crear combobox con autocompletado
   function crearComboboxAutocompletado(inputId, containerId, opciones = [], placeholder = "") {
     const container = document.getElementById(containerId);
     if (!container) {
@@ -35,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Limpiar contenedor
     container.innerHTML = '';
 
-    // Crear estructura del combobox
+    // Crear estructura del combobox con mejores clases
     const comboboxHTML = `
       <input type="text" 
              id="${inputId}" 
@@ -50,6 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     container.innerHTML = comboboxHTML;
+    container.classList.add('combobox-container'); // Agregar clase
 
     const input = document.getElementById(inputId);
     const dropdown = document.getElementById(`${inputId}-dropdown`);
@@ -969,7 +1332,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
   }
 
-  // Función para abrir modal de agregar producto con comboboxes
+  // Función para abrir modal de agregar producto con comboboxes (MODIFICADA)
   async function abrirModalProducto() {
     console.log("Abriendo modal de producto...");
     
@@ -986,27 +1349,32 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       console.log("Cargando datos para comboboxes...");
       
-      // Verificar que las funciones estén disponibles
-      if (!window.getCategorias || !window.getMarcas || !window.getEnvases) {
-        console.error('Funciones de servicio no disponibles');
-        throw new Error('Servicios no disponibles');
-      }
+      // Obtener datos de la base de datos (con manejo de errores)
+      let categoriasServidor = [];
+      let marcasServidor = [];
+      let envasesServidor = [];
       
-      // Obtener datos de la base de datos
-      const [categorias, marcas, envases] = await Promise.all([
-        window.getCategorias(),
-        window.getMarcas(),
-        window.getEnvases()
-      ]);
+      try {
+        if (window.getCategorias) categoriasServidor = await window.getCategorias();
+        if (window.getMarcas) marcasServidor = await window.getMarcas();
+        if (window.getEnvases) envasesServidor = await window.getEnvases();
+      } catch (error) {
+        console.warn('Error obteniendo datos del servidor, usando solo opciones predeterminadas:', error);
+      }
 
-      console.log('Datos obtenidos:', { categorias, marcas, envases });
+      console.log('Datos obtenidos del servidor:', { categoriasServidor, marcasServidor, envasesServidor });
 
-      // Procesar datos para extraer solo los nombres
-      const categoriasArray = procesarDatosCombobox(categorias);
-      const marcasArray = procesarDatosCombobox(marcas);
-      const envasesArray = procesarDatosCombobox(envases);
+      // Procesar datos del servidor
+      const categoriasDelServidor = procesarDatosCombobox(categoriasServidor);
+      const marcasDelServidor = procesarDatosCombobox(marcasServidor);
+      const envasesDelServidor = procesarDatosCombobox(envasesServidor);
 
-      console.log('Datos procesados:', { categoriasArray, marcasArray, envasesArray });
+      // Combinar opciones predeterminadas con datos del servidor
+      const categoriasFinales = combinarOpciones(CATEGORIAS_PREDETERMINADAS, categoriasDelServidor);
+      const marcasFinales = marcasDelServidor; // Solo del servidor para marcas
+      const envasesFinales = combinarOpciones(ENVASES_PREDETERMINADOS, envasesDelServidor);
+
+      console.log('Opciones finales:', { categoriasFinales, marcasFinales, envasesFinales });
 
       // Verificar que los contenedores existan
       const categoriaContainer = document.getElementById('categoria-container');
@@ -1018,21 +1386,21 @@ document.addEventListener('DOMContentLoaded', function() {
         throw new Error('Contenedores de combobox no encontrados');
       }
 
-      // Crear comboboxes con autocompletado
-      crearComboboxAutocompletado('categoria-producto', 'categoria-container', categoriasArray, 'Buscar o crear categoría...');
-      crearComboboxAutocompletado('marca-producto', 'marca-container', marcasArray, 'Buscar o crear marca...');
-      crearComboboxAutocompletado('envase-producto', 'envase-container', envasesArray, 'Buscar o crear envase...');
+      // Crear comboboxes con autocompletado y opciones predeterminadas
+      crearComboboxAutocompletado('categoria-producto', 'categoria-container', categoriasFinales, 'Buscar o crear categoría...');
+      crearComboboxAutocompletado('marca-producto', 'marca-container', marcasFinales, 'Buscar o crear marca...');
+      crearComboboxAutocompletado('envase-producto', 'envase-container', envasesFinales, 'Buscar o crear envase...');
 
-      console.log('Comboboxes creados exitosamente');
+      console.log('Comboboxes creados exitosamente con opciones predeterminadas');
 
     } catch (error) {
       console.error('Error cargando datos para comboboxes:', error);
       
-      // Crear comboboxes vacíos en caso de error pero que permitan escribir
+      // Crear comboboxes con solo opciones predeterminadas en caso de error
       setTimeout(() => {
-        crearComboboxAutocompletado('categoria-producto', 'categoria-container', [], 'Escribir categoría...');
+        crearComboboxAutocompletado('categoria-producto', 'categoria-container', CATEGORIAS_PREDETERMINADAS, 'Buscar o crear categoría...');
         crearComboboxAutocompletado('marca-producto', 'marca-container', [], 'Escribir marca...');
-        crearComboboxAutocompletado('envase-producto', 'envase-container', [], 'Escribir envase...');
+        crearComboboxAutocompletado('envase-producto', 'envase-container', ENVASES_PREDETERMINADOS, 'Buscar o crear envase...');
       }, 50);
     }
     
@@ -1104,7 +1472,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Función para abrir modal de editar producto con comboboxes
+  // Función para abrir modal de editar producto con comboboxes (MODIFICADA)
   async function abrirModalEditar() {
     if (!filaSeleccionada) {
       mostrarAlertaVisual('Por favor selecciona un producto para editar');
@@ -1139,22 +1507,33 @@ document.addEventListener('DOMContentLoaded', function() {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
-      // Obtener datos de la base de datos
-      const [categorias, marcas, envases] = await Promise.all([
-        window.getCategorias ? window.getCategorias() : [],
-        window.getMarcas ? window.getMarcas() : [],
-        window.getEnvases ? window.getEnvases() : []
-      ]);
+      // Obtener datos de la base de datos (con manejo de errores)
+      let categoriasServidor = [];
+      let marcasServidor = [];
+      let envasesServidor = [];
+      
+      try {
+        if (window.getCategorias) categoriasServidor = await window.getCategorias();
+        if (window.getMarcas) marcasServidor = await window.getMarcas();
+        if (window.getEnvases) envasesServidor = await window.getEnvases();
+      } catch (error) {
+        console.warn('Error obteniendo datos del servidor para edición, usando solo opciones predeterminadas:', error);
+      }
 
-      // Procesar datos para extraer solo los nombres
-      const categoriasArray = procesarDatosCombobox(categorias);
-      const marcasArray = procesarDatosCombobox(marcas);
-      const envasesArray = procesarDatosCombobox(envases);
+      // Procesar datos del servidor
+      const categoriasDelServidor = procesarDatosCombobox(categoriasServidor);
+      const marcasDelServidor = procesarDatosCombobox(marcasServidor);
+      const envasesDelServidor = procesarDatosCombobox(envasesServidor);
 
-      // Crear comboboxes con autocompletado
-      const categoriaCombo = crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', categoriasArray, 'Buscar o crear categoría...');
-      const marcaCombo = crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', marcasArray, 'Buscar o crear marca...');
-      const envaseCombo = crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', envasesArray, 'Buscar o crear envase...');
+      // Combinar opciones predeterminadas con datos del servidor
+      const categoriasFinales = combinarOpciones(CATEGORIAS_PREDETERMINADAS, categoriasDelServidor);
+      const marcasFinales = marcasDelServidor; // Solo del servidor para marcas
+      const envasesFinales = combinarOpciones(ENVASES_PREDETERMINADOS, envasesDelServidor);
+
+      // Crear comboboxes con autocompletado y opciones predeterminadas
+      const categoriaCombo = crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', categoriasFinales, 'Buscar o crear categoría...');
+      const marcaCombo = crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', marcasFinales, 'Buscar o crear marca...');
+      const envaseCombo = crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', envasesFinales, 'Buscar o crear envase...');
 
       // Prellenar campos después de crear los comboboxes
       setTimeout(() => {
@@ -1193,15 +1572,15 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        console.log('Campos prellenados correctamente');
+        console.log('Campos prellenados correctamente con opciones predeterminadas');
       }, 100);
 
     } catch (error) {
       console.error('Error cargando datos para comboboxes:', error);
-      // Crear comboboxes vacíos en caso de error
-      crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', [], 'Escribir categoría...');
+      // Crear comboboxes con solo opciones predeterminadas en caso de error
+      crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', CATEGORIAS_PREDETERMINADAS, 'Buscar o crear categoría...');
       crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', [], 'Escribir marca...');
-      crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', [], 'Escribir envase...');
+      crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', ENVASES_PREDETERMINADOS, 'Buscar o crear envase...');
     }
 
     // Configurar eventos del modal
