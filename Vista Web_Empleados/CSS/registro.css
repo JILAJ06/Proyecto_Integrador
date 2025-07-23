@@ -1,4 +1,4 @@
-        body {
+body {
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
@@ -96,3 +96,30 @@
                 margin-top: 30px;
             }
         }
+        .mensaje {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    display: none;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.mensaje.success {
+    background-color: #d4edda;
+    border: 2px solid #c3e6cb;
+    color: #155724;
+}
+
+.mensaje.error {
+    background-color: #f8d7da;
+    border: 2px solid #f5c6cb;
+    color: #721c24;
+}
+
+.mensaje.info {
+    background-color: #d1ecf1;
+    border: 2px solid #bee5eb;
+    color: #0c5460;
+}
