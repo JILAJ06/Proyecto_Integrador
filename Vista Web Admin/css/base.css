@@ -217,38 +217,71 @@ body.sidebar-expanded .sidebar {
 /* Sección inferior - Logout */
 .nav-section-bottom {
     margin-top: auto;
-    padding: 1rem 0;
+    padding: 0.5rem;
     display: flex;
     justify-content: center;
 }
 
 .logout-btn {
-    width: 50px;
-    height: 50px;
-    background-color: #D8D8C0;
-    border: none;
-    border-radius: 12px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    justify-content: center; /* Centrar por defecto */
+    padding: 0.6rem;
+    background-color: #D8D8C0;
+    color: #2c2c2c;
+    text-decoration: none;
+    border: none;
+    border-radius: 25px;
     transition: all 0.3s ease;
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-family: 'konkhmer sleokchher', sans-serif;
+    white-space: nowrap;
     position: relative;
-    flex-shrink: 0;
+    min-height: 52px; /* Altura mínima consistente */
+    width: 52px; /* Ancho por defecto colapsado */
+    cursor: pointer;
+}
+
+/* Cuando está expandida, alinear a la izquierda con padding normal */
+.sidebar:hover .logout-btn {
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+    width: auto; /* Permitir que se expanda */
+    min-width: 100%; /* Ocupar todo el ancho disponible */
+}
+
+.logout-btn span {
+    font-family: 'Konkhmer Sleokchher', sans-serif;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s;
+    margin-left: 0.75rem;
+}
+
+.sidebar:hover .logout-btn span {
+    opacity: 1;
 }
 
 .logout-btn:hover {
-    background-color: white;
-    transform: scale(1.05);
+    background-color: rgba(255,255,255,1);
+    transform: translateX(5px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .logout-btn i {
-    font-size: 1.2rem;
+    width: 24px;
+    height: 24px;
+    font-size: 18px; /* Aumentar el tamaño del icono */
     color: #2c2c2c;
+    min-width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Evita que el icono se encoja */
 }
 
-/* Tooltip para el botón de logout */
+/* Tooltips para cuando está colapsado */
 .logout-btn::after {
     content: attr(title);
     position: absolute;
@@ -281,13 +314,26 @@ body.sidebar-expanded .sidebar {
     transition: all 0.3s ease;
     margin-left: 5px;
     z-index: 1001;
-    
 }
 
 .sidebar:not(:hover) .logout-btn:hover::after,
 .sidebar:not(:hover) .logout-btn:hover::before {
     opacity: 1;
     visibility: visible;
+}
+
+/* Estado colapsado: círculo con icono centrado */
+.sidebar:not(:hover) .logout-btn {
+    width: 52px;           /* igual al min-height para cuadrado */
+    height: 52px;          /* igual al min-height para cuadrado */
+    padding: 0;            /* sin padding extra */
+    border-radius: 50%;    /* círculo perfecto */
+    overflow: hidden;      /* oculta cualquier texto que sobre */
+}
+
+/* Esconde el texto en collapsado */
+.sidebar:not(:hover) .logout-btn span {
+    display: none;
 }
 
 /* Main Content */
@@ -424,7 +470,3 @@ body.sidebar-expanded .sidebar {
 .logo span {
   transition: all 0.5s ease;
 }
-
-
-
-
