@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
     <link rel="stylesheet" href="/Vista Web Admin/css/productos.css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 para las alertas -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Clink - Productos</title>
 </head>
 <body>
@@ -13,16 +15,11 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <i class="fas fa-cube"></i>
+                <img src="/Vista Web Admin/img/caja-logo.jpg" alt="Logo Clink" class="logo-img">
                 <span>CLINK</span>
             </div>
-            
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item active" data-tooltip="Inicio">
-                        <i class="fas fa-home"></i>
-                        <span>Inicio</span>
-                    </a>
                     <a href="ventas.html" class="nav-item" data-tooltip="Venta">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
@@ -30,13 +27,13 @@
 
                     <div class="nav-divider"></div>
 
-                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Inventario</span>
-                    </a>
                     <a href="productos.html" class="nav-item" data-tooltip="Productos">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
+                    </a>
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
                     </a>
                     <a href="clientes.html" class="nav-item" data-tooltip="Clientes">
                         <i class="fas fa-users"></i>
@@ -68,6 +65,7 @@
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </nav>
