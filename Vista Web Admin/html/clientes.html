@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Vista Web Admin/css/clientes.css">
-    <link rel="stylesheet" href="/Vista Web Admin/css/base.css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/clientes.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
-    <script src="clientes.js"></script>
-    <script src="/Vista Web Admin/script.js"></script>
     <title>Clink - Clientes</title>
 </head>
 <body>
@@ -16,16 +14,12 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <i class="fas fa-cube"></i>
+                <img src="/Vista Web Admin/img/caja-logo.jpg" alt="Logo Clink" class="logo-img">
                 <span>CLINK</span>
             </div>
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item " data-tooltip="Inicio">
-                        <i class="fas fa-home"></i>
-                        <span>Inicio</span>
-                    </a>
                     <a href="ventas.html" class="nav-item" data-tooltip="Venta">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
@@ -33,13 +27,13 @@
 
                     <div class="nav-divider"></div>
 
-                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Inventario</span>
-                    </a>
                     <a href="productos.html" class="nav-item" data-tooltip="Productos">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
+                    </a>
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
                     </a>
                     <a href="clientes.html" class="nav-item active" data-tooltip="Clientes">
                         <i class="fas fa-users"></i>
@@ -67,18 +61,19 @@
                     </a>
                 </div>
 
-
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </nav>
         </aside>
-         <main class="main-content">
+        
+        <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </div>
                 <div class="header-right">
@@ -88,8 +83,9 @@
                     </div>
                 </div>
             </header>
-        <div class="clientes-container">
-             <!-- Botón de agregar -->
+            
+            <div class="clientes-container">
+                <!-- Botón de agregar -->
                 <div class="action-buttons">
                     <button class="btn-action btn-add">
                         <i class="fas fa-plus"></i>
@@ -115,9 +111,16 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
             </div>
-            <script src="/Vista Web Admin/src/Forms/FormClientes.js"></script>
+        </main>
+    </div>
+
+    <!-- Scripts al final del body -->
+    <!-- IMPORTANTE: Cargar primero el script de sesión -->
+    <script src="/Vista Web Admin/script.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Forms/FormClientes.js"></script>
 </body>
 </html>
