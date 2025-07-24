@@ -46,7 +46,7 @@ export async function getEmpleados() {
         }
     } catch (error) {
         console.error('Error fetching empleados:', error);
-        mostrarError('Error al cargar los empleados');
+        window.mostrarAlertaGlobal('Error al cargar los empleados', 'error');
     }
 }
 
@@ -125,12 +125,12 @@ export async function postEmpleado(datos) {
         
         console.log('Empleado creado:', resultado);
         await getEmpleados();
-        mostrarExito('Empleado creado exitosamente');
+        window.mostrarAlertaGlobal('Empleado creado exitosamente', 'success');
         return resultado;
         
     } catch (error) {
         console.error('Error posting empleado:', error);
-        mostrarError('Error al crear el empleado: ' + error.message);
+        window.mostrarAlertaGlobal('Error al crear el empleado: ' + error.message, 'error');
         throw error;
     }
 }
@@ -183,12 +183,12 @@ export async function putEmpleado(nombre, datos) {
         
         console.log('Empleado actualizado:', resultado);
         await getEmpleados();
-        mostrarExito('Empleado actualizado exitosamente');
+        window.mostrarAlertaGlobal('Empleado actualizado exitosamente', 'success');
         
         return resultado;
     } catch (error) {
         console.error('Error updating empleado:', error);
-        mostrarError('Error al actualizar el empleado: ' + error.message);
+        window.mostrarAlertaGlobal('Error al actualizar el empleado: ' + error.message, 'error');
         throw error;
     }
 }
@@ -213,71 +213,10 @@ export async function deleteEmpleado(nombre) {
         return { message: 'Empleado eliminado exitosamente' };
     } catch (error) {
         console.error('Error deleting empleado:', error);
-        mostrarError('Error al eliminar el empleado');
+        window.mostrarAlertaGlobal('Error al eliminar el empleado', 'error');
         throw error;
     }
 }
 
-// Función para mostrar mensajes de éxito
-function mostrarExito(mensaje) {
-    let snackbar = document.getElementById('snackbar-empleados');
-    if (!snackbar) {
-        snackbar = document.createElement('div');
-        snackbar.id = 'snackbar-empleados';
-        snackbar.className = 'snackbar-empleados';
-        snackbar.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 16px;
-            border-radius: 4px;
-            z-index: 9999;
-            max-width: 300px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: none;
-        `;
-        document.body.appendChild(snackbar);
-    }
-    
-    snackbar.style.background = '#4caf50';
-    snackbar.textContent = mensaje;
-    snackbar.style.display = 'block';
-    
-    setTimeout(() => {
-        snackbar.style.display = 'none';
-    }, 4000);
-}
 
 // Función auxiliar para mostrar errores (actualizada)
-function mostrarError(mensaje) {
-    let snackbar = document.getElementById('snackbar-empleados');
-    if (!snackbar) {
-        snackbar = document.createElement('div');
-        snackbar.id = 'snackbar-empleados';
-        snackbar.className = 'snackbar-empleados';
-        snackbar.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #f44336;
-            color: white;
-            padding: 16px;
-            border-radius: 4px;
-            z-index: 9999;
-            max-width: 300px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: none;
-        `;
-        document.body.appendChild(snackbar);
-    }
-    
-    snackbar.style.background = '#f44336';
-    snackbar.textContent = mensaje;
-    snackbar.style.display = 'block';
-    
-    setTimeout(() => {
-        snackbar.style.display = 'none';
-    }, 4000);
-}
