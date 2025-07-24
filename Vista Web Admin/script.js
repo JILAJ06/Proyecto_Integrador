@@ -1,3 +1,24 @@
+// Desactivar todas las alertas globalmente
+window.alert = function() {};
+window.confirm = function() { return true; };
+window.prompt = function(message, defaultValue) { return defaultValue || ''; };
+
+// Desactivar console errors y warnings si es necesario
+// window.console.error = function() {};
+// window.console.warn = function() {};
+
+// Si existe SweetAlert2, desactivarlo
+if (typeof Swal !== 'undefined') {
+    window.Swal = {
+        fire: function() { return Promise.resolve({ isConfirmed: true, value: '' }); },
+        close: function() {},
+        isVisible: function() { return false; },
+        mixin: function() { return this; },
+        showLoading: function() {},
+        hideLoading: function() {}
+    };
+}
+
 // Alerta visual global reutilizable (estilo historial)
 function mostrarAlertaVisual(mensaje) {
     if (document.getElementById('alerta-descarga')) return;
@@ -38,6 +59,18 @@ function mostrarAlertaVisual(mensaje) {
         setTimeout(() => alerta.remove(), 400);
     }, 2600);
 }
+
+// Importar sistemas unificados
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar sistemas de alertas y modales
+    const alertasScript = document.createElement('script');
+    alertasScript.src = '/Vista Web Admin/src/Servicios/alertasGlobales.js';
+    document.head.appendChild(alertasScript);
+
+    const modalesScript = document.createElement('script');
+    modalesScript.src = '/Vista Web Admin/src/Servicios/modalesGlobales.js';
+    document.head.appendChild(modalesScript);
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar autenticación al cargar la página
@@ -100,6 +133,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== FUNCIONES DE SESIÓN AÑADIDAS =====
 
+function obtenerDatosSesion() {
+  // Buscar en ambas variantes por compatibilidad
+  let sesionActiva = sessionStorage.getItem('clink_session_activa') || 
+                     sessionStorage.getItem('clink_sesion_activa');
+  return sesionActiva ? JSON.parse(sesionActiva) : null;
+}
+
+// Función para configurar el botón de cerrar sesión
+function configurarBotonCerrarSesion() {
+  const botonCerrarSesion = document.querySelector('.logout-btn');
+  
+  if (botonCerrarSesion) {
+    botonCerrarSesion.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Mostrar confirmación antes de cerrar sesión
+      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        cerrarSesion();
+      }
+    });
+    
+    console.log('✅ Botón de cerrar sesión configurado');
+  } else {
+    console.warn('⚠️ No se encontró botón de cerrar sesión');
+  }
+}
+
 // Función para verificar autenticación en páginas protegidas
 function verificarAutenticacionYRol() {
   const sesion = obtenerDatosSesion();
@@ -110,23 +170,43 @@ function verificarAutenticacionYRol() {
     return;
   }
   
-  // Verificar si el usuario tiene permisos de admin
-  if (sesion.rol.toLowerCase() !== 'admin' && sesion.rol.toLowerCase() !== 'administrador') {
-    alert('No tienes permisos para acceder a esta sección');
-    window.location.href = '/Vista Web_Empleados/HTML/Index_Empleados.html';
-    return;
-  }
-  
   // Mostrar información del usuario en la interfaz
   mostrarInfoUsuario(sesion);
+  
+  // Guardar datos en el formato que espera inventarioServices
+  guardarDatosParaInventario(sesion);
+  
+  // Configurar botón de cerrar sesión
+  configurarBotonCerrarSesion();
+}
+
+// Nueva función para guardar los datos en el formato correcto para el inventario
+function guardarDatosParaInventario(sesion) {
+  try {
+    // Extraer datos de la sesión
+    const nombreUsuario = sesion.nombreusuario || sesion.nombreUsuario || sesion.usuario || 'admin';
+    const negocioId = sesion.negocioid || sesion.idNegocio || sesion.id_negocio || '1';
+    
+    // Guardar en las claves que espera inventarioServices
+    sessionStorage.setItem('nombreUsuario', nombreUsuario);
+    sessionStorage.setItem('negocioId', negocioId);
+    
+    console.log('💾 Datos guardados para inventario:');
+    console.log('- nombreUsuario:', nombreUsuario);
+    console.log('- negocioId:', negocioId);
+    
+  } catch (error) {
+    console.error('❌ Error al guardar datos para inventario:', error);
+  }
 }
 
 function mostrarInfoUsuario(sesion) {
   // Actualizar información de sesión en el header
   const sessionInfo = document.querySelector('.session-info');
   if (sessionInfo) {
-    // CAMBIO: Mostrar nombre de usuario en lugar de "Sesión X"
-    sessionInfo.innerHTML = `${sesion.nombreUsuario}<br>${sesion.rol}`;
+    const nombreUsuario = sesion.nombreusuario || sesion.nombreUsuario || sesion.usuario || 'Usuario';
+    const rol = sesion.rol || 'Admin';
+    sessionInfo.innerHTML = `${nombreUsuario}<br>${rol}`;
   }
   
   // Buscar elementos donde mostrar info del usuario
@@ -136,193 +216,32 @@ function mostrarInfoUsuario(sesion) {
     const info = elemento.getAttribute('data-usuario-info');
     switch(info) {
       case 'nombre':
-        elemento.textContent = sesion.nombreUsuario;
+        elemento.textContent = sesion.nombreusuario || sesion.nombreUsuario || sesion.usuario || 'Usuario';
         break;
       case 'rol':
-        elemento.textContent = sesion.rol;
+        elemento.textContent = sesion.rol || 'Admin';
         break;
       case 'negocio':
-        elemento.textContent = `Negocio #${sesion.idNegocio}`;
+        const negocioId = sesion.negocioid || sesion.idNegocio || sesion.id_negocio || '1';
+        elemento.textContent = `Negocio #${negocioId}`;
         break;
     }
   });
-}
-
-function obtenerDatosSesion() {
-  const sesionActiva = sessionStorage.getItem('clink_sesion_activa');
-  return sesionActiva ? JSON.parse(sesionActiva) : null;
-}
-
-// Función para configurar el botón de cerrar sesión
-function configurarBotonCerrarSesion() {
-  // Buscar el botón de cerrar sesión
-  const btnCerrarSesion = document.querySelector('.logout-btn');
-  
-  console.log('Botón de cerrar sesión encontrado:', btnCerrarSesion);
-
-  if (btnCerrarSesion) {
-    // Remover cualquier href existente para evitar navegación
-    if (btnCerrarSesion.tagName === 'A') {
-      btnCerrarSesion.removeAttribute('href');
-      btnCerrarSesion.style.cursor = 'pointer';
-    }
-
-    btnCerrarSesion.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      console.log('Botón de cerrar sesión clickeado');
-      
-      // Mostrar modal de confirmación
-      mostrarModalConfirmacion();
-    });
-  } else {
-    console.warn('No se encontró el botón de cerrar sesión en el sidebar');
-    
-    // Búsqueda alternativa
-    const sidebarLinks = document.querySelectorAll('.sidebar a, .sidebar button');
-    sidebarLinks.forEach((link) => {
-      const texto = link.textContent.toLowerCase();
-      if (texto.includes('cerrar') || texto.includes('salir') || texto.includes('logout')) {
-        console.log('Botón de logout encontrado manualmente:', link);
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          mostrarModalConfirmacion();
-        });
-      }
-    });
-  }
-}
-
-// Modal de confirmación para cerrar sesión
-function mostrarModalConfirmacion() {
-  // Crear modal si no existe
-  let modal = document.getElementById('modal-logout-confirmacion');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'modal-logout-confirmacion';
-    modal.innerHTML = `
-      <div class="modal-logout-overlay"></div>
-      <div class="modal-logout-content">
-        <div class="modal-logout-icon">🚪</div>
-        <div class="modal-logout-title">¿Cerrar sesión?</div>
-        <div class="modal-logout-message">¿Estás seguro que deseas cerrar sesión?</div>
-        <div class="modal-logout-actions">
-          <button class="modal-logout-btn-confirmar">Sí, cerrar sesión</button>
-          <button class="modal-logout-btn-cancelar">Cancelar</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Estilos del modal
-    if (!document.getElementById('modal-logout-styles')) {
-      const style = document.createElement('style');
-      style.id = 'modal-logout-styles';
-      style.textContent = `
-        #modal-logout-confirmacion {
-          display: none;
-          position: fixed;
-          z-index: 5000;
-          left: 0; top: 0; width: 100vw; height: 100vh;
-          align-items: center; justify-content: center;
-          backdrop-filter: blur(2px);
-        }
-        #modal-logout-confirmacion .modal-logout-overlay {
-          position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-          background: rgba(0,0,0,0.5);
-        }
-        #modal-logout-confirmacion .modal-logout-content {
-          position: relative;
-          background: #fff;
-          border-radius: 16px;
-          padding: 32px 24px;
-          min-width: 320px;
-          max-width: 400px;
-          text-align: center;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-          animation: modalSlideIn 0.3s ease-out;
-        }
-        @keyframes modalSlideIn {
-          from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        #modal-logout-confirmacion .modal-logout-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
-        }
-        #modal-logout-confirmacion .modal-logout-title {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 8px;
-          color: #333;
-        }
-        #modal-logout-confirmacion .modal-logout-message {
-          color: #666;
-          margin-bottom: 24px;
-          line-height: 1.4;
-        }
-        #modal-logout-confirmacion .modal-logout-actions {
-          display: flex;
-          gap: 12px;
-          flex-direction: column;
-        }
-        #modal-logout-confirmacion .modal-logout-btn-confirmar,
-        #modal-logout-confirmacion .modal-logout-btn-cancelar {
-          padding: 12px 24px;
-          border: none;
-          border-radius: 8px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        #modal-logout-confirmacion .modal-logout-btn-confirmar {
-          background: #f44336;
-          color: white;
-        }
-        #modal-logout-confirmacion .modal-logout-btn-confirmar:hover {
-          background: #d32f2f;
-          transform: translateY(-1px);
-        }
-        #modal-logout-confirmacion .modal-logout-btn-cancelar {
-          background: #e0e0e0;
-          color: #333;
-        }
-        #modal-logout-confirmacion .modal-logout-btn-cancelar:hover {
-          background: #d0d0d0;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }
-  
-  modal.style.display = 'flex';
-  
-  // Cerrar modal
-  const overlay = modal.querySelector('.modal-logout-overlay');
-  const btnCancelar = modal.querySelector('.modal-logout-btn-cancelar');
-  const btnConfirmar = modal.querySelector('.modal-logout-btn-confirmar');
-  
-  function cerrarModal() {
-    modal.style.display = 'none';
-  }
-  
-  overlay.onclick = cerrarModal;
-  btnCancelar.onclick = cerrarModal;
-  
-  // Confirmar logout
-  btnConfirmar.onclick = function() {
-    cerrarModal();
-    cerrarSesion();
-  };
 }
 
 // Función para cerrar sesión completamente
 function cerrarSesion() {
   try {
     // Limpiar todos los datos de sessionStorage relacionados con la sesión
+    sessionStorage.removeItem('clink_session_activa');
     sessionStorage.removeItem('clink_sesion_activa');
     sessionStorage.removeItem('clink_api_base_url');
+    
+    // También limpiar los datos específicos del inventario
+    sessionStorage.removeItem('nombreUsuario');
+    sessionStorage.removeItem('negocioId');
+    sessionStorage.removeItem('idNegocio');
+    sessionStorage.removeItem('id_negocio');
     
     // Mantener preferencias del sidebar si se desea
     // sessionStorage.removeItem('sidebarExpanded');
@@ -344,8 +263,27 @@ function cerrarSesion() {
   }
 }
 
+// Función helper para debuggear sessionStorage (útil para desarrollo)
+function debugSessionStorage() {
+  console.log('🔍 DEBUG: Contenido de sessionStorage:');
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    const value = sessionStorage.getItem(key);
+    
+    try {
+      const parsed = JSON.parse(value);
+      console.log(`📝 ${key}:`, parsed);
+    } catch {
+      console.log(`📝 ${key}:`, value);
+    }
+  }
+}
+
 // Exportar funciones para uso global
 window.cerrarSesion = cerrarSesion;
 window.obtenerDatosSesion = obtenerDatosSesion;
 window.verificarAutenticacionYRol = verificarAutenticacionYRol;
+window.debugSessionStorage = debugSessionStorage;
+window.guardarDatosParaInventario = guardarDatosParaInventario;
+window.configurarBotonCerrarSesion = configurarBotonCerrarSesion;
 
