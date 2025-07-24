@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Verificar autenticación al cargar la página
-  verificarAutenticacionYRol();
+  // Verificar autenticación al cargar la página (usando función del Admin)
+  if (typeof verificarAutenticacionYRol === 'function') {
+    verificarAutenticacionYRol();
+  }
   
-  // Extrae sólo el nombre del archivo actual, ej: "inventario.html"
+  // Extrae sólo el nombre del archivo actual
   const currentPage = window.location.pathname
     .split("/")
     .pop()
@@ -19,23 +21,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Configurar funcionalidad del sidebar
   const sidebar = document.querySelector('.sidebar');
-  // 1) Al cargar, lee el estado guardado
   if (localStorage.getItem('sidebarExpanded') === 'true') {
     sidebar.classList.add('expanded');
   }
-  // 2) Cuando el usuario expande (mouseenter), guarda "true"
+  
   sidebar.addEventListener('mouseenter', () => {
     sidebar.classList.add('expanded');
     localStorage.setItem('sidebarExpanded', 'true');
   });
-  // 3) Cuando se colapsa (mouseleave), guarda "false"
+  
   sidebar.addEventListener('mouseleave', () => {
     sidebar.classList.remove('expanded');
     localStorage.setItem('sidebarExpanded', 'false');
   });
 
-  // Configurar botón de cerrar sesión
-  configurarBotonCerrarSesion();
+  // Configurar botón de cerrar sesión (usando función del Admin)
+  if (typeof configurarBotonCerrarSesion === 'function') {
+    configurarBotonCerrarSesion();
+  }
 });
 
 // ===== FUNCIONES DE SESIÓN =====
