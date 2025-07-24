@@ -15,16 +15,12 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <i class="fas fa-cube"></i>
+                <img src="/Vista Web Admin/img/caja-logo.jpg" alt="Logo Clink" class="logo-img">
                 <span>CLINK</span>
             </div>
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item " data-tooltip="Inicio">
-                        <i class="fas fa-home"></i>
-                        <span>Inicio</span>
-                    </a>
                     <a href="ventas.html" class="nav-item" data-tooltip="Venta">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
@@ -32,13 +28,13 @@
 
                     <div class="nav-divider"></div>
 
-                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Inventario</span>
-                    </a>
                     <a href="productos.html" class="nav-item" data-tooltip="Productos">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
+                    </a>
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
                     </a>
                     <a href="clientes.html" class="nav-item active" data-tooltip="Clientes">
                         <i class="fas fa-users"></i>
@@ -70,6 +66,7 @@
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </nav>
@@ -77,8 +74,8 @@
          <main class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Graficas</span>
+                    <i class="fas fa-question-circle"></i>
+                    <span>Ayuda</span>
                 </div>
                 <div class="header-right">
                     <span class="session-info">Cargando...<br>Administrador</span>
@@ -100,30 +97,30 @@
                     <li><strong>¿Cómo puedo cancelar la venta de un producto o la venta general?</strong> Si deseas cancelar un producto, en el módulo Ventas, selecciona el producto que deseas eliminar y haz clic en el botón de Eliminar producto. 
                     En caso de que sea la venta general, cuando se realice el pago aparecerá la opción de Pagar y Cancelar, da la opción de Cancelar.</li>
                     <li><strong>¿Se puede obtener un ticket o comprobante de la venta?</strong> Sí, al finalizar una venta puedes enviar por SMS al cliente o exportar el ticket.</li>
-					<li><strong>¿El número telefónico del cliente se guarda automáticamente cuando se genera el ticket?</strong> Si, en el módulo Clientes se guarda la información.</li>
-					<li><strong> ¿Puedo editar los datos del cliente?</strong> Si, en la sección Cliente te muestra las opciones de editar, como también eliminar o agregar.</li>
-					<li><strong> ¿Cómo funciona el corte de caja?</strong> Al finalizar el día o la venta, en el botón “Cargar caja”, al hacer clic los datos de se reflejarán, como la fecha, quien atendió (empleado), las ganancias, etc. Una vez cargado al dar clic en el botón “Cerrar caja” el proceso habrá terminado. 
+                    <li><strong>¿El número telefónico del cliente se guarda automáticamente cuando se genera el ticket?</strong> Si, en el módulo Clientes se guarda la información.</li>
+                    <li><strong> ¿Puedo editar los datos del cliente?</strong> Si, en la sección Cliente te muestra las opciones de editar, como también eliminar o agregar.</li>
+                    <li><strong> ¿Cómo funciona el corte de caja?</strong> Al finalizar el día o la venta, en el botón “Cargar caja”, al hacer clic los datos de se reflejarán, como la fecha, quien atendió (empleado), las ganancias, etc. Una vez cargado al dar clic en el botón “Cerrar caja” el proceso habrá terminado. 
                     Al volver a usar el programa en el botón “Cerrar caja” será reemplazado por “Abrir caja”, al dar clic aparecerá un formulario que deberá llenar para empezar la venta nuevamente.</li>
-					<li><strong> ¿El programa guarda un historial de ventas?</strong> Sí, en la sección Historial puedes consultar las ventas realizadas del día o del mes, además de que podrás exportarla en un archivo o eliminar.</li>
-					<li><strong> ¿El inventario se actualiza solo después de cada venta?</strong> Sí, el sistema descuenta automáticamente las cantidades vendidas del inventario.</li>
-					<li><strong> ¿Cómo agrego más unidades de un producto al inventario?</strong> En la sección Inventario usa la opción de Modificar lote o en Agregar lote.</li>
-					<li><strong> ¿Cómo puedo ver cuántos productos me quedan?</strong> Ve al módulo Inventario, donde aparece el stock actual de cada artículo.</li>
-					<li><strong> ¿Qué pasa si ingreso mal el precio de un producto?</strong> Puedes editarlo en la sección Productos si es donde te equivocastes o si es en Inventario, la solución es la misma: haciendo clic en Editar. </li>
-					<li><strong> ¿Puedo eliminar un producto?</strong> Sí, desde la lista de productos, selecciona el que deseas eliminar y haz clic en Eliminar.</li>
-					<li><strong> ¿Puedo generar reportes de ventas o productos?</strong>En el módulo Gráficas podrás ver las estadísticas de ventas por semana o los productos más vendidos.</li>
-					<li><strong> ¿Qué hago si olvido mi contraseña?</strong> Contacta al administrador o al área de soporte técnico para restablecer tu acceso.</li>
-					<li><strong> ¿Cómo salgo del programa?</strong> En el menú, en el lado izquierdo ubicado en la parte de abajo encontrará un botón de salida, al hacer clic aparecerá un mensaje preguntando si desea salir, para hacerlo solo tienes que dar Aceptar.</li>
-					<li><strong> ¿Puedo agregar más empleados?</strong> Si eres administrador podrás hacerlo, de lo contrario no.</li>
-					<li><strong> ¿Puedo editar los datos de los empleados?</strong> Si, en la sección Empleados te mostrará todos los empleados registrados y sus datos, la cual podrás editar, eliminar o agregar.</li>
+                    <li><strong> ¿El programa guarda un historial de ventas?</strong> Sí, en la sección Historial puedes consultar las ventas realizadas del día o del mes, además de que podrás exportarla en un archivo o eliminar.</li>
+                    <li><strong> ¿El inventario se actualiza solo después de cada venta?</strong> Sí, el sistema descuenta automáticamente las cantidades vendidas del inventario.</li>
+                    <li><strong> ¿Cómo agrego más unidades de un producto al inventario?</strong> En la sección Inventario usa la opción de Modificar lote o en Agregar lote.</li>
+                    <li><strong> ¿Cómo puedo ver cuántos productos me quedan?</strong> Ve al módulo Inventario, donde aparece el stock actual de cada artículo.</li>
+                    <li><strong> ¿Qué pasa si ingreso mal el precio de un producto?</strong> Puedes editarlo en la sección Productos si es donde te equivocastes o si es en Inventario, la solución es la misma: haciendo clic en Editar. </li>
+                    <li><strong> ¿Puedo eliminar un producto?</strong> Sí, desde la lista de productos, selecciona el que deseas eliminar y haz clic en Eliminar.</li>
+                    <li><strong> ¿Puedo generar reportes de ventas o productos?</strong>En el módulo Gráficas podrás ver las estadísticas de ventas por semana o los productos más vendidos.</li>
+                    <li><strong> ¿Qué hago si olvido mi contraseña?</strong> Contacta al administrador o al área de soporte técnico para restablecer tu acceso.</li>
+                    <li><strong> ¿Cómo salgo del programa?</strong> En el menú, en el lado izquierdo ubicado en la parte de abajo encontrará un botón de salida, al hacer clic aparecerá un mensaje preguntando si desea salir, para hacerlo solo tienes que dar Aceptar.</li>
+                    <li><strong> ¿Puedo agregar más empleados?</strong> Si eres administrador podrás hacerlo, de lo contrario no.</li>
+                    <li><strong> ¿Puedo editar los datos de los empleados?</strong> Si, en la sección Empleados te mostrará todos los empleados registrados y sus datos, la cual podrás editar, eliminar o agregar.</li>
                     </ul>
 
                     <h2>Problemas comunes</h2>
                     <ul>
                     <li><strong>No puedo registrar una venta.</strong> Es porque no hay productos registrados. Agregue productos Primero en la sección productos.</li>
-					<li><strong> El inventario no se actualizó.</strong> La venta no se finalizó correctamente, verifica que se haya completado el proceso.</li>
-					<li><strong> No se guardan productos nuevos.</strong> No se guardó correctamente o falta datos obligatorios, vuelve a intentar y asegura haber completado todos los requisitos.</li>
-					<li><strong> El total de ventas es incorrecto.</strong> Error de cantidad o precio, revisa los datos antes de finalizar la venta.</li>
-					<li><strong> No aparecen productos nuevos en el inventario.</strong> No se guardó correctamente, verifica si se hizo clic en Guardar después de registrar.</li>
+                    <li><strong> El inventario no se actualizó.</strong> La venta no se finalizó correctamente, verifica que se haya completado el proceso.</li>
+                    <li><strong> No se guardan productos nuevos.</strong> No se guardó correctamente o falta datos obligatorios, vuelve a intentar y asegura haber completado todos los requisitos.</li>
+                    <li><strong> El total de ventas es incorrecto.</strong> Error de cantidad o precio, revisa los datos antes de finalizar la venta.</li>
+                    <li><strong> No aparecen productos nuevos en el inventario.</strong> No se guardó correctamente, verifica si se hizo clic en Guardar después de registrar.</li>
                     </ul>
 
                     <h2>Contacto o soporte técnico</h2>
