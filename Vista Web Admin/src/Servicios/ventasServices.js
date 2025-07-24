@@ -1,274 +1,155 @@
-// ventasServices.js - Servicios para gestión de ventas con Javalin
+// ventasServices.js - Servicios de conexión con API REST de ventas
 
-const API_BASE_URL = 'http://localhost:8080'; // Ajusta según tu configuración
+export const VentasServices = {
+    // Accede dinámicamente a los datos de sesión
+    get idNegocio() {
+        const sesion = window.obtenerDatosSesion?.();
+        return sesion ? parseInt(sesion.idNegocio) : null;
+    },
 
-// Clase para manejar servicios de ventas
-class VentasServices {
-    
-    /**
-     * PASO 1: Iniciar una nueva venta
-     * POST /negocio/{id}/venta/{nombreUsuario}
-     */
-    static async iniciarVenta() {
+    get nombreUsuario() {
+        const sesion = window.obtenerDatosSesion?.();
+        return sesion?.nombreUsuario || null;
+    },
+
+    async iniciarVenta() {
+    try {
+        if (!this.idNegocio || !this.nombreUsuario) {
+            throw new Error("No hay sesión activa para iniciar venta");
+        }
+
+        const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/${this.nombreUsuario}`;
+        const res = await fetch(url, { method: "POST" });
+
+        if (!res.ok) {
+            throw new Error("No se pudo iniciar venta");
+        }
+
+        const text = await res.text();
+        if (!text) return {};
+        return JSON.parse(text);
+    } catch (error) {
+        window.mostrarAlertaGlobal('Error al iniciar venta: ' + error.message, 'error');
+        throw error;
+    }
+    },
+
+
+    async consultarProductoPorCodigo(codigoProducto) {
         try {
-            // Obtener datos desde sessionStorage
-            const negocioId = sessionStorage.getItem('negocioId') || '1';
-            const nombreUsuario = sessionStorage.getItem('nombreUsuario') || 'admin';
-            
-            console.log('Iniciando nueva venta para usuario:', nombreUsuario, 'negocio:', negocioId);
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/lote/${codigoProducto}`;
+            const res = await fetch(url);
+            console.log(res);
 
-            const response = await fetch(`${API_BASE_URL}/negocio/${negocioId}/venta/${nombreUsuario}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error al iniciar venta: ${response.status} ${response.statusText} - ${errorText}`);
+            if (!res.ok) {
+                throw new Error("Producto no encontrado");
             }
 
-            const resultado = await response.json();
-            console.log('Venta iniciada exitosamente:', resultado);
-            
-            // Guardar ID de venta en sessionStorage para uso posterior
-            if (resultado.idVenta || resultado.id) {
-                sessionStorage.setItem('ventaActualId', resultado.idVenta || resultado.id);
-            }
-            
-            return resultado;
-
+            return await res.json();
         } catch (error) {
-            console.error('Error en iniciarVenta:', error);
+            window.mostrarAlertaGlobal('Error al consultar producto: ' + error.message, 'error');
             throw error;
         }
-    }
+    },
 
-    /**
-     * PASO 2: Consultar producto por código (para escaneo)
-     * GET /negocio/{id}/venta/lote/{codigoProducto}
-     */
-    static async consultarProductoPorCodigo(codigoProducto) {
+    async guardarDetallesVenta(listaDetalles) {
         try {
-            const negocioId = sessionStorage.getItem('negocioId') || '1';
-            
-            console.log('Consultando producto con código:', codigoProducto);
-
-            const response = await fetch(`${API_BASE_URL}/negocio/${negocioId}/venta/lote/${codigoProducto}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
+            const url = `http://localhost:8080/negocio/venta/detalles`;
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(listaDetalles)
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error al consultar producto: ${response.status} ${response.statusText} - ${errorText}`);
+            if (!res.ok) {
+                throw new Error("Error al guardar detalles de venta");
             }
 
-            const producto = await response.json();
-            console.log('Producto consultado:', producto);
-            
-            return producto;
+            const text = await res.text();
 
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                return { mensaje: text }; // lo que haya devuelto el servidor
+            }
         } catch (error) {
-            console.error('Error en consultarProductoPorCodigo:', error);
+            window.mostrarAlertaGlobal('Error al guardar detalles de venta: ' + error.message, 'error');
             throw error;
         }
-    }
 
-    /**
-     * PASO 3: Guardar detalles de venta (array de productos)
-     * POST /negocio/venta/detalles
-     */
-    static async guardarDetallesVenta(detallesVenta) {
+    },
+
+    async cancelarVenta() {
         try {
-            console.log('Guardando detalles de venta:', detallesVenta);
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta`;
+            const res = await fetch(url, { method: "DELETE" });
 
-            const response = await fetch(`${API_BASE_URL}/negocio/venta/detalles`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(detallesVenta)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error al guardar detalles: ${response.status} ${response.statusText} - ${errorText}`);
+            if (!res.ok) {
+                throw new Error("Error al cancelar venta");
             }
 
-            const resultado = await response.json();
-            console.log('Detalles de venta guardados exitosamente:', resultado);
-            
-            return resultado;
-
+            return await res.json();
         } catch (error) {
-            console.error('Error en guardarDetallesVenta:', error);
+            window.mostrarAlertaGlobal('Error al cancelar venta: ' + error.message, 'error');
             throw error;
         }
-    }
+    },
 
-    /**
-     * PASO 4: Obtener total de la venta
-     * GET /negocio/{id}/venta/total
-     */
-    static async obtenerTotalVenta() {
+    async obtenerTotalVenta() {
         try {
-            const negocioId = sessionStorage.getItem('negocioId') || '1';
-            
-            console.log('Obteniendo total de venta...');
+            const url = `http://localhost:8080/negocio/${this.idNegocio}/venta/total`;
+            const res = await fetch(url);
 
-            const response = await fetch(`${API_BASE_URL}/negocio/${negocioId}/venta/total`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error al obtener total: ${response.status} ${response.statusText} - ${errorText}`);
+            if (!res.ok) {
+                throw new Error("No se pudo obtener total de la venta");
             }
 
-            const total = await response.json();
-            console.log('Total de venta obtenido:', total);
-            
-            return total;
-
+            return await res.json();
         } catch (error) {
-            console.error('Error en obtenerTotalVenta:', error);
+            window.mostrarAlertaGlobal('Error al obtener total de la venta: ' + error.message, 'error');
             throw error;
         }
+    },
+
+    mapearProductoADetalleVenta(producto, cantidad) {
+    const precioUnitario = parseFloat(
+    producto.precioVentaActual || producto.precio || producto.Precio || producto.precio_unitario || producto.precioUnitario || 0
+    );
+
+    const subtotal = parseFloat((cantidad * precioUnitario).toFixed(2));
+
+    return {
+        idRegistro: producto.idRegistro || producto.ID_Registro || producto.idRegistroLote || Date.now(),
+        codigoProducto: producto.codigoProducto || producto.Codigo_Prod || producto.codigo || producto.codigoBarras,
+        nombreProducto: producto.nombreProducto || producto.Nombre_Prod || producto.nombre,
+        precioUnitario,
+        cantidad,
+        subtotal
+    };
+},
+
+
+
+    calcularTotales(lista) {
+        const subtotal = lista.reduce((sum, item) => sum + item.subtotal, 0);
+        const total = +(subtotal).toFixed(2);
+        const cantidadItems = lista.reduce((sum, item) => sum + item.cantidad, 0);
+
+        return { subtotal, total, cantidadItems };
+    },
+
+    formatearPrecio(valor) {
+        return `$${parseFloat(valor).toFixed(2)}`;
+    },
+
+    generarNumeroTicket() {
+        return "T-" + Math.floor(Math.random() * 100000);
+    },
+
+    // Agregar esta función para obtener el ID de la venta actual
+    getVentaActualId() {
+        // Esto depende de cómo manejes las ventas en tu aplicación
+        // Puede ser que tengas que almacenar el ID cuando inicias una venta
+        return ventaActualId || null; // Necesitarás implementar esto según tu lógica
     }
-
-    /**
-     * PASO 5: Cancelar venta (eliminar última venta)
-     * DELETE /negocio/{id}/venta
-     */
-    static async cancelarVenta() {
-        try {
-            const negocioId = sessionStorage.getItem('negocioId') || '1';
-            
-            console.log('Cancelando venta...');
-
-            const response = await fetch(`${API_BASE_URL}/negocio/${negocioId}/venta`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error al cancelar venta: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-
-            // Limpiar sessionStorage
-            sessionStorage.removeItem('ventaActualId');
-            
-            console.log('Venta cancelada exitosamente');
-            
-            return { message: 'Venta cancelada exitosamente' };
-
-        } catch (error) {
-            console.error('Error en cancelarVenta:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Mapear producto consultado al formato requerido para detalles de venta
-     * Formato específico según tu flujo:
-     * {
-     *   "idRegistro": number,
-     *   "codigoProducto": string,
-     *   "nombreProducto": string,
-     *   "precioUnitario": number,
-     *   "cantidad": number,
-     *   "subtotal": number
-     * }
-     */
-    static mapearProductoADetalleVenta(producto, cantidad = 1) {
-        const precioUnitario = parseFloat(producto.precioUnitario || producto.precio || producto.precioventa || 0);
-        const subtotal = precioUnitario * cantidad;
-        
-        return {
-            idRegistro: parseInt(producto.idRegistro || producto.id || Math.floor(Math.random() * 10000)),
-            codigoProducto: producto.codigoProducto || producto.codigo || '',
-            nombreProducto: producto.nombreProducto || producto.nombre || 'Sin nombre',
-            precioUnitario: precioUnitario,
-            cantidad: parseFloat(cantidad),
-            subtotal: parseFloat(subtotal.toFixed(2))
-        };
-    }
-
-    /**
-     * Calcular totales de la venta
-     */
-    static calcularTotales(listaProductos) {
-        const subtotal = listaProductos.reduce((total, item) => total + item.subtotal, 0);
-        const impuestos = subtotal * 0.16; // 16% IVA
-        const total = subtotal + impuestos;
-        const cantidadItems = listaProductos.reduce((total, item) => total + item.cantidad, 0);
-        
-        return {
-            subtotal: parseFloat(subtotal.toFixed(2)),
-            impuestos: parseFloat(impuestos.toFixed(2)),
-            total: parseFloat(total.toFixed(2)),
-            cantidadItems: parseInt(cantidadItems)
-        };
-    }
-
-    /**
-     * Formatear precio como moneda
-     */
-    static formatearPrecio(valor) {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'MXN'
-        }).format(valor || 0);
-    }
-
-    /**
-     * Generar número de ticket único
-     */
-    static generarNumeroTicket() {
-        const fecha = new Date();
-        const timestamp = fecha.getTime();
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `TKT-${timestamp}-${random}`;
-    }
-
-    /**
-     * Validar datos de producto para venta
-     */
-    static validarProductoParaVenta(producto, cantidad) {
-        const errores = [];
-        
-        if (!producto.codigoProducto && !producto.codigo) {
-            errores.push('El producto debe tener un código');
-        }
-        
-        if (!producto.precioUnitario && !producto.precio && !producto.precioventa) {
-            errores.push('El producto debe tener un precio');
-        }
-        
-        if (cantidad <= 0) {
-            errores.push('La cantidad debe ser mayor a 0');
-        }
-        
-        return errores;
-    }
-}
-
-// Para compatibilidad con sistemas que no usan modules, hacer disponible globalmente
-if (typeof window !== 'undefined') {
-    window.VentasServices = VentasServices;
-}
+};
