@@ -2,12 +2,12 @@
   display: flex;
   justify-content: center;
   padding: 35px;
-  background-color: #f3f0db;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
 .ayuda-card {
-  background-color: #fefbea;
+  background-color: #f3f0db;
   border: 2px solid #ccc;
   border-radius: 12px;
   padding: 30px 40px;
