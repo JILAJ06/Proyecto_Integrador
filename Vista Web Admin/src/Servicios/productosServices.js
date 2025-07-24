@@ -39,103 +39,113 @@ async function cargarDatosIniciales() {
         console.log('Datos iniciales cargados correctamente');
     } catch (error) {
         console.error('Error cargando datos iniciales:', error);
+        window.mostrarAlertaGlobal('Error cargando datos iniciales: ' + error.message, 'error');
     }
 }
 
 // ===== FUNCIONES PRINCIPALES DEL API =====
 
-// Obtener categorías disponibles - SIMPLIFICAR
+// Obtener categorías disponibles - CORREGIDO
+// Función para extraer categorías únicas de todos los productos
 async function getCategorias() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/categorias`;
-    
     try {
-        console.log('Obteniendo categorías desde:', url_endpoint);
+        console.log('Obteniendo categorías desde productos...');
         
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer categorías');
+            return [];
         }
         
-        const data = await response.json();
-        console.log('Categorías RAW sin procesar:', data);
+        // Extraer categorías únicas
+        const categorias = productos
+            .map(producto => {
+                if (producto && producto.categoria && producto.categoria.nombreCategoria) {
+                    return producto.categoria.nombreCategoria;
+                }
+                return null;
+            })
+            .filter(categoria => categoria && categoria.trim() !== '')
+            .filter((categoria, index, array) => array.indexOf(categoria) === index); // Remover duplicados
         
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
+        console.log('Categorías extraídas:', categorias);
+        return categorias;
         
     } catch (error) {
-        console.error('Error fetching categorías:', error);
-        mostrarError('Error al cargar las categorías desde el servidor');
+        console.error('Error extrayendo categorías:', error);
+        window.mostrarAlertaGlobal('Error extrayendo categorías: ' + error.message, 'error');
         return [];
     }
 }
 
-// Obtener envases disponibles - SIMPLIFICAR
-async function getEnvases() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/envases`;
-    
-    try {
-        console.log('Obteniendo envases desde:', url_endpoint);
-        
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Envases RAW sin procesar:', data);
-        
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
-        
-    } catch (error) {
-        console.error('Error fetching envases:', error);
-        mostrarError('Error al cargar los envases desde el servidor');
-        return [];
-    }
-}
-
-// Obtener marcas disponibles - SIMPLIFICAR
+// Obtener marcas disponibles - CORREGIDO
+// Función para extraer marcas únicas de todos los productos
 async function getMarcas() {
-    // CORRECCIÓN: Usar el endpoint correcto del backend
-    const url_endpoint = `${API_BASE_URL}/producto/marcas`;
-    
     try {
-        console.log('Obteniendo marcas desde:', url_endpoint);
+        console.log('Obteniendo marcas desde productos...');
         
-        const response = await fetch(url_endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer marcas');
+            return [];
         }
         
-        const data = await response.json();
-        console.log('Marcas RAW sin procesar:', data);
+        // Extraer marcas únicas
+        const marcas = productos
+            .map(producto => {
+                if (producto && producto.marca && producto.marca.nombreMarca) {
+                    return producto.marca.nombreMarca;
+                }
+                return null;
+            })
+            .filter(marca => marca && marca.trim() !== '')
+            .filter((marca, index, array) => array.indexOf(marca) === index); // Remover duplicados
         
-        // DEVOLVER LOS DATOS TAL COMO VIENEN DEL BACKEND
-        return data;
+        console.log('Marcas extraídas:', marcas);
+        return marcas;
         
     } catch (error) {
-        console.error('Error fetching marcas:', error);
-        mostrarError('Error al cargar las marcas desde el servidor');
+        console.error('Error extrayendo marcas:', error);
+        window.mostrarAlertaGlobal('Error extrayendo marcas: ' + error.message, 'error');
+        return [];
+    }
+}
+
+// Obtener envases disponibles - CORREGIDO
+// Función para extraer envases únicos de todos los productos
+async function getEnvases() {
+    try {
+        console.log('Obteniendo envases desde productos...');
+        
+        // Obtener todos los productos
+        const productos = await getProductos();
+        
+        if (!productos || !Array.isArray(productos)) {
+            console.warn('No se pudieron obtener productos para extraer envases');
+            return [];
+        }
+        
+        // Extraer envases únicos
+        const envases = productos
+            .map(producto => {
+                if (producto && producto.envase && producto.envase.nombreEnvase) {
+                    return producto.envase.nombreEnvase;
+                }
+                return null;
+            })
+            .filter(envase => envase && envase.trim() !== '')
+            .filter((envase, index, array) => array.indexOf(envase) === index); // Remover duplicados
+        
+        console.log('Envases extraídos:', envases);
+        return envases;
+        
+    } catch (error) {
+        console.error('Error extrayendo envases:', error);
+        window.mostrarAlertaGlobal('Error extrayendo envases: ' + error.message, 'error');
         return [];
     }
 }
@@ -206,6 +216,7 @@ async function getProductos() {
         
     } catch (error) {
         console.error('Error fetching productos:', error);
+        window.mostrarAlertaGlobal('Error al obtener productos: ' + error.message, 'error');
         mostrarError('Error al cargar los productos desde el servidor');
         // Limpiar la tabla en caso de error
         const tbody = document.querySelector('.productos-table tbody');
@@ -410,7 +421,7 @@ async function postProducto(datosProducto) {
         }
         
         console.log('Producto creado:', resultado);
-        mostrarExito('Producto creado exitosamente');
+        window.mostrarAlertaGlobal('Producto creado exitosamente', 'success');
         
         // Recargar productos después de crear
         setTimeout(() => {
@@ -421,7 +432,7 @@ async function postProducto(datosProducto) {
         
     } catch (error) {
         console.error('Error posting producto:', error);
-        mostrarError('Error al crear el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al crear el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -509,7 +520,7 @@ async function putProducto(codigo, datosProducto) {
         }
         
         console.log('Producto editado:', resultado);
-        mostrarExito('Producto editado exitosamente');
+        window.mostrarAlertaGlobal('Producto editado exitosamente', 'success');
         
         // Recargar productos después de editar
         setTimeout(() => {
@@ -520,7 +531,7 @@ async function putProducto(codigo, datosProducto) {
         
     } catch (error) {
         console.error('Error editing producto:', error);
-        mostrarError('Error al editar el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al editar el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -554,7 +565,7 @@ async function deleteProducto(codigo) {
         }
 
         console.log('Producto eliminado exitosamente');
-        mostrarExito('Producto eliminado exitosamente');
+        window.mostrarAlertaGlobal('Producto eliminado exitosamente', 'success');
         
         // Recargar productos después de eliminar
         await getProductos();
@@ -563,7 +574,7 @@ async function deleteProducto(codigo) {
         
     } catch (error) {
         console.error('Error deleting producto:', error);
-        mostrarError('Error al eliminar el producto: ' + error.message);
+        window.mostrarAlertaGlobal('Error al eliminar el producto: ' + error.message, 'error');
         throw error;
     }
 }
@@ -711,65 +722,15 @@ function capitalizarTexto(texto) {
     return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
 }
 
-// Función para mostrar mensajes de éxito
-function mostrarExito(mensaje) {
-    if (typeof mostrarAlertaVisual === 'function') {
-        mostrarAlertaVisual(mensaje);
-    } else {
-        console.log(mensaje);
-        // Crear alerta simple si no existe la función
-        const alerta = document.createElement('div');
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            z-index: 10001;
-            font-size: 14px;
-        `;
-        alerta.textContent = mensaje;
-        document.body.appendChild(alerta);
-        setTimeout(() => alerta.remove(), 3000);
-    }
-}
 
-// Función auxiliar para mostrar errores
-function mostrarError(mensaje) {
-    if (typeof mostrarAlertaVisual === 'function') {
-        mostrarAlertaVisual(mensaje);
-    } else {
-        console.error(mensaje);
-        // Crear alerta simple si no existe la función
-        const alerta = document.createElement('div');
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #f44336;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            z-index: 10001;
-            font-size: 14px;
-        `;
-        alerta.textContent = mensaje;
-        document.body.appendChild(alerta);
-        setTimeout(() => alerta.remove(), 3000);
-    }
-}
-
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL - Sin export =====
-
+// Al final del archivo, agrega estas líneas para exponer las funciones globalmente:
 window.getCategorias = getCategorias;
-window.getEnvases = getEnvases;
 window.getMarcas = getMarcas;
+window.getEnvases = getEnvases;
 window.postProducto = postProducto;
-window.getProductos = getProductos;
 window.putProducto = putProducto;
 window.deleteProducto = deleteProducto;
+window.getProductos = getProductos;
 window.cargarDatosIniciales = cargarDatosIniciales;
 window.capitalizarTexto = capitalizarTexto;
 
