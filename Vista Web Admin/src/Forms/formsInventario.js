@@ -1,3 +1,5 @@
+import InventarioServices, { setNegocioId, getSessionInfo, setNombreUsuario } from '../Servicios/inventarioServices.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   // Elementos del DOM
   const tabla = document.querySelector(".products-table tbody");
@@ -26,76 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
     { value: "higiene", text: "Higiene Personal" }
   ];
 
-  // Datos de ejemplo (simula API)
-  const datosEjemplo = [
-    {
-      codigo: "001",
-      producto: "Coca Cola 600ml",
-      categoria: "bebidas",
-      marca: "Coca Cola",
-      fechaCaducidad: "2025-12-31",
-      id: "REG001",
-      fechaEntrada: "2024-01-15",
-      fechaSalida: "-",
-      stockAlmacen: 50,
-      stockExhibicion: 24,
-      precio: 25.50
-    },
-    {
-      codigo: "002", 
-      producto: "Sabritas Clásicas",
-      categoria: "snacks",
-      marca: "Sabritas",
-      fechaCaducidad: "2025-06-15",
-      id: "REG002",
-      fechaEntrada: "2024-01-10",
-      fechaSalida: "-",
-      stockAlmacen: 30,
-      stockExhibicion: 15,
-      precio: 18.00
-    },
-    {
-      codigo: "003",
-      producto: "Leche Lala 1L",
-      categoria: "lacteos", 
-      marca: "Lala",
-      fechaCaducidad: "2025-02-28",
-      id: "REG003",
-      fechaEntrada: "2024-01-20",
-      fechaSalida: "-",
-      stockAlmacen: 25,
-      stockExhibicion: 12,
-      precio: 22.50
-    }
-  ];
 
-  // Crear dropdown dinámicamente
-  function crearDropdown() {
-    dropdownMenu = document.createElement("div");
-    dropdownMenu.className = "dropdown-menu";
-
-    categorias.forEach(categoria => {
-      const item = document.createElement("div");
-      item.className = "dropdown-item";
-      item.setAttribute("data-category", categoria.value);
-      item.textContent = categoria.text;
-      
-      if (categoria.value === "all") {
-        item.classList.add("selected");
-      }
-      
-      dropdownMenu.appendChild(item);
-    });
-
-    dropdownContainer.appendChild(dropdownMenu);
-    dropdownItems = dropdownMenu.querySelectorAll(".dropdown-item");
-  }
 
   // Crear modal para agregar producto
   function crearModalAgregar() {
     const modal = document.createElement("div");
     modal.id = "modal-add";
     modal.className = "modal-overlay";
+    
+    // Obtener el nombre de usuario desde sessionStorage
+    const nombreUsuarioActual = InventarioServices.getNombreUsuario();
     
     modal.innerHTML = `
       <div class="modal-container">
@@ -105,50 +47,64 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <form id="form-add-product" class="modal-form">
           <div class="form-group">
-            <label>Escanee o escriba el código del producto</label>
-            <input type="text" id="codigo" name="codigo" required placeholder="Código del producto">
+            <label>Nombre de Usuario</label>
+            <input type="text" id="nombreUsuario" name="nombreUsuario" 
+                   value="${nombreUsuarioActual}" 
+                   placeholder="Nombre del usuario"
+                   readonly>
+            <small style="color: #666; font-size: 0.8em;">
+              📝 Obtenido automáticamente del sistema. 
+              <button type="button" id="editarUsuario" style="background: none; border: none; color: #007bff; cursor: pointer; text-decoration: underline;">
+                Editar
+              </button>
+            </small>
           </div>
 
-           <div class="form-group">
-            <label>Ingrese la fecha de Entrada</label>
+          <div class="form-group">
+            <label>Código del Producto *</label>
+            <input type="text" id="codigoProducto" name="codigoProducto" required placeholder="Código del producto">
+          </div>
+
+          <div class="form-group">
+            <label>Nombre del Producto</label>
+            <input type="text" id="producto" name="producto" placeholder="Nombre del producto (opcional)">
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Entrada *</label>
             <input type="date" id="fechaEntrada" name="fechaEntrada" required>
           </div>
 
           <div class="form-group">
-            <label>Ingrese la fecha de caducidad</label>
+            <label>Fecha de Caducidad *</label>
             <input type="date" id="fechaCaducidad" name="fechaCaducidad" required>
           </div>
 
           <div class="form-group">
-            <label>Cantidad Mínima para Alerta</label>
-            <input type="number" id="stockMinimo" name="stockMinimo " step="0.01" required placeholder="0.00">
-          </div>
-
-           <div class="form-group">
-            <label>Precio de Compra</label>
+            <label>Precio de Compra *</label>
             <input type="number" id="precioCompra" name="precioCompra" step="0.01" required placeholder="0.00">
           </div>
 
           <div class="form-group">
-            <label>Precio por Unidad</label>
-            <input type="number" id="precio" name="precio" step="0.01" required placeholder="0.00">
-          </div>
-          
-           <div class="form-group">
-            <label>Ganancia al Producto</label>
-            <input type="number" id="margenGanancia" name="margenGanancia" step="0.01" required placeholder="0.00">
+            <label>Margen de Ganancia (%) *</label>
+            <input type="number" id="margenGanancia" name="margenGanancia" step="0.01" required placeholder="0.25">
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Ingrese la cantidad en almacén</label>
+              <label>Stock en Almacén *</label>
               <input type="number" id="stockAlmacen" name="stockAlmacen" required placeholder="0">
             </div>
             
             <div class="form-group">
-              <label>Ingrese la cantidad en exhibición</label>
+              <label>Stock en Exhibición *</label>
               <input type="number" id="stockExhibicion" name="stockExhibicion" required placeholder="0">
             </div>
+          </div>
+
+          <div class="form-group">
+            <label>Stock Mínimo *</label>
+            <input type="number" id="stockMinimo" name="stockMinimo" required placeholder="0">
           </div>
           
           <div class="modal-buttons">
@@ -160,6 +116,34 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     document.body.appendChild(modal);
+    
+    // Agregar funcionalidad para editar el usuario
+    const editarUsuarioBtn = modal.querySelector('#editarUsuario');
+    const inputUsuario = modal.querySelector('#nombreUsuario');
+    
+    editarUsuarioBtn.addEventListener('click', () => {
+        if (inputUsuario.readOnly) {
+            inputUsuario.readOnly = false;
+            inputUsuario.focus();
+            editarUsuarioBtn.textContent = 'Guardar';
+            inputUsuario.style.backgroundColor = '#fff';
+        } else {
+            inputUsuario.readOnly = true;
+            editarUsuarioBtn.textContent = 'Editar';
+            inputUsuario.style.backgroundColor = '#f8f9fa';
+            
+            // Guardar el nuevo nombre en sessionStorage
+            const nuevoNombre = inputUsuario.value.trim();
+            if (nuevoNombre) {
+                setNombreUsuario(nuevoNombre);
+                mostrarAlertaVisual(`Usuario actualizado: ${nuevoNombre}`, "success");
+            }
+        }
+    });
+    
+    // Estilo inicial para el campo readonly
+    inputUsuario.style.backgroundColor = '#f8f9fa';
+    
     return modal;
   }
 
@@ -177,49 +161,18 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <form id="form-edit-product" class="modal-form">
           <div class="form-group">
-            <label>Código del producto</label>
-            <input type="text" id="edit-codigo" name="codigo" required readonly>
+            <label>Stock en Exhibición *</label>
+            <input type="number" id="edit-stockExhibicion" name="stockExhibicion" min="0" required>
           </div>
-          
+
           <div class="form-group">
-            <label>Nombre del producto</label>
-            <input type="text" id="edit-producto" name="producto" required>
+            <label>Stock Mínimo *</label>
+            <input type="number" id="edit-stockMinimo" name="stockMinimo" min="0" required>
           </div>
-          
+
           <div class="form-group">
-            <label>Categoría</label>
-            <select id="edit-categoria" name="categoria" required>
-              ${categorias.filter(cat => cat.value !== "all").map(cat => 
-                `<option value="${cat.value}">${cat.text}</option>`
-              ).join("")}
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Marca</label>
-            <input type="text" id="edit-marca" name="marca" required>
-          </div>
-          
-          <div class="form-group">
-            <label>Fecha de caducidad</label>
-            <input type="date" id="edit-fechaCaducidad" name="fechaCaducidad" required>
-          </div>
-          
-          <div class="form-group">
-            <label>Precio unitario</label>
-            <input type="number" id="edit-precio" name="precio" step="0.01" required>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cantidad en almacén</label>
-              <input type="number" id="edit-stockAlmacen" name="stockAlmacen" required>
-            </div>
-            
-            <div class="form-group">
-              <label>Cantidad en exhibición</label>
-              <input type="number" id="edit-stockExhibicion" name="stockExhibicion" required>
-            </div>
+            <label>Margen de Ganancia (%) *</label>
+            <input type="number" id="edit-margenGanancia" name="margenGanancia" step="0.1" min="0" required>
           </div>
           
           <div class="modal-buttons">
@@ -236,13 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Crear modal para eliminar producto
   function crearModalEliminar() {
-    // Verificar si ya existe un modal
     const modalExistente = document.getElementById('modal-advertencia');
     if (modalExistente) {
       modalExistente.remove();
     }
 
-    // Crear el modal usando el mismo diseño que modalAdvertencia.js
     const modal = document.createElement('div');
     modal.id = 'modal-advertencia';
     modal.innerHTML = `
@@ -259,14 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     
     document.body.appendChild(modal);
-    
-    // Aplicar estilos del modal de advertencia
     aplicarEstilosModalAdvertencia();
-    
-    // Configurar eventos del modal de eliminar
     setupModalAdvertenciaEvents(modal);
     
-    // Mostrar modal con animación
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('mostrar'), 10);
     
@@ -275,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Función para aplicar estilos específicos del modal de advertencia
   function aplicarEstilosModalAdvertencia() {
-    // Verificar si ya existen los estilos
     if (document.getElementById('modal-advertencia-styles')) {
       return;
     }
@@ -376,7 +321,6 @@ document.addEventListener("DOMContentLoaded", () => {
         background: #f2bcbc;
       }
 
-      /* Responsive para pantallas pequeñas */
       @media (max-width: 480px) {
         #modal-advertencia .modal-advertencia-content {
           min-width: 320px;
@@ -417,7 +361,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelar = modal.querySelector('.modal-advertencia-btn-cancelar');
     const overlay = modal.querySelector('.modal-advertencia-overlay');
 
-    // Función para cerrar modal con animación
     function cerrarModal() {
       modal.classList.remove('mostrar');
       setTimeout(() => { 
@@ -427,7 +370,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 280);
     }
 
-    // Evento para cerrar modal con Escape
     function handleEscape(e) {
       if (e.key === 'Escape') {
         cerrarModal();
@@ -436,72 +378,163 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener('keydown', handleEscape);
 
-    // Limpiar listeners previos
     btnAceptar.onclick = null;
     btnCancelar.onclick = null;
     overlay.onclick = null;
 
-    // Evento del botón aceptar (confirmar eliminación)
     btnAceptar.onclick = function() {
       confirmarEliminar();
       cerrarModal();
       document.removeEventListener('keydown', handleEscape);
     };
 
-    // Evento del botón cancelar
     btnCancelar.onclick = function() {
       cerrarModal();
       document.removeEventListener('keydown', handleEscape);
     };
 
-    // Evento para cerrar modal al hacer clic en overlay
     overlay.onclick = function() {
       cerrarModal();
       document.removeEventListener('keydown', handleEscape);
     };
   }
 
+  // Eliminar funciones duplicadas de alertas
+  // function mostrarAlertaVisual() { ... } // ELIMINAR
+  // function aplicarEstilosModalAdvertencia() { ... } // ELIMINAR
+  // function crearModalEliminar() { ... } // ELIMINAR
+
+  // Actualizar función de eliminar para usar sistema unificado
+  async function abrirModalEliminar() {
+    if (!filaSeleccionada) {
+        window.Alertas.error("Selecciona una fila para eliminar.");
+        return;
+    }
+
+    const confirmado = await window.Modales.mostrarConfirmacion({
+        titulo: 'Eliminar Lote',
+        texto: '¿Estás seguro de que deseas eliminar<br>este lote?<br>Esta acción no se puede deshacer.',
+        icono: '&#9888;'
+    });
+
+    if (confirmado) {
+        await confirmarEliminar();
+    }
+  }
+
+  async function confirmarEliminar() {
+    if (!filaSeleccionada) {
+        window.Alertas.error("No hay lote seleccionado para eliminar");
+        return;
+    }
+
+    try {
+        const registroId = filaSeleccionada.dataset.registroId || filaSeleccionada.children[0]?.textContent;
+        
+        if (!registroId) {
+            window.Alertas.error("No se pudo obtener el ID del registro");
+            return;
+        }
+
+        window.Alertas.info("Eliminando lote...");
+
+        await InventarioServices.eliminarLote(registroId);
+        
+        await cargarInventario();
+        filaSeleccionada = null;
+        
+        window.Alertas.success("Lote eliminado exitosamente");
+        
+    } catch (error) {
+        console.error('Error al eliminar lote:', error);
+        window.Alertas.error(error.message);
+    }
+  }
+
+  // Cargar inventario desde la API
+  async function cargarInventario() {
+    try {
+      mostrarAlertaVisual("Cargando inventario...", "warning");
+      
+      const datos = await InventarioServices.obtenerLotes();
+      inventario = datos || [];
+      
+      const tbody = tabla;
+      tbody.innerHTML = '';
+
+      // Filtrar inventario por categoría
+      const inventarioFiltrado = filtrarPorCategoria(inventario, filtroCategoria);
+
+      // Crear filas para cada item
+      inventarioFiltrado.forEach(item => {
+        const fila = crearFilaTabla(item);
+        tbody.appendChild(fila);
+      });
+
+      setupRowSelection();
+      console.log(`Inventario cargado: ${inventarioFiltrado.length} items`);
+      
+      // Ocultar mensaje de carga
+      setTimeout(() => {
+        const alertas = document.querySelectorAll('div[style*="Cargando inventario"]');
+        alertas.forEach(alerta => alerta.remove());
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error al cargar inventario:', error);
+      mostrarAlertaVisual(error.message, "error");
+      
+      // Mostrar inventario vacío en caso de error
+      const tbody = tabla;
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 20px;">Error al cargar datos</td></tr>';
+    }
+  }
+
+  // Función para filtrar por categoría
+  function filtrarPorCategoria(inventario, categoria) {
+    if (categoria === "all") return inventario;
+    return inventario.filter(item => {
+        // Usar la categoría parseada o la original
+        const categoriaItem = item.categoria || 'general';
+        return categoriaItem.toLowerCase() === categoria.toLowerCase();
+    });
+  }
+
   // Inicializar aplicación
-  function init() {
-    inventario = [...datosEjemplo];
+  async function init() {
+    try {
+      // Verificar conexión primero
+      const conexionOk = await InventarioServices.verificarConexion();
+      if (!conexionOk) {
+        mostrarAlertaVisual("No se pudo conectar con el servidor", "error");
+      }
+
+      // Crear elementos dinámicos
     
-    // Crear elementos dinámicos
-    crearDropdown();
-    const modalAdd = crearModalAgregar();
-    const modalEdit = crearModalEditar();
-    
-    cargarInventario();
-    setupEventListeners(modalAdd, modalEdit);
+      const modalAdd = crearModalAgregar();
+      const modalEdit = crearModalEditar();
+      
+      // Cargar datos desde la API
+      await cargarInventario();
+      setupEventListeners(modalAdd, modalEdit);
+      
+    } catch (error) {
+      console.error('Error al inicializar:', error);
+      mostrarAlertaVisual("Error al inicializar la aplicación", "error");
+    }
   }
 
   // Configurar event listeners
   function setupEventListeners(modalAdd, modalEdit) {
-    // Botones principales
     btnAdd.addEventListener("click", () => abrirModalAgregar(modalAdd));
     btnEdit.addEventListener("click", () => abrirModalEditar(modalEdit));
-    btnDelete.addEventListener("click", () => abrirModalEliminar());
-    
-    // Dropdown de categorías
-    btnCategory.addEventListener("click", toggleDropdown);
-    dropdownItems.forEach(item => {
-      item.addEventListener("click", filtrarPorCategoria);
-    });
+    btnDelete.addEventListener("click", abrirModalEliminar);
 
-    // Cerrar dropdown al hacer click fuera
-    document.addEventListener("click", (e) => {
-      if (!dropdownContainer.contains(e.target)) {
-        cerrarDropdown();
-      }
-    });
-
-    // Modales (solo para agregar y editar)
     setupModalEvents(modalAdd, modalEdit);
 
-    // Formularios
     document.getElementById("form-add-product").addEventListener("submit", agregarProducto);
     document.getElementById("form-edit-product").addEventListener("submit", editarProducto);
 
-    // Selección de filas
     setupRowSelection();
   }
 
@@ -509,13 +542,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function setupModalEvents(modalAdd, modalEdit) {
     const modales = [modalAdd, modalEdit];
     
-    // Cerrar modales con X
     modales.forEach(modal => {
       const closeBtn = modal.querySelector(".modal-close");
       closeBtn.addEventListener("click", () => cerrarModales(modales));
     });
 
-    // Cerrar modales con botón cancelar
     modales.forEach(modal => {
       const cancelBtns = modal.querySelectorAll(".btn-cancel");
       cancelBtns.forEach(btn => {
@@ -523,7 +554,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Cerrar modales haciendo click fuera
     modales.forEach(modal => {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) {
@@ -537,22 +567,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function setupRowSelection() {
     tabla.addEventListener("click", (e) => {
       const fila = e.target.closest("tr");
-      // Mejorar la condición para detectar filas válidas
       if (fila && fila.children.length > 0) {
         const primeraCelda = fila.children[0];
         const contenidoCelda = primeraCelda.textContent.trim();
         
-        // Solo seleccionar si la fila tiene contenido real (no está vacía)
         if (contenidoCelda && contenidoCelda !== '' && contenidoCelda !== '\u00A0') {
+          if (!fila.dataset.registroId) {
+            const idCelda = fila.children[5];
+            if (idCelda) {
+              fila.dataset.registroId = idCelda.textContent.trim();
+            }
+          }
           seleccionarFila(fila);
         }
       }
     });
   }
 
-  // Seleccionar fila - AGREGAR ESTILOS CSS
+  // Seleccionar fila
   function seleccionarFila(fila) {
-    // Asegurar que los estilos CSS existan
     if (!document.getElementById('row-selection-styles')) {
       const style = document.createElement('style');
       style.id = 'row-selection-styles';
@@ -574,178 +607,114 @@ document.addEventListener("DOMContentLoaded", () => {
       document.head.appendChild(style);
     }
     
-    // Remover selección anterior
     document.querySelectorAll(".products-table tbody tr").forEach(tr => {
       tr.classList.remove("selected");
     });
     
-    // Seleccionar nueva fila
     fila.classList.add("selected");
     filaSeleccionada = fila;
     
-    console.log('Fila seleccionada:', filaSeleccionada); // Para debug
+    console.log('Fila seleccionada:', filaSeleccionada);
   }
 
-  // Función abrirModalEliminar corregida
   function abrirModalEliminar() {
     if (!filaSeleccionada) {
-      mostrarAlertaVisual("Selecciona una fila para eliminar.");
-      return;
+        mostrarAlertaVisual("Selecciona una fila para eliminar.", "error");
+        return;
     }
-    
-    // Crear el modal solo cuando se necesite
     crearModalEliminar();
   }
 
-  // Agregar función mostrarAlertaVisual si no existe
-  function mostrarAlertaVisual(mensaje) {
-    // Crear alerta temporal
-    const alerta = document.createElement('div');
-    alerta.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #f8d7da;
-      color: #721c24;
-      padding: 15px 20px;
-      border: 1px solid #f5c6cb;
-      border-radius: 4px;
-      z-index: 9999;
-      font-size: 14px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    `;
-    alerta.textContent = mensaje;
-    
-    document.body.appendChild(alerta);
-    
-    // Remover después de 3 segundos
-    setTimeout(() => {
-      if (alerta.parentNode) {
-        alerta.remove();
-      }
-    }, 3000);
-  }
-
-  // Cargar inventario en la tabla
-  function cargarInventario() {
-    tabla.innerHTML = "";
-    
-    const inventarioFiltrado = filtroCategoria === "all" 
-      ? inventario 
-      : inventario.filter(item => item.categoria === filtroCategoria);
-
-    inventarioFiltrado.forEach(item => {
-      const fila = crearFilaTabla(item);
-      tabla.appendChild(fila);
-    });
-
-    // Agregar filas vacías si es necesario
-    const filasVacias = Math.max(0, 9 - inventarioFiltrado.length);
-    for (let i = 0; i < filasVacias; i++) {
-      const filaVacia = document.createElement("tr");
-      for (let j = 0; j < 11; j++) {
-        const td = document.createElement("td");
-        filaVacia.appendChild(td);
-      }
-      tabla.appendChild(filaVacia);
+  function toggleDropdown() {
+    if (dropdownMenu.style.display === "block") {
+      cerrarDropdown();
+    } else {
+      abrirDropdown();
     }
   }
 
-  // Crear fila de tabla
-  function crearFilaTabla(item) {
-    const fila = document.createElement("tr");
-    
-    const campos = [
-      item.codigo,
-      item.producto,
-      capitalizarTexto(item.categoria),
-      item.marca,
-      formatearFecha(item.fechaCaducidad),
-      item.id,
-      formatearFecha(item.fechaEntrada),
-      item.fechaSalida,
-      item.stockAlmacen,
-      item.stockExhibicion,
-      `$${item.precio.toFixed(2)}`
-    ];
-
-    campos.forEach(campo => {
-      const td = document.createElement("td");
-      td.textContent = campo;
-      fila.appendChild(td);
-    });
-
-    return fila;
-  }
-
-  // Dropdown de categorías
-  function toggleDropdown() {
-    dropdownContainer.classList.toggle("active");
+  function abrirDropdown() {
+    dropdownMenu.style.display = "block";
+    btnCategory.classList.add("active");
   }
 
   function cerrarDropdown() {
-    dropdownContainer.classList.remove("active");
+    if (dropdownMenu) {
+      dropdownMenu.style.display = "none";
+      btnCategory.classList.remove("active");
+    }
   }
 
-  function filtrarPorCategoria(e) {
-    const categoria = e.target.getAttribute("data-category");
+  function filtrarPorCategoriaHandler(e) {
+    const categoria = e.target.dataset.category;
     filtroCategoria = categoria;
-    
-    // Actualizar selección visual
+
+    const text = e.target.textContent;
+    btnCategory.querySelector("i").nextSibling.textContent = ` ${text}`;
+
     dropdownItems.forEach(item => item.classList.remove("selected"));
     e.target.classList.add("selected");
-    
-    // Actualizar texto del botón
-    const textoCategoria = categoria === "all" ? "Categoria" : capitalizarTexto(categoria);
-    btnCategory.innerHTML = `
-      <i class="fas fa-filter"></i>
-      ${textoCategoria}
-      <i class="fas fa-chevron-down dropdown-arrow"></i>
-    `;
-    
+
     cargarInventario();
     cerrarDropdown();
-    filaSeleccionada = null;
   }
 
-  // Modales
   function abrirModalAgregar(modal) {
-    document.getElementById("form-add-product").reset();
+    // Actualizar el nombre de usuario cada vez que se abre el modal
+    const nombreUsuarioActual = InventarioServices.getNombreUsuario();
+    const inputUsuario = modal.querySelector("#nombreUsuario");
+    if (inputUsuario) {
+        inputUsuario.value = nombreUsuarioActual;
+    }
+    
     modal.classList.add("active");
+    modal.querySelector("#codigoProducto").focus(); // Cambiar el focus al código del producto
   }
 
   function abrirModalEditar(modal) {
     if (!filaSeleccionada) {
-      mostrarAlertaVisual("Selecciona una fila para editar.");
+      mostrarAlertaVisual("Selecciona una fila para editar.", "error");
       return;
     }
 
-    const celdas = filaSeleccionada.querySelectorAll("td");
-    const codigo = celdas[0].textContent.trim();
-    const producto = inventario.find(item => item.codigo === codigo);
-
-    if (producto) {
-      document.getElementById("edit-codigo").value = producto.codigo;
-      document.getElementById("edit-producto").value = producto.producto;
-      document.getElementById("edit-categoria").value = producto.categoria;
-      document.getElementById("edit-marca").value = producto.marca;
-      document.getElementById("edit-fechaCaducidad").value = producto.fechaCaducidad;
-      document.getElementById("edit-precio").value = producto.precio;
-      document.getElementById("edit-stockAlmacen").value = producto.stockAlmacen;
-      document.getElementById("edit-stockExhibicion").value = producto.stockExhibicion;
-      
-      modal.classList.add("active");
+    const datos = obtenerDatosFilaSeleccionada();
+    if (!datos) {
+      mostrarAlertaVisual("Error al obtener datos de la fila seleccionada.", "error");
+      return;
     }
+
+    llenarFormularioEdicion(modal, datos);
+    modal.classList.add("active");
   }
 
-  function abrirModalEliminar() {
-    if (!filaSeleccionada) {
-      mostrarAlertaVisual("Selecciona una fila para eliminar.");
-      return;
-    }
-    
-    // Crear el modal solo cuando se necesite
-    crearModalEliminar();
+  function obtenerDatosFilaSeleccionada() {
+    if (!filaSeleccionada) return null;
+
+    const celdas = filaSeleccionada.children;
+    return {
+      codigo: celdas[0]?.textContent || '',
+      producto: celdas[1]?.textContent || '',
+      categoria: celdas[2]?.textContent || '',
+      marca: celdas[3]?.textContent || '',
+      fechaCaducidad: celdas[4]?.textContent || '',
+      id: celdas[5]?.textContent || '',
+      fechaEntrada: celdas[6]?.textContent || '',
+      fechaSalida: celdas[7]?.textContent || '',
+      stockAlmacen: parseInt(celdas[8]?.textContent) || 0,
+      stockExhibicion: parseInt(celdas[9]?.textContent) || 0,
+      precio: parseFloat(celdas[10]?.textContent.replace('$', '')) || 0
+    };
+  }
+
+  function llenarFormularioEdicion(modal, datos) {
+    // Llenar el campo de stock de exhibición
+    modal.querySelector("#edit-stockExhibicion").value = datos.stockExhibicion;
+    modal.querySelector("#edit-stockMinimo").value = datos.stockMinimo ?? 10;
+    modal.querySelector("#edit-margenGanancia").value = datos.margenGanancia ?? 20;
+
+    const stockExhibicionInput = modal.querySelector("#edit-stockExhibicion");
+    stockExhibicionInput.dataset.stockTotal = datos.stockAlmacen + datos.stockExhibicion;
+
   }
 
   function cerrarModales(modales) {
@@ -754,95 +723,206 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Agregar producto
-  function agregarProducto(e) {
+  async function agregarProducto(e) {
     e.preventDefault();
     
+    console.log('🔄 Iniciando proceso de agregar producto...');
+    
     const formData = new FormData(e.target);
-    const nuevoProducto = {
-      codigo: formData.get("codigo"),
-      producto: formData.get("producto"),
-      categoria: formData.get("categoria"),
-      marca: formData.get("marca"),
-      fechaCaducidad: formData.get("fechaCaducidad"),
-      id: `REG${String(inventario.length + 1).padStart(3, "0")}`,
-      fechaEntrada: new Date().toISOString().split("T")[0],
-      fechaSalida: "-",
-      stockAlmacen: parseInt(formData.get("stockAlmacen")),
-      stockExhibicion: parseInt(formData.get("stockExhibicion")),
-      precio: parseFloat(formData.get("precio"))
+    
+    // Mostrar todos los datos del formulario para debug
+    console.log('📋 Datos completos del formulario:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: ${value}`);
+    }
+    
+    // El nombre de usuario se toma del formulario, pero si está vacío, se usa el del sessionStorage
+    const nombreUsuario = formData.get("nombreUsuario") || InventarioServices.getNombreUsuario();
+    
+    // SOLO incluir los campos que necesita el backend
+    const nuevoLote = {
+        nombreUsuario: nombreUsuario,
+        codigoProducto: formData.get("codigoProducto"),
+        stockAlmacen: parseInt(formData.get("stockAlmacen")) || 0,
+        stockExhibicion: parseInt(formData.get("stockExhibicion")) || 0,
+        stockMinimo: parseInt(formData.get("stockMinimo")) || 0,
+        fechaCaducidad: formData.get("fechaCaducidad"),
+        precioCompra: parseFloat(formData.get("precioCompra")) || 0.0,
+        fechaEntrada: formData.get("fechaEntrada"),
+        margenGanancia: parseFloat(formData.get("margenGanancia")) || 0.0
     };
 
-    // Verificar si el código ya existe
-    if (inventario.some(item => item.codigo === nuevoProducto.codigo)) {
-      mostrarAlertaVisual("Ya existe un producto con ese código.");
-      return;
+    console.log('📝 Datos preparados para enviar (sin campos extra):', nuevoLote);
+
+    // Validar campos obligatorios antes de enviar
+    if (!nuevoLote.codigoProducto) {
+        mostrarAlertaVisual("El código del producto es obligatorio", "error");
+        return;
+    }
+    
+    if (!nuevoLote.fechaEntrada) {
+        mostrarAlertaVisual("La fecha de entrada es obligatoria", "error");
+        return;
+    }
+    
+    if (!nuevoLote.fechaCaducidad) {
+        mostrarAlertaVisual("La fecha de caducidad es obligatoria", "error");
+        return;
+    }
+    
+    if (!nuevoLote.precioCompra || nuevoLote.precioCompra <= 0) {
+        mostrarAlertaVisual("El precio de compra debe ser mayor a 0", "error");
+        return;
     }
 
-    inventario.push(nuevoProducto);
-    cargarInventario();
-    cerrarModales([document.getElementById("modal-add")]);
-    
-    mostrarAlertaVisual("Producto agregado exitosamente.");
+    try {
+        mostrarAlertaVisual("Agregando lote...", "warning");
+        
+        const resultado = await InventarioServices.crearLote(nuevoLote);
+        console.log('✅ Resultado del servidor:', resultado);
+        
+        const modal = document.getElementById("modal-add");
+        modal.classList.remove("active");
+        e.target.reset();
+        
+        await cargarInventario();
+        mostrarAlertaVisual("Lote agregado exitosamente.", "success");
+        
+    } catch (error) {
+        console.error('❌ Error detallado al agregar lote:', error);
+        mostrarAlertaVisual(`Error: ${error.message}`, "error");
+    }
   }
 
-  // Editar producto
-  function editarProducto(e) {
+  async function editarProducto(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
-    const codigo = formData.get("codigo");
-    const index = inventario.findIndex(item => item.codigo === codigo);
+    
+    const datosActualizacion = {
+        stockExhibicion: parseInt(formData.get("stockExhibicion")) || 0,
+        stockMinimo: parseInt(formData.get("stockMinimo")) || 0,
+        margenGanancia: parseFloat(formData.get("margenGanancia")) || 0.0
+    };
 
-    if (index !== -1) {
-      inventario[index] = {
-        ...inventario[index],
-        producto: formData.get("producto"),
-        categoria: formData.get("categoria"),
-        marca: formData.get("marca"),
-        fechaCaducidad: formData.get("fechaCaducidad"),
-        precio: parseFloat(formData.get("precio")),
-        stockAlmacen: parseInt(formData.get("stockAlmacen")),
-        stockExhibicion: parseInt(formData.get("stockExhibicion"))
-      };
-
-      cargarInventario();
-      cerrarModales([document.getElementById("modal-edit")]);
-      filaSeleccionada = null;
-      
-      mostrarAlertaVisual("Producto modificado exitosamente.");
+    if (!filaSeleccionada) {
+        mostrarAlertaVisual("Por favor seleccione un lote para editar", "error");
+        return;
     }
-  }
 
-  // Confirmar eliminación
-  function confirmarEliminar() {
-    if (!filaSeleccionada) return;
+    try {
+        const registroId = filaSeleccionada.dataset.registroId || filaSeleccionada.children[0]?.textContent;
+        
+        if (!registroId) {
+            mostrarAlertaVisual("No se pudo obtener el ID del registro", "error");
+            return;
+        }
 
-    const celdas = filaSeleccionada.querySelectorAll("td");
-    const codigo = celdas[0].textContent.trim();
-    const index = inventario.findIndex(item => item.codigo === codigo);
+        mostrarAlertaVisual("Actualizando lote...", "warning");
 
-    if (index !== -1) {
-      inventario.splice(index, 1);
-      cargarInventario();
-      cerrarModales([document.getElementById("modal-delete")]);
-      filaSeleccionada = null;
-      
-      mostrarAlertaVisual("Producto eliminado exitosamente.");
+        await InventarioServices.actualizarLote(registroId, datosActualizacion);
+        
+        const modal = document.getElementById("modal-edit");
+        modal.classList.remove("active");
+        
+        await cargarInventario();
+        filaSeleccionada = null;
+        
+        mostrarAlertaVisual("Lote modificado exitosamente", "success");
+        
+    } catch (error) {
+        console.error('Error al editar lote:', error);
+        mostrarAlertaVisual(error.message, "error");
     }
-  }
-
-  // Utilidades
-  function formatearFecha(fecha) {
-    if (!fecha || fecha === "-") return "-";
-    const date = new Date(fecha);
-    return date.toLocaleDateString("es-ES");
   }
 
   function capitalizarTexto(texto) {
-    return texto.charAt(0).toUpperCase() + texto.slice(1);
+    if (!texto) return '';
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
   }
 
-  // Inicializar aplicación
+  function formatearFecha(fecha) {
+    if (!fecha || fecha === '-') return '-';
+    
+    try {
+      if (fecha.includes('-')) {
+        const partes = fecha.split('-');
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+      
+      if (fecha.includes('/')) {
+        return fecha;
+      }
+      
+      const fechaObj = new Date(fecha);
+      if (!isNaN(fechaObj.getTime())) {
+        return fechaObj.toLocaleDateString('es-ES');
+      }
+      
+      return fecha;
+    } catch (error) {
+      console.error('Error formateando fecha:', error);
+      return fecha;
+    }
+  }
+
+  function formatearPrecio(precio) {
+    if (!precio) return '$0.00';
+    return `$${parseFloat(precio).toFixed(2)}`;
+  }
+
+  function crearFilaTabla(item) {
+    const fila = document.createElement("tr");
+    
+    const registroId = item.idRegistro || item.id || item.registro || item.id_registro || '';
+    fila.dataset.registroId = registroId;
+    
+    const campos = [
+        { valor: item.codigoProducto || '', clase: 'column-codigo' },
+        { valor: item.nombre || item.producto || 'Producto no encontrado', clase: 'column-producto' }, // Usar nombre parseado si existe
+        { valor: capitalizarTexto(item.categoria || 'Sin categoría'), clase: 'column-cat' },
+        { valor: item.marca || 'Sin marca', clase: 'column-marca' },
+        { valor: formatearFecha(item.fechaCaducidad), clase: 'column-fechacad' },
+        { valor: registroId, clase: 'column-id' },
+        { valor: formatearFecha(item.fechaEntrada), clase: 'column-fechaent' },
+        { valor: item.fechaSalida || '-', clase: 'column-fechasal' },
+        { valor: item.stockAlmacen || 0, clase: 'column-stockalm' },
+        { valor: item.stockExhibicion || 0, clase: 'column-stockex' },
+        { valor: formatearPrecio(item.precioCompra || item.precio), clase: 'column-precio' }
+    ];
+
+    campos.forEach(campo => {
+        const td = document.createElement("td");
+        td.className = campo.clase;
+        td.textContent = campo.valor;
+        fila.appendChild(td);
+    });
+
+    return fila;
+  }
+
   init();
 });
+
+// Exportar función principal para uso externo si es necesario
+window.cargarInventario = async () => {
+  await cargarInventario();
+};
+
+// Agregar función de debug al final del archivo
+window.debugInventario = async () => {
+  console.log('🐛 INICIANDO DEBUG DEL INVENTARIO...');
+  
+  // Mostrar información de sessionStorage
+  console.log('🔍 Información de sessionStorage:');
+  getSessionInfo();
+  
+  // Debugear respuesta del servidor
+  console.log('🔍 Analizando respuesta del servidor:');
+  await InventarioServices.debugRespuestaServidor();
+};
+
+// También exportar las funciones helper
+window.setNegocioId = setNegocioId;
+window.getSessionInfo = getSessionInfo;
+window.setNombreUsuario = setNombreUsuario;
