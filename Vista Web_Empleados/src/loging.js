@@ -108,19 +108,19 @@ function redirigirSegunRol(rol, datosUsuario) {
         case 'admin':
         case 'administrador':
             // Redirigir a la vista de administrador
-            window.location.href = '/Vista Web Admin/html/Index.html';
+            window.location.href = '/Vista Web Admin/html/Ventas.html';
             break;
             
         case 'empleado':
         case 'employee':
             // Redirigir a la vista de empleado
-            window.location.href = '/Vista Web_Empleados/HTML/Index_Empleados.html';
+            window.location.href = '/Vista Web_Empleados/HTML/Ventas_Empleados.html';
             break;
             
         default:
             console.warn('Rol no reconocido:', rol);
             // Por defecto, redirigir a vista de empleado
-            window.location.href = '/Vista Web_Empleados/HTML/Index_Empleados.html';
+            window.location.href = '/Vista Web_Empleados/HTML/Ventas_Empleados.html';
             break;
     }
 }
