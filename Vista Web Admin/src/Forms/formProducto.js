@@ -2,12 +2,497 @@ document.addEventListener("DOMContentLoaded", () => {
   // Variables globales
   let productos = [];
   let filaSeleccionada = null;
-  let productosOriginales = []; // Copia de todos los productos
+  let productosOriginales = [];
 
-  // ELIMINAR DATOS DE EJEMPLO COMPLETAMENTE
-  // const datosEjemplo = [...]; // ELIMINAR ESTA SECCIÓN
+  // Función auxiliar para procesar datos de combobox - SIMPLIFICADA PARA TU ESTRUCTURA
+  function procesarDatosCombobox(data) {
+    console.log('Procesando datos recibidos:', data);
+    
+    if (!data || !Array.isArray(data)) {
+      console.log('Datos no válidos o no es array:', data);
+      return [];
+    }
+    
+    // Los datos ya vienen como array de strings desde las funciones get*
+    const resultado = data.filter(item => 
+      item && 
+      typeof item === 'string' && 
+      item.trim() !== ''
+    );
+    
+    console.log('Datos procesados finales:', resultado);
+    return resultado;
+  }
 
-  // Crear modal para agregar producto
+  // NUEVAS OPCIONES PREDETERMINADAS
+  const CATEGORIAS_PREDETERMINADAS = [
+    'Frutas y Verduras',
+    'Embutidos',
+    'Carnes rojas',
+    'Carnes blancas',
+    'Pescadería',
+    'Lácteos',
+    'Panadería',
+    'Repostería',
+    'Alimentos Congelados',
+    'Legumbres',
+    'Harinas y levaduras',
+    'Despensa Básica',
+    'Conservas y Enlatados',
+    'Frituras',
+    'Bebidas',
+    'Higiene',
+    'Hogar',
+    'Bebés',
+    'Limpieza',
+    'Cuidado Femenino y Adultos Mayores',
+    'Electrónica',
+    'Farmacia y Salud'
+  ];
+
+  const ENVASES_PREDETERMINADOS = [
+    'Bolsa (plástico, papel, aluminio)',
+    'Caja',
+    'Lata',
+    'Frasco de vidrio',
+    'Botella de plástico',
+    'Tetra Pak',
+    'Bolsa sellada al vacío',
+    'Botella de vidrio',
+    'Lata de aluminio'
+  ];
+
+  // Función para combinar opciones predeterminadas con datos del servidor
+  function combinarOpciones(opcionesPredeterminadas, datosServidor) {
+    console.log('Combinando opciones:', { opcionesPredeterminadas, datosServidor });
+    
+    // Crear un Set para evitar duplicados (ignorando mayúsculas/minúsculas)
+    const opcionesUnicas = new Set();
+    const resultado = [];
+    
+    // Agregar opciones predeterminadas primero
+    opcionesPredeterminadas.forEach(opcion => {
+      const opcionLower = opcion.toLowerCase().trim();
+      if (!opcionesUnicas.has(opcionLower)) {
+        opcionesUnicas.add(opcionLower);
+        resultado.push(opcion);
+      }
+    });
+    
+    // Agregar opciones del servidor que no estén duplicadas
+    if (Array.isArray(datosServidor)) {
+      datosServidor.forEach(opcion => {
+        if (opcion && typeof opcion === 'string') {
+          const opcionLower = opcion.toLowerCase().trim();
+          if (!opcionesUnicas.has(opcionLower) && opcion.trim() !== '') {
+            opcionesUnicas.add(opcionLower);
+            resultado.push(opcion.trim());
+          }
+        }
+      });
+    }
+    
+    console.log('Opciones combinadas:', resultado);
+    return resultado;
+  }
+
+  // Agregar estilos CSS mejorados para los comboboxes
+  if (!document.getElementById('combobox-styles')) {
+    const comboboxStyle = document.createElement('style');
+    comboboxStyle.id = 'combobox-styles';
+    comboboxStyle.textContent = `
+      /* Contenedor principal del combobox */
+      .combobox-container {
+        position: relative;
+        width: 100%;
+      }
+
+      /* Input del combobox */
+      .combobox-input {
+        width: 100%;
+        padding: 12px 40px 12px 15px;
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        color: #333;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        cursor: text;
+        position: relative;
+        z-index: 1;
+      }
+
+      .combobox-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        background: #fafafa;
+      }
+
+      .combobox-input::placeholder {
+        color: #999;
+        font-style: italic;
+      }
+
+      /* Icono de dropdown */
+      .combobox-container::after {
+        content: '▼';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 2;
+        transition: transform 0.3s ease;
+      }
+
+      .combobox-container.active::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+
+      /* Dropdown del combobox */
+      .combobox-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #007bff;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-height: 200px;
+        overflow: hidden;
+        animation: slideDown 0.2s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Contenedor de opciones con scroll */
+      .combobox-options {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      /* Estilos del scrollbar */
+      .combobox-options::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .combobox-options::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .combobox-options::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      .combobox-options::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+
+      /* Opciones individuales */
+      .combobox-option {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+      }
+
+      .combobox-option:last-child {
+        border-bottom: none;
+      }
+
+      .combobox-option:hover {
+        background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+        color: #1976d2;
+        transform: translateX(2px);
+      }
+
+      .combobox-option:active {
+        background: linear-gradient(135deg, #bbdefb, #e3f2fd);
+        transform: translateX(0px);
+      }
+
+      /* Opción para crear nueva */
+      .combobox-option.nueva-opcion {
+        background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+        border-left: 4px solid #4caf50;
+        color: #2e7d32;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .combobox-option.nueva-opcion:hover {
+        background: linear-gradient(135deg, #c8e6c9, #dcedc8);
+        color: #1b5e20;
+        transform: translateX(4px);
+      }
+
+      .combobox-option.nueva-opcion i {
+        color: #4caf50;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      /* Estados especiales */
+      .combobox-option.destacado {
+        background: linear-gradient(135deg, #fff3e0, #ffecd1);
+        border-left: 3px solid #ff9800;
+        font-weight: 500;
+      }
+
+      .combobox-option.destacado:hover {
+        background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+      }
+
+      /* Mensaje cuando no hay opciones */
+      .combobox-no-options {
+        padding: 20px 15px;
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        background: #fafafa;
+      }
+
+      /* Separadores de categorías */
+      .combobox-separator {
+        padding: 6px 15px;
+        background: #f8f9fa;
+        color: #6c757d;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #dee2e6;
+        cursor: default;
+      }
+
+      /* Animación de carga */
+      .combobox-loading {
+        padding: 15px;
+        text-align: center;
+        color: #007bff;
+        font-style: italic;
+      }
+
+      .combobox-loading::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #007bff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Resaltado de texto buscado */
+      .combobox-option .highlight {
+        background: #ffeb3b;
+        font-weight: bold;
+        padding: 1px 2px;
+        border-radius: 2px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .combobox-dropdown {
+          max-height: 150px;
+        }
+        
+        .combobox-option {
+          padding: 14px 15px;
+          font-size: 16px; /* Mejor para móviles */
+        }
+        
+        .combobox-input {
+          padding: 14px 40px 14px 15px;
+          font-size: 16px; /* Evita zoom en iOS */
+        }
+      }
+
+      /* Modo oscuro (opcional) */
+      @media (prefers-color-scheme: dark) {
+        .combobox-input {
+          background: #2d2d2d;
+          color: #ffffff;
+          border-color: #555;
+        }
+        
+        .combobox-dropdown {
+          background: #2d2d2d;
+          border-color: #555;
+        }
+        
+        .combobox-option {
+          background: #2d2d2d;
+          color: #ffffff;
+          border-bottom-color: #555;
+        }
+        
+        .combobox-option:hover {
+          background: #3d3d3d;
+        }
+      }
+
+      /* Estados de validación */
+      .combobox-container.error .combobox-input {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+      }
+
+      .combobox-container.success .combobox-input {
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+      }
+
+      /* Transiciones suaves para todos los elementos */
+      .combobox-container * {
+        transition: all 0.2s ease;
+      }
+    `;
+    document.head.appendChild(comboboxStyle);
+  }
+
+  // Función para crear combobox con autocompletado
+  function crearComboboxAutocompletado(inputId, containerId, opciones = [], placeholder = "") {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error(`Contenedor ${containerId} no encontrado`);
+      return;
+    }
+
+    // Limpiar contenedor
+    container.innerHTML = '';
+
+    // Crear estructura del combobox con mejores clases
+    const comboboxHTML = `
+      <input type="text" 
+             id="${inputId}" 
+             name="${inputId.replace('-producto', '').replace('edit-', '')}" 
+             placeholder="${placeholder}"
+             autocomplete="off"
+             class="combobox-input"
+             required>
+      <div class="combobox-dropdown" id="${inputId}-dropdown">
+        <div class="combobox-options" id="${inputId}-options"></div>
+      </div>
+    `;
+
+    container.innerHTML = comboboxHTML;
+    container.classList.add('combobox-container'); // Agregar clase
+
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(`${inputId}-dropdown`);
+    const optionsContainer = document.getElementById(`${inputId}-options`);
+
+    if (!input || !dropdown || !optionsContainer) {
+      console.error('Error creando elementos del combobox');
+      return;
+    }
+
+    console.log(`Combobox ${inputId} creado con ${opciones.length} opciones:`, opciones);
+
+    // Función para filtrar y mostrar opciones
+    function mostrarOpciones(filtro = '') {
+      optionsContainer.innerHTML = '';
+      
+      const opcionesFiltradas = opciones.filter(opcion => 
+        opcion.toLowerCase().includes(filtro.toLowerCase())
+      );
+
+      if (opcionesFiltradas.length === 0 && filtro) {
+        optionsContainer.innerHTML = `
+          <div class="combobox-option nueva-opcion" data-value="${filtro}">
+            <i class="fas fa-plus"></i> Crear "${filtro}"
+          </div>
+        `;
+      } else {
+        opcionesFiltradas.forEach(opcion => {
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'combobox-option';
+          optionDiv.textContent = opcion;
+          optionDiv.setAttribute('data-value', opcion);
+          optionDiv.addEventListener('click', () => {
+            input.value = opcion;
+            dropdown.style.display = 'none';
+          });
+          optionsContainer.appendChild(optionDiv);
+        });
+      }
+
+      dropdown.style.display = (opcionesFiltradas.length > 0 || filtro) ? 'block' : 'none';
+    }
+
+    // Eventos del input
+    input.addEventListener('focus', () => {
+      mostrarOpciones(input.value);
+    });
+
+    input.addEventListener('input', (e) => {
+      mostrarOpciones(e.target.value);
+    });
+
+    input.addEventListener('blur', (e) => {
+      // Delay para permitir click en opciones
+      setTimeout(() => {
+        dropdown.style.display = 'none';
+      }, 200);
+    });
+
+    // Click en opciones
+    optionsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('combobox-option') || e.target.closest('.combobox-option')) {
+        const option = e.target.classList.contains('combobox-option') ? e.target : e.target.closest('.combobox-option');
+        const valor = option.getAttribute('data-value');
+        if (valor) {
+          input.value = valor;
+          dropdown.style.display = 'none';
+          
+          // Agregar a las opciones para futuras búsquedas si es nueva
+          if (option.classList.contains('nueva-opcion') && !opciones.includes(valor)) {
+            opciones.push(valor);
+          }
+        }
+      }
+    });
+
+    return { input, dropdown, opciones };
+  }
+
+  // Crear modal para agregar producto con comboboxes
   function crearModalProducto() {
     const modal = document.createElement("div");
     modal.id = "modal-producto";
@@ -40,43 +525,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             <div class="form-group">
               <label>Categoría</label>
-              <div class="dropdown-field">
-                <select id="categoria-producto" name="categoria" required>
-                  <option value="">Categoría</option>
-                  <option value="bebidas">Bebidas</option>
-                  <option value="snacks">Snacks</option>
-                  <option value="dulces">Dulces</option>
-                  <option value="lacteos">Lácteos</option>
-                  <option value="panaderia">Panadería</option>
-                  <option value="limpieza">Limpieza</option>
-                  <option value="higiene">Higiene Personal</option>
-                </select>
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-              </div>
+              <div class="combobox-container" id="categoria-container"></div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label>Escriba la marca</label>
-              <input type="text" id="marca-producto" name="marca" required placeholder="Ejem. Cloralex">
+              <div class="combobox-container" id="marca-container"></div>
             </div>
             
             <div class="form-group">
-              <label>Escriba el envase</label>
-              <div class="dropdown-field">
-                <select id="envase" name="envase" required>
-                  <option value="">Escriba el envase</option>
-                  <option value="botella">Botella</option>
-                  <option value="lata">Lata</option>
-                  <option value="bolsa">Bolsa</option>
-                  <option value="caja">Caja</option>
-                  <option value="frasco">Frasco</option>
-                  <option value="tetrapack">Tetrapack</option>
-                  <option value="sobre">Sobre</option>
-                </select>
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-              </div>
+              <label>Escriba la presentación del producto</label>
+              <div class="combobox-container" id="envase-container"></div>
             </div>
           </div>
           
@@ -89,7 +550,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="form-group">
               <label>Medida</label>
               <div class="medida-container">
-                <input type="text" value="Medida" readonly class="medida-label">
                 <div class="dropdown-field">
                   <select id="medida" name="medida" required>
                     <option value="ml">ml</option>
@@ -119,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    // Agregar estilos CSS inline para asegurar que funcione
+    // Agregar estilos base
     modal.style.cssText = `
       position: fixed;
       top: 0;
@@ -136,7 +596,6 @@ document.addEventListener("DOMContentLoaded", () => {
       transition: all 0.3s ease;
     `;
 
-    // Estilos para el contenedor del modal
     const modalContainer = modal.querySelector('.modal-container');
     if (modalContainer) {
       modalContainer.style.cssText = `
@@ -156,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return modal;
   }
 
-  // Crear modal para editar producto
+  // Crear modal para editar producto con comboboxes
   function crearModalEditar() {
     const modal = document.createElement("div");
     modal.id = "modal-editar-producto";
@@ -189,45 +648,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             <div class="form-group">
               <label>Categoría</label>
-              <div class="dropdown-field">
-                <select id="edit-categoria-producto" name="categoria" required>
-                  <option value="">Seleccionar categoría</option>
-                  <option value="bebidas">Bebidas</option>
-                  <option value="snacks">Snacks</option>
-                  <option value="dulces">Dulces</option>
-                  <option value="lacteos">Lácteos</option>
-                  <option value="panaderia">Panadería</option>
-                  <option value="limpieza">Limpieza</option>
-                  <option value="higiene">Higiene Personal</option>
-                  <option value="cocina">Cocina</option>
-                  <option value="frituras">Frituras</option>
-                </select>
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-              </div>
+              <div class="combobox-container" id="edit-categoria-container"></div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label>Marca</label>
-              <input type="text" id="edit-marca-producto" name="marca" required placeholder="Ejem. Cloralex">
+              <div class="combobox-container" id="edit-marca-container"></div>
             </div>
             
             <div class="form-group">
-              <label>Envase</label>
-              <div class="dropdown-field">
-                <select id="edit-envase" name="envase" required>
-                  <option value="">Seleccionar envase</option>
-                  <option value="botella">Botella</option>
-                  <option value="lata">Lata</option>
-                  <option value="bolsa">Bolsa</option>
-                  <option value="caja">Caja</option>
-                  <option value="frasco">Frasco</option>
-                  <option value="tetrapack">Tetrapack</option>
-                  <option value="sobre">Sobre</option>
-                </select>
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-              </div>
+              <label>Escriba la presentación del producto</label>
+              <div class="combobox-container" id="edit-envase-container"></div>
             </div>
           </div>
           
@@ -240,7 +673,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="form-group">
               <label>Medida</label>
               <div class="medida-container">
-                <input type="text" value="Medida" readonly class="medida-label">
                 <div class="dropdown-field">
                   <select id="edit-medida" name="medida" required>
                     <option value="ml">ml</option>
@@ -274,6 +706,334 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return modal;
   }
+
+  // Alertas para el sistema de productos
+  class ProductosAlertas {
+    
+    // Producto agregado exitosamente
+    static productoAgregado(nombreProducto) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Producto agregado!',
+            text: `${nombreProducto} ha sido agregado exitosamente`,
+            timer: 2500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Producto editado exitosamente
+    static productoEditado(nombreProducto) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Producto actualizado!',
+            text: `${nombreProducto} ha sido actualizado exitosamente`,
+            timer: 2500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Confirmación antes de eliminar producto
+    static confirmarEliminarProducto(nombreProducto) {
+        return Swal.fire({
+            title: '¿Eliminar producto?',
+            html: `
+                <p>¿Estás seguro de que deseas eliminar:</p>
+                <strong>${nombreProducto}</strong>
+                <p class="text-danger mt-2">Esta acción no se puede deshacer</p>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+    }
+
+    // Producto eliminado exitosamente
+    static productoEliminado(nombreProducto) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Producto eliminado',
+            text: `${nombreProducto} ha sido eliminado del inventario`,
+            timer: 2500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Ningún producto seleccionado para editar/eliminar
+    static ningunProductoSeleccionado(accion) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona un producto',
+            text: `Debes seleccionar un producto de la tabla para ${accion}`,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Campos requeridos vacíos
+    static camposRequeridos(campos) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos requeridos',
+            html: `
+                <p>Los siguientes campos son obligatorios:</p>
+                <ul style="text-align: left; margin: 10px 0;">
+                    ${campos.map(campo => `<li>${campo}</li>`).join('')}
+                </ul>
+            `,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Código de producto duplicado
+    static codigoDuplicado(codigo) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Código duplicado',
+            text: `El código "${codigo}" ya existe. Usa un código diferente.`,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Precio inválido
+    static precioInvalido() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Precio inválido',
+            text: 'El precio debe ser un número mayor a 0',
+            confirmButtonText: 'Corregir'
+        });
+    }
+
+    // Error al cargar productos
+    static errorCargarProductos() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar productos',
+            text: 'No se pudieron cargar los productos. Verifica tu conexión.',
+            showCancelButton: true,
+            confirmButtonText: 'Reintentar',
+            cancelButtonText: 'Cancelar'
+        });
+    }
+
+    // Error al guardar producto
+    static errorGuardarProducto(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar',
+            text: mensaje || 'Ocurrió un error al guardar el producto',
+            confirmButtonText: 'Intentar nuevamente'
+        });
+    }
+
+    // Confirmación antes de salir sin guardar
+    static confirmarSalirSinGuardar() {
+        return Swal.fire({
+            title: '¿Salir sin guardar?',
+            text: 'Tienes cambios sin guardar que se perderán',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Salir sin guardar',
+            cancelButtonText: 'Continuar editando'
+        });
+    }
+
+    // Contenido neto inválido
+    static contenidoNetoInvalido() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Contenido neto inválido',
+            text: 'El contenido neto debe ser un número mayor a 0',
+            confirmButtonText: 'Corregir'
+        });
+    }
+
+    // Categoría no válida
+    static categoriaInvalida() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Categoría requerida',
+            text: 'Debes seleccionar una categoría válida',
+            confirmButtonText: 'Seleccionar'
+        });
+    }
+
+    // Producto no encontrado
+    static productoNoEncontrado() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Producto no encontrado',
+            text: 'El producto seleccionado no existe o fue eliminado',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Múltiples productos seleccionados para editar
+    static multiplesProductosSeleccionados() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selección múltiple',
+            text: 'Solo puedes editar un producto a la vez. Selecciona solo uno.',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Filtros aplicados
+    static filtrosAplicados(tipoFiltro, valor) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Filtro aplicado',
+            text: `Mostrando productos: ${tipoFiltro} - ${valor}`,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    // Sin resultados en búsqueda
+    static sinResultadosBusqueda(termino) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Sin resultados',
+            text: `No se encontraron productos que coincidan con: "${termino}"`,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Importación de productos exitosa
+    static importacionExitosa(cantidad) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Importación exitosa',
+            text: `Se importaron ${cantidad} productos correctamente`,
+            confirmButtonText: 'Continuar'
+        });
+    }
+
+    // Error en importación
+    static errorImportacion(errores) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en importación',
+            html: `
+                <p>Se encontraron los siguientes errores:</p>
+                <ul style="text-align: left; max-height: 200px; overflow-y: auto;">
+                    ${errores.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+            `,
+            confirmButtonText: 'Revisar errores'
+        });
+    }
+}
+
+// Event listeners para los botones de productos
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Botón agregar producto
+    const btnAgregar = document.querySelector('.btn-add');
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', function() {
+            // Aquí iría la lógica para mostrar modal de agregar producto
+            // Ejemplo de validación:
+            // ProductosAlertas.productoAgregado('Nuevo Producto');
+        });
+    }
+
+    // Botón editar producto
+    const btnEditar = document.querySelector('.btn-edit');
+    if (btnEditar) {
+        btnEditar.addEventListener('click', function() {
+            // Verificar si hay un producto seleccionado
+            const filaSeleccionada = document.querySelector('.productos-table tbody tr.selected');
+            
+            if (!filaSeleccionada) {
+                ProductosAlertas.ningunProductoSeleccionado('editar');
+                return;
+            }
+
+            // Verificar si hay múltiples selecciones
+            const filasSeleccionadas = document.querySelectorAll('.productos-table tbody tr.selected');
+            if (filasSeleccionadas.length > 1) {
+                ProductosAlertas.multiplesProductosSeleccionados();
+                return;
+            }
+
+            // Proceder con la edición
+            // ProductosAlertas.productoEditado('Producto editado');
+        });
+    }
+
+    // Botón eliminar producto
+    const btnEliminar = document.querySelector('.btn-category'); // Cambiar clase si es necesario
+    if (btnEliminar) {
+        btnEliminar.addEventListener('click', function() {
+            const filaSeleccionada = document.querySelector('.productos-table tbody tr.selected');
+            
+            if (!filaSeleccionada) {
+                ProductosAlertas.ningunProductoSeleccionado('eliminar');
+                return;
+            }
+
+            const nombreProducto = filaSeleccionada.querySelector('td:nth-child(4)')?.textContent || 'Producto seleccionado';
+            
+            ProductosAlertas.confirmarEliminarProducto(nombreProducto).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí iría la lógica para eliminar el producto
+                    ProductosAlertas.productoEliminado(nombreProducto);
+                }
+            });
+        });
+    }
+
+    // Función para validar formulario de producto
+    function validarFormularioProducto(formulario) {
+        const camposRequeridos = [];
+        
+        // Validar campos obligatorios
+        if (!formulario.codigo.value.trim()) camposRequeridos.push('Código');
+        if (!formulario.producto.value.trim()) camposRequeridos.push('Nombre del producto');
+        if (!formulario.categoria.value.trim()) camposRequeridos.push('Categoría');
+        if (!formulario.precio.value.trim()) camposRequeridos.push('Precio');
+        
+        if (camposRequeridos.length > 0) {
+            ProductosAlertas.camposRequeridos(camposRequeridos);
+            return false;
+        }
+
+        // Validar precio
+        const precio = parseFloat(formulario.precio.value);
+        if (isNaN(precio) || precio <= 0) {
+            ProductosAlertas.precioInvalido();
+            return false;
+        }
+
+        // Validar contenido neto si está presente
+        if (formulario.contenidoNeto.value.trim()) {
+            const contenido = parseFloat(formulario.contenidoNeto.value);
+            if (isNaN(contenido) || contenido <= 0) {
+                ProductosAlertas.contenidoNetoInvalido();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Hacer la función disponible globalmente
+    window.validarFormularioProducto = validarFormularioProducto;
+    window.ProductosAlertas = ProductosAlertas;
+});
 
   // Crear modal para eliminar producto
   function crearModalEliminar() {
@@ -570,28 +1330,103 @@ document.addEventListener("DOMContentLoaded", () => {
     return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
   }
 
-  // Función para abrir modal de agregar producto
-  function abrirModalProducto() {
+  // Función para abrir modal de agregar producto con comboboxes (MODIFICADA)
+  async function abrirModalProducto() {
     console.log("Abriendo modal de producto...");
     
     // Crear modal
     const modal = crearModalProducto();
     
+    // Mostrar modal primero
+    mostrarModal(modal);
+    
+    // Esperar un poco para que el modal se renderice completamente
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Cargar datos y crear comboboxes después de mostrar el modal
+    try {
+      console.log("Cargando datos para comboboxes...");
+      
+      // Obtener datos de la base de datos (con manejo de errores)
+      let categoriasServidor = [];
+      let marcasServidor = [];
+      let envasesServidor = [];
+      
+      try {
+        if (window.getCategorias) categoriasServidor = await window.getCategorias();
+        if (window.getMarcas) marcasServidor = await window.getMarcas();
+        if (window.getEnvases) envasesServidor = await window.getEnvases();
+      } catch (error) {
+        console.warn('Error obteniendo datos del servidor, usando solo opciones predeterminadas:', error);
+      }
+
+      console.log('Datos obtenidos del servidor:', { categoriasServidor, marcasServidor, envasesServidor });
+
+      // Procesar datos del servidor
+      const categoriasDelServidor = procesarDatosCombobox(categoriasServidor);
+      const marcasDelServidor = procesarDatosCombobox(marcasServidor);
+      const envasesDelServidor = procesarDatosCombobox(envasesServidor);
+
+      // Combinar opciones predeterminadas con datos del servidor
+      const categoriasFinales = combinarOpciones(CATEGORIAS_PREDETERMINADAS, categoriasDelServidor);
+      const marcasFinales = marcasDelServidor; // Solo del servidor para marcas
+      const envasesFinales = combinarOpciones(ENVASES_PREDETERMINADOS, envasesDelServidor);
+
+      console.log('Opciones finales:', { categoriasFinales, marcasFinales, envasesFinales });
+
+      // Verificar que los contenedores existan
+      const categoriaContainer = document.getElementById('categoria-container');
+      const marcaContainer = document.getElementById('marca-container');
+      const envaseContainer = document.getElementById('envase-container');
+
+      if (!categoriaContainer || !marcaContainer || !envaseContainer) {
+        console.error('Contenedores no encontrados');
+        throw new Error('Contenedores de combobox no encontrados');
+      }
+
+      // Crear comboboxes con autocompletado y opciones predeterminadas
+      crearComboboxAutocompletado('categoria-producto', 'categoria-container', categoriasFinales, 'Buscar o crear categoría...');
+      crearComboboxAutocompletado('marca-producto', 'marca-container', marcasFinales, 'Buscar o crear marca...');
+      crearComboboxAutocompletado('envase-producto', 'envase-container', envasesFinales, 'Buscar o crear envase...');
+
+      console.log('Comboboxes creados exitosamente con opciones predeterminadas');
+
+    } catch (error) {
+      console.error('Error cargando datos para comboboxes:', error);
+      
+      // Crear comboboxes con solo opciones predeterminadas en caso de error
+      setTimeout(() => {
+        crearComboboxAutocompletado('categoria-producto', 'categoria-container', CATEGORIAS_PREDETERMINADAS, 'Buscar o crear categoría...');
+        crearComboboxAutocompletado('marca-producto', 'marca-container', [], 'Escribir marca...');
+        crearComboboxAutocompletado('envase-producto', 'envase-container', ENVASES_PREDETERMINADOS, 'Buscar o crear envase...');
+      }, 50);
+    }
+    
     // Configurar eventos del modal
     configurarEventosModal(modal, async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
+      
+      // Obtener valores de los comboboxes
+      const codigo = document.getElementById('codigo-producto')?.value?.trim() || '';
+      const contenido = document.getElementById('contenido')?.value?.trim() || '';
+      const nombre = document.getElementById('nombre-producto')?.value?.trim() || '';
+      const categoria = document.getElementById('categoria-producto')?.value?.trim() || '';
+      const marca = document.getElementById('marca-producto')?.value?.trim() || '';
+      const envase = document.getElementById('envase-producto')?.value?.trim() || '';
+      const variedad = document.getElementById('variedad')?.value?.trim() || '';
+      const medida = document.getElementById('medida')?.value?.trim() || 'pz';
+      const precio = parseFloat(document.getElementById('precio')?.value) || 0;
       
       const datosProducto = {
-        codigo: (formData.get("codigo") || '').trim(),
-        nombre: (formData.get("nombre") || '').trim(),
-        marca: (formData.get("marca") || '').trim(),
-        variedad: (formData.get("variedad") || '').trim(),
-        contenido: (formData.get("contenido") || '0').trim(),
-        categoria: (formData.get("categoria") || '').trim(),
-        envase: (formData.get("envase") || '').trim(),
-        medida: (formData.get("medida") || 'pz').trim(),
-        precio: parseFloat(formData.get("precio")) || 0
+        codigo,
+        nombre,
+        marca,
+        variedad,
+        contenido,
+        categoria,
+        envase,
+        medida,
+        precio
       };
 
       console.log("Datos a enviar:", datosProducto);
@@ -633,13 +1468,10 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarAlertaVisual('Error al agregar el producto: ' + error.message);
       }
     });
-
-    // Mostrar modal
-    mostrarModal(modal);
   }
 
-  // Función para abrir modal de editar producto
-  function abrirModalEditar() {
+  // Función para abrir modal de editar producto con comboboxes (MODIFICADA)
+  async function abrirModalEditar() {
     if (!filaSeleccionada) {
       mostrarAlertaVisual('Por favor selecciona un producto para editar');
       return;
@@ -666,104 +1498,131 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = crearModalEditar();
     document.body.appendChild(modal);
 
-    // IMPORTANTE: Prellenar campos después de que el modal esté en el DOM
-    setTimeout(() => {
-      // Prellenar campos
-      const codigoInput = modal.querySelector('#edit-codigo-producto');
-      const nombreInput = modal.querySelector('#edit-nombre-producto');
-      const marcaInput = modal.querySelector('#edit-marca-producto');
-      const envaseSelect = modal.querySelector('#edit-envase');
-      const categoriaSelect = modal.querySelector('#edit-categoria-producto');
-      const variedadInput = modal.querySelector('#edit-variedad');
-      const contenidoInput = modal.querySelector('#edit-contenido');
-      const medidaSelect = modal.querySelector('#edit-medida');
-      const precioInput = modal.querySelector('#edit-precio');
+    // Mostrar modal
+    mostrarModal(modal);
 
-      if (codigoInput) codigoInput.value = datosActuales.codigo;
-      if (nombreInput) nombreInput.value = datosActuales.nombre;
-      if (marcaInput) marcaInput.value = datosActuales.marca;
-      if (variedadInput) variedadInput.value = datosActuales.variedad;
-      if (contenidoInput) contenidoInput.value = datosActuales.contenido;
-      if (precioInput) precioInput.value = datosActuales.precio;
+    // Esperar un poco para que el modal se renderice
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-      // CRÍTICO: Asignar valores a los selects
-      if (envaseSelect && datosActuales.envase) {
-        // Buscar la opción que coincida con el valor actual
-        const opcionEnvase = Array.from(envaseSelect.options).find(option => 
-          option.textContent.toLowerCase().trim() === datosActuales.envase.toLowerCase().trim()
-        );
-        if (opcionEnvase) {
-          envaseSelect.value = opcionEnvase.value;
-        } else {
-          // Si no existe, crear una nueva opción
-          const newOption = document.createElement('option');
-          newOption.value = datosActuales.envase;
-          newOption.textContent = datosActuales.envase;
-          newOption.selected = true;
-          envaseSelect.appendChild(newOption);
-        }
+    try {
+      // Obtener datos de la base de datos (con manejo de errores)
+      let categoriasServidor = [];
+      let marcasServidor = [];
+      let envasesServidor = [];
+      
+      try {
+        if (window.getCategorias) categoriasServidor = await window.getCategorias();
+        if (window.getMarcas) marcasServidor = await window.getMarcas();
+        if (window.getEnvases) envasesServidor = await window.getEnvases();
+      } catch (error) {
+        console.warn('Error obteniendo datos del servidor para edición, usando solo opciones predeterminadas:', error);
       }
 
-      // CRÍTICO: Asignar categoría
-      if (categoriaSelect && datosActuales.categoria) {
-        // Buscar la opción que coincida con el valor actual
-        const opcionCategoria = Array.from(categoriaSelect.options).find(option => 
-          option.textContent.toLowerCase().trim() === datosActuales.categoria.toLowerCase().trim()
-        );
-        if (opcionCategoria) {
-          categoriaSelect.value = opcionCategoria.value;
-        } else {
-          // Si no existe, crear una nueva opción
-          const newOption = document.createElement('option');
-          newOption.value = datosActuales.categoria;
-          newOption.textContent = datosActuales.categoria;
-          newOption.selected = true;
-          categoriaSelect.appendChild(newOption);
-        }
-      }
+      // Procesar datos del servidor
+      const categoriasDelServidor = procesarDatosCombobox(categoriasServidor);
+      const marcasDelServidor = procesarDatosCombobox(marcasServidor);
+      const envasesDelServidor = procesarDatosCombobox(envasesServidor);
 
-      // CRÍTICO: Asignar medida
-      if (medidaSelect && datosActuales.medida) {
-        const opcionMedida = Array.from(medidaSelect.options).find(option => 
-          option.value.toLowerCase() === datosActuales.medida.toLowerCase()
-        );
-        if (opcionMedida) {
-          medidaSelect.value = opcionMedida.value;
-        } else {
-          // Si no existe, crear una nueva opción
-          const newOption = document.createElement('option');
-          newOption.value = datosActuales.medida;
-          newOption.textContent = datosActuales.medida;
-          newOption.selected = true;
-          medidaSelect.appendChild(newOption);
-        }
-      }
+      // Combinar opciones predeterminadas con datos del servidor
+      const categoriasFinales = combinarOpciones(CATEGORIAS_PREDETERMINADAS, categoriasDelServidor);
+      const marcasFinales = marcasDelServidor; // Solo del servidor para marcas
+      const envasesFinales = combinarOpciones(ENVASES_PREDETERMINADOS, envasesDelServidor);
 
-      console.log('Campos prellenados correctamente');
-    }, 100);
+      // Crear comboboxes con autocompletado y opciones predeterminadas
+      const categoriaCombo = crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', categoriasFinales, 'Buscar o crear categoría...');
+      const marcaCombo = crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', marcasFinales, 'Buscar o crear marca...');
+      const envaseCombo = crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', envasesFinales, 'Buscar o crear envase...');
+
+      // Prellenar campos después de crear los comboboxes
+      setTimeout(() => {
+        // Campos normales
+        const codigoInput = modal.querySelector('#edit-codigo-producto');
+        const nombreInput = modal.querySelector('#edit-nombre-producto');
+        const variedadInput = modal.querySelector('#edit-variedad');
+        const contenidoInput = modal.querySelector('#edit-contenido');
+        const medidaSelect = modal.querySelector('#edit-medida');
+        const precioInput = modal.querySelector('#edit-precio');
+
+        if (codigoInput) codigoInput.value = datosActuales.codigo;
+        if (nombreInput) nombreInput.value = datosActuales.nombre;
+        if (variedadInput) variedadInput.value = datosActuales.variedad;
+        if (contenidoInput) contenidoInput.value = datosActuales.contenido;
+        if (precioInput) precioInput.value = datosActuales.precio;
+
+        // Prellenar comboboxes
+        if (categoriaCombo && categoriaCombo.input) {
+          categoriaCombo.input.value = datosActuales.categoria;
+        }
+        if (marcaCombo && marcaCombo.input) {
+          marcaCombo.input.value = datosActuales.marca;
+        }
+        if (envaseCombo && envaseCombo.input) {
+          envaseCombo.input.value = datosActuales.envase;
+        }
+
+        // Medida
+        if (medidaSelect && datosActuales.medida) {
+          const opcionMedida = Array.from(medidaSelect.options).find(option => 
+            option.value.toLowerCase() === datosActuales.medida.toLowerCase()
+          );
+          if (opcionMedida) {
+            medidaSelect.value = opcionMedida.value;
+          }
+        }
+
+        console.log('Campos prellenados correctamente con opciones predeterminadas');
+      }, 100);
+
+    } catch (error) {
+      console.error('Error cargando datos para comboboxes:', error);
+      // Crear comboboxes con solo opciones predeterminadas en caso de error
+      crearComboboxAutocompletado('edit-categoria-producto', 'edit-categoria-container', CATEGORIAS_PREDETERMINADAS, 'Buscar o crear categoría...');
+      crearComboboxAutocompletado('edit-marca-producto', 'edit-marca-container', [], 'Escribir marca...');
+      crearComboboxAutocompletado('edit-envase-producto', 'edit-envase-container', ENVASES_PREDETERMINADOS, 'Buscar o crear envase...');
+    }
 
     // Configurar eventos del modal
     configurarEventosModal(modal, async (e) => {
       e.preventDefault();
       
-      // Recoger datos del formulario
-      const formData = new FormData(e.target);
-      const datosProducto = {};
+      // Obtener valores de los comboboxes y campos
+      const codigo = document.getElementById('edit-codigo-producto')?.value?.trim() || '';
+      const contenido = document.getElementById('edit-contenido')?.value?.trim() || '';
+      const nombre = document.getElementById('edit-nombre-producto')?.value?.trim() || '';
+      const categoria = document.getElementById('edit-categoria-producto')?.value?.trim() || '';
+      const marca = document.getElementById('edit-marca-producto')?.value?.trim() || '';
+      const envase = document.getElementById('edit-envase-producto')?.value?.trim() || '';
+      const variedad = document.getElementById('edit-variedad')?.value?.trim() || '';
+      const medida = document.getElementById('edit-medida')?.value?.trim() || 'pz';
+      const precio = parseFloat(document.getElementById('edit-precio')?.value) || 0;
       
-      for (let [key, value] of formData.entries()) {
-        datosProducto[key] = value;
-      }
+      const datosProducto = {
+        codigo,
+        nombre,
+        marca,
+        variedad,
+        contenido,
+        categoria,
+        envase,
+        medida,
+        precio
+      };
       
       console.log('Datos del formulario para editar:', datosProducto);
       
-      // VALIDACIÓN ADICIONAL antes de enviar
+      // VALIDACIÓN antes de enviar
       if (!datosProducto.categoria || datosProducto.categoria.trim() === '') {
-        mostrarAlertaVisual('Por favor selecciona una categoría');
+        mostrarAlertaVisual('Por favor ingresa una categoría');
+        return;
+      }
+      
+      if (!datosProducto.marca || datosProducto.marca.trim() === '') {
+        mostrarAlertaVisual('Por favor ingresa una marca');
         return;
       }
       
       if (!datosProducto.envase || datosProducto.envase.trim() === '') {
-        mostrarAlertaVisual('Por favor selecciona un envase');
+        mostrarAlertaVisual('Por favor ingresa un envase');
         return;
       }
       
@@ -781,9 +1640,6 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarAlertaVisual('Error al editar el producto: ' + error.message);
       }
     });
-
-    // Mostrar modal
-    mostrarModal(modal);
   }
 
   // Función para eliminar producto
@@ -897,6 +1753,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // NUEVO: Exponer función de selección globalmente
   window.seleccionarFilaProducto = seleccionarFila;
 
+  // Funcionalidad para seleccionar filas de la tabla
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabla = document.querySelector('.productos-table tbody');
+    
+    if (tabla) {
+        tabla.addEventListener('click', function(e) {
+            const fila = e.target.closest('tr');
+            if (fila) {
+                // Si la fila ya está seleccionada, deseleccionarla
+                if (fila.classList.contains('selected')) {
+                    fila.classList.remove('selected');
+                } else {
+                    // Deseleccionar todas las otras filas (para selección única)
+                    tabla.querySelectorAll('tr.selected').forEach(tr => {
+                        tr.classList.remove('selected');
+                    });
+                    // Seleccionar la fila actual
+                    fila.classList.add('selected');
+                }
+            }
+        });
+    }
+});
+
   // Función para cargar productos en la tabla - MODIFICADA para NO duplicar eventos
   function cargarProductos() {
     console.log('Cargando productos en tabla...');
@@ -936,7 +1816,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function init() {
     console.log("Inicializando formProducto.js..."); // Debug
     
-    // Cargar datos desde el backend - SIN DATOS DE EJEMPLO
+    // Cargar datos desde el backend
     cargarProductosDesdeBackend();
 
     // Configurar event listeners de los botones del HTML
@@ -958,7 +1838,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btnEditar.addEventListener("click", function(e) {
         e.preventDefault();
         console.log("Click en botón editar"); // Debug
-        abrirModalEditar();
+        abrirModalEditar(); // ← Esta función ahora estará definida
       });
     }
 
@@ -973,8 +1853,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar selección de filas
     setupRowSelection();
 
-    // Función global para abrir el modal desde cualquier parte
+    // Funciones globales
     window.abrirFormularioProducto = abrirModalProducto;
+    window.abrirModalEditar = abrirModalEditar; // ← Exponer globalmente
   }
 
   // Inicializar
@@ -1296,34 +2177,6 @@ document.addEventListener("DOMContentLoaded", () => {
         background: #f0f0f0;
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Responsive para pantallas pequeñas */
-      @media (max-width: 650px) {
-        .advertencia-modal {
-          width: 90vw !important;
-          height: auto !important;
-          min-height: 400px !important;
-          max-height: 90vh !important;
-        }
-        
-        .advertencia-modal .delete-warning i {
-          font-size: 60px;
-        }
-        
-        .advertencia-modal .delete-warning h3 {
-          font-size: 24px;
-        }
-        
-        .advertencia-modal .delete-warning p {
-          font-size: 16px;
-        }
-        
-        .btn-accept-advertencia,
-        .btn-cancel-advertencia {
-          padding: 12px 25px;
-          font-size: 14px;
-        }
       }
 
       /* Estilos para el modal de eliminación */
