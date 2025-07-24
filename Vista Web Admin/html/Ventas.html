@@ -14,17 +14,13 @@
         <!-- Sidebar - Reutilizada del código anterior -->
         <aside class="sidebar">
             <div class="logo">
-                <i class="fas fa-cube"></i>
+                <img src="/Vista Web Admin/img/caja-logo.jpg" alt="Logo Clink" class="logo-img">
                 <span>CLINK</span>
             </div>
             
             <nav class="nav-menu">
                 <!-- Sección principal de navegación -->
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item">
-                        <i class="fas fa-home"></i>
-                        <span>Inicio</span>
-                    </a>
                     <a href="Ventas.html" class="nav-item">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
@@ -32,35 +28,35 @@
                                     <!-- Línea divisoria -->
                 <div class="nav-divider"></div>
                 
-                    <a href="inventario.html" class="nav-item">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Inventario</span>
-                    </a>
-                    <a href="productos.html" class="nav-item">
+                    <a href="productos.html" class="nav-item" data-tooltip="Productos">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
                     </a>
-                    <a href="clientes.html" class="nav-item">
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
+                    </a>
+                    <a href="clientes.html" class="nav-item" data-tooltip="Clientes">
                         <i class="fas fa-users"></i>
                         <span>Clientes</span>
                     </a>
-                    <a href="empleados.html" class="nav-item">
+                    <a href="empleados.html" class="nav-item" data-tooltip="Empleados">
                         <i class="fas fa-user-tie"></i>
                         <span>Empleados</span>
                     </a>
-                    <a href="graficas.html" class="nav-item">
+                    <a href="graficas.html" class="nav-item" data-tooltip="Graficas de ventas">
                         <i class="fas fa-chart-line"></i>
                         <span>Graficas</span>
                     </a>
-                    <a href="historial.html" class="nav-item">
+                    <a href="historial.html" class="nav-item" data-tooltip="Historial de ventas">
                         <i class="fas fa-history"></i>
                         <span>Historial</span>
                     </a>
-                    <a href="corte-caja.html" class="nav-item">
+                    <a href="corte-caja.html" class="nav-item" data-tooltip="Corte de caja">
                         <i class="fas fa-cash-register"></i>
                         <span>Corte de caja</span>
                     </a>
-                    <a href="ayuda.html" class="nav-item">
+                    <a href="ayuda.html" class="nav-item" data-tooltip="Ayuda">
                         <i class="fas fa-question-circle"></i>
                         <span>Ayuda</span>
                     </a>
@@ -72,6 +68,7 @@
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </nav>
@@ -95,17 +92,6 @@
 
             <!-- Ventas Content -->
             <div class="ventas-container">
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button class="btn-action btn-add">
-                        <i class="fas fa-plus"></i>
-                        Agregar producto
-                    </button>
-                    <button class="btn-action btn-remove">
-                        <i class="fas fa-minus"></i>
-                        Eliminar producto
-                    </button>
-                </div>
 
                 <!-- Products Table -->
                 <div class="table-container">
@@ -120,14 +106,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>19198398</td>
-                                <td>Leche no se qué</td>
-                                <td>12.5</td>
-                                <td>2</td>
-                                <td>25</td>
-                            </tr>
-                            <!-- Más filas se pueden agregar aquí -->
+                            <!-- Los productos se cargarán dinámicamente aquí -->
                         </tbody>
                     </table>
                 </div>
@@ -136,15 +115,16 @@
                 <div class="payment-section">
                     <div class="total-container">
                         <span class="total-label">Total</span>
-                        <span class="total-amount">$ 156.5</span>
+                        <span class="total-amount">$ 0.00</span>
                     </div>
                     <button class="btn-pay">Pagar</button>
                 </div>
             </div>
         </main>
     </div>
-    <script src="/Vista Web Admin/src/Forms/pagoModal.js"></script>
-
-    <script src="/Vista Web Admin/script.js"></script>
+    <!-- Scripts para el sistema de ventas -->
+    <script type="module" src="/Vista Web Admin/src/Servicios/ventasServices.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Forms/formsVentas.js"></script>
+    <script type="module" src="/Vista Web Admin/script.js"></script>
 </body>
 </html>
