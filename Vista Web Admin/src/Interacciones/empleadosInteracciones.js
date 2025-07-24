@@ -490,54 +490,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Función para mostrar snackbar
-    function mostrarSnackbar(mensaje, esError = false) {
-        let snackbar = document.getElementById('snackbar-empleados');
-        if (!snackbar) {
-            snackbar = document.createElement('div');
-            snackbar.id = 'snackbar-empleados';
-            snackbar.className = 'snackbar-empleados';
-            document.body.appendChild(snackbar);
-            
-            if (!document.getElementById('snackbar-style-empleados')) {
-                const style = document.createElement('style');
-                style.id = 'snackbar-style-empleados';
-                style.textContent = `
-                    .snackbar-empleados {
-                        min-width: 320px;
-                        max-width: 400px;
-                        background: #4caf50;
-                        color: white;
-                        text-align: center;
-                        border-radius: 18px;
-                        padding: 18px 24px;
-                        position: fixed;
-                        z-index: 4000;
-                        right: 32px;
-                        bottom: 32px;
-                        font-size: 1.1rem;
-                        box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-                        opacity: 0;
-                        pointer-events: none;
-                        transition: opacity 0.4s, bottom 0.4s;
-                    }
-                    .snackbar-empleados.show {
-                        opacity: 1;
-                        pointer-events: auto;
-                        bottom: 48px;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        
-        snackbar.style.background = esError ? '#f44336' : '#4caf50';
-        snackbar.textContent = mensaje;
-        snackbar.classList.add('show');
-        setTimeout(() => {
-            snackbar.classList.remove('show');
-        }, 3000);
-    }
 });
 
 // Función para aplicar estilos mejorados del modal de agregar empleado
