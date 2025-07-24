@@ -8,7 +8,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Konkhmer+Sleokchher&display=swap" rel="stylesheet">
     <script src="/Vista Web Admin/script.js"></script>
-    <script src="/Vista Web Admin/src/Servicios/corteServices.js"></script>
+    <script type="module" src="/Vista Web Admin/src/Servicios/corteServices.js"></script>
     <title>Clink - Corte de Caja</title>
 </head>
 <body>
@@ -16,16 +16,12 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <i class="fas fa-cube"></i>
+                <img src="/Vista Web Admin/img/caja-logo.jpg" alt="Logo Clink" class="logo-img">
                 <span>CLINK</span>
             </div>
             
             <nav class="nav-menu">
                 <div class="nav-section-main">
-                    <a href="index.html" class="nav-item active" data-tooltip="Inicio">
-                        <i class="fas fa-home"></i>
-                        <span>Inicio</span>
-                    </a>
                     <a href="ventas.html" class="nav-item" data-tooltip="Venta">
                         <i class="fas fa-cash-register"></i>
                         <span>Venta</span>
@@ -33,13 +29,13 @@
 
                     <div class="nav-divider"></div>
 
-                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Inventario</span>
-                    </a>
                     <a href="productos.html" class="nav-item" data-tooltip="Productos">
                         <i class="fas fa-box"></i>
                         <span>Productos</span>
+                    </a>
+                    <a href="inventario.html" class="nav-item" data-tooltip="Inventario">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Inventario</span>
                     </a>
                     <a href="clientes.html" class="nav-item" data-tooltip="Clientes">
                         <i class="fas fa-users"></i>
@@ -71,6 +67,7 @@
                 <div class="nav-section-bottom">
                     <button class="logout-btn" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </nav>
@@ -118,23 +115,34 @@
                 </table>
                 <div class="corte-caja-actions">
                     <button class="corte-caja-btn" id="cargarCajaBtn">Cargar caja</button>
-                    <button class="corte-caja-btn">Cerrar caja</button>
+                    <button class="corte-caja-btn" id="toggleCajaBtn">Cerrar caja</button>
                 </div>
             </div>
         </section>
     </div>
-    <script>
-        document.getElementById('cargarCajaBtn').addEventListener('click', function() {
-            // Simulación de datos
-            const fecha = new Date();
-            const fechaStr = fecha.toLocaleDateString('es-MX');
-            document.getElementById('fecha').textContent = fechaStr;
-            document.getElementById('empleado').textContent = 'Juan Chin Chin';
-            document.getElementById('cantidadInicial').textContent = '$1,000.00';
-            document.getElementById('ingresos').textContent = '$2,500.00';
-            document.getElementById('ganancias').textContent = '$1,500.00';
-            document.getElementById('totalEntregar').textContent = '$2,500.00';
-        });
+    <!-- Modal para abrir caja -->
+    <div id="modalAbrirCaja" class="modal-abrir-caja" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Abrir Caja</span>
+                <span class="modal-close" id="cerrarModalAbrirCaja">&times;</span>
+            </div>
+            <form id="formAbrirCaja" autocomplete="off">
+                <div class="modal-body">
+                    <label for="cantidadInicialInput">¿Con cuánto se empieza?</label>
+                    <input type="number" min="0" step="0.01" id="cantidadInicialInput" name="cantidadInicialInput" placeholder="$0.00" required style="width:100%;font-size:1.2rem;padding:8px 12px;border-radius:8px;border:1.5px solid #bdbdbd;margin-top:8px;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn-cancelar" id="cancelarAbrirCaja">Cancelar</button>
+                    <button type="submit" class="modal-btn-aceptar">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- estilos movidos a corte-caja.css -->
+    <script type="module">
+        import { inicializarCorteCaja } from '/Vista Web Admin/src/Servicios/corteServices.js';
+        inicializarCorteCaja && inicializarCorteCaja();
     </script>
 </body>
 </html>
